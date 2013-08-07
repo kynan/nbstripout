@@ -1,8 +1,8 @@
 #!/bin/sh
 #
 # strip output of IPython Notebooks
-# add this as `.git/hooks/pre-commit
-# to run every time you commit a file
+# add this as `.git/hooks/pre-commit`
+# to run every time you commit a notebook
 #
 # requires `nbstripout` to be available on your PATH
 #
