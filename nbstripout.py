@@ -7,7 +7,7 @@ import sys
 
 # Use README as docstring
 try:
-    with open('README.rst') as f:
+    with open(path.join(path.abspath(path.dirname(__file__)), 'README.rst')) as f:
         __doc__ = f.read()
 except IOError:
     pass
