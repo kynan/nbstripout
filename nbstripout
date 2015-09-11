@@ -10,8 +10,14 @@ track output in VCS.
 This does mostly the same thing as the `Clear All Output` command in the
 notebook UI.
 
-Installation
-============
+Automatic installation
+======================
+
+Use ``nbstripout install`` to set up the filter and git attributes as
+described in the manual installation instructions below.
+
+Manual installation
+===================
 
 Set up a git filter using nbstripout as follows: ::
 
