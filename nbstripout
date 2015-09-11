@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""strip outputs from an IPython Notebook
+"""nbstripout: strip outputs from an IPython Notebook
 
 Opens a notebook, strips its output, and writes the outputless version to the original file.
 
@@ -21,10 +21,10 @@ except ImportError:
     except ImportError:
         # IPython < 3
         from IPython.nbformat import current
-    
+
         def read(f, as_version):
             return current.read(f, 'json')
-    
+
         def write(nb, f):
             return current.write(nb, f, 'json')
 
@@ -52,10 +52,12 @@ def strip_output(nb):
 
 
 if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        print(__doc__)
+        sys.exit(1)
     filename = sys.argv[1]
     with io.open(filename, 'r', encoding='utf8') as f:
         nb = read(f, as_version=NO_CONVERT)
     nb = strip_output(nb)
     with io.open(filename, 'w', encoding='utf8') as f:
         write(nb, f)
-
