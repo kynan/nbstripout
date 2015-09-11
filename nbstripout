@@ -104,7 +104,7 @@ def install():
         f.write('*.ipynb filter=nbstripout')
 
 
-if __name__ == '__main__':
+def main():
     if len(sys.argv) > 1:
         if sys.argv[1] in ['help', '-h', '--help']:
             print(__doc__, file=sys.stderr)
@@ -119,3 +119,6 @@ if __name__ == '__main__':
             write(nb, f)
     else:
         write(strip_output(read(sys.stdin, as_version=NO_CONVERT)), sys.stdout)
+
+if __name__ == '__main__':
+    main()
