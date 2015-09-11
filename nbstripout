@@ -1,11 +1,27 @@
 #!/usr/bin/env python
 """nbstripout: strip outputs from an IPython Notebook
 
-Opens a notebook, strips its output, and writes the outputless version to the original file.
+Opens a notebook, strips its output, and writes the outputless version to the
+original file.
 
-Useful mainly as a git filter or pre-commit hook for users who don't want to track output in VCS.
+Useful mainly as a git filter or pre-commit hook for users who don't want to
+track output in VCS.
 
-This does mostly the same thing as the `Clear All Output` command in the notebook UI.
+This does mostly the same thing as the `Clear All Output` command in the
+notebook UI.
+
+Installation
+============
+
+Set up a git filter using nbstripout as follows: ::
+
+    git config filter.nbstripout.clean '/path/to/nbstripout'
+    git config filter.nbstripout.smudge cat
+    git config filter.nbstripout.required true
+
+Create a file ``.gitattributes`` or ``.git/info/attributes`` with: ::
+
+    *.ipynb filter=nbstripout
 """
 
 import io
