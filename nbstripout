@@ -67,10 +67,24 @@ def strip_output(nb):
     return nb
 
 
+def install():
+    """Install the git filter and set the git attributes."""
+    from os import path
+    from subprocess import check_call, check_output
+    git_dir = check_output(['git', 'rev-parse', '--git-dir']).strip()
+    check_call(['git', 'config', 'filter.nbstripout.clean', "'%s'" % path.abspath(__file__)])
+    check_call(['git', 'config', 'filter.nbstripout.smudge', 'cat'])
+    check_call(['git', 'config', 'filter.nbstripout.required', 'true'])
+    with open(path.join(git_dir, 'info', 'attributes'), 'w') as f:
+        f.write('*.ipynb filter=nbstripout')
+
+
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print(__doc__)
         sys.exit(1)
+    if sys.argv[1] in ['install', '--install']:
+        sys.exit(install())
     filename = sys.argv[1]
     with io.open(filename, 'r', encoding='utf8') as f:
         nb = read(f, as_version=NO_CONVERT)
