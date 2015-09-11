@@ -91,14 +91,17 @@ def install():
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        print(__doc__, file=sys.stderr)
-        sys.exit(1)
-    if sys.argv[1] in ['install', '--install']:
-        sys.exit(install())
-    filename = sys.argv[1]
-    with io.open(filename, 'r', encoding='utf8') as f:
-        nb = read(f, as_version=NO_CONVERT)
-    nb = strip_output(nb)
-    with io.open(filename, 'w', encoding='utf8') as f:
-        write(nb, f)
+    if len(sys.argv) > 1:
+        if sys.argv[1] in ['help', '-h', '--help']:
+            print(__doc__, file=sys.stderr)
+            sys.exit(1)
+        if sys.argv[1] in ['install', '--install']:
+            sys.exit(install())
+        filename = sys.argv[1]
+        with io.open(filename, 'r', encoding='utf8') as f:
+            nb = read(f, as_version=NO_CONVERT)
+        nb = strip_output(nb)
+        with io.open(filename, 'w', encoding='utf8') as f:
+            write(nb, f)
+    else:
+        write(strip_output(read(sys.stdin, as_version=NO_CONVERT)), sys.stdout)
