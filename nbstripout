@@ -30,6 +30,7 @@ Create a file ``.gitattributes`` or ``.git/info/attributes`` with: ::
     *.ipynb filter=nbstripout
 """
 
+from __future__ import print_function
 import io
 import sys
 
@@ -87,7 +88,7 @@ def install():
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print(__doc__)
+        print(__doc__, file=sys.stderr)
         sys.exit(1)
     if sys.argv[1] in ['install', '--install']:
         sys.exit(install())
