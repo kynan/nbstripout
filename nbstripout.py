@@ -100,7 +100,13 @@ def install():
     check_call(['git', 'config', 'filter.nbstripout.clean', "'%s'" % path.abspath(__file__)])
     check_call(['git', 'config', 'filter.nbstripout.smudge', 'cat'])
     check_call(['git', 'config', 'filter.nbstripout.required', 'true'])
-    with open(path.join(git_dir, 'info', 'attributes'), 'a') as f:
+    attrfile = path.join(git_dir, 'info', 'attributes')
+    # Check if there is already a filter for ipynb files
+    if path.exists(attrfile):
+        with open(attrfile, 'r') as f:
+            if '*.ipynb filter' in f.read():
+                return
+    with open(attrfile, 'a') as f:
         f.write('\n*.ipynb filter=nbstripout')
 
 
