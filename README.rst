@@ -1,5 +1,5 @@
-nbstripout: strip outputs from an IPython Notebook
-##################################################
+nbstripout: strip output from Jupyter and IPython notebooks
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Opens a notebook, strips its output, and writes the outputless version to the
 original file.
