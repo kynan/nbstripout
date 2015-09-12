@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+"""nbstripout: strip outputs from an IPython Notebook"""
 
 from __future__ import print_function
 import io
