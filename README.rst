@@ -10,6 +10,8 @@ track output in VCS.
 This does mostly the same thing as the `Clear All Output` command in the
 notebook UI.
 
+Based on https://gist.github.com/minrk/6176788.
+
 Usage
 =====
 
