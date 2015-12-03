@@ -85,6 +85,8 @@ def strip_output(nb):
             cell['outputs'] = []
         if 'prompt_number' in cell:
             cell['prompt_number'] = None
+        if 'execution_count' in cell:
+            cell['execution_count'] = None
     return nb
 
 
