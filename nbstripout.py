@@ -121,11 +121,17 @@ def main():
         if sys.argv[1] in ['install', '--install']:
             sys.exit(install())
         filename = sys.argv[1]
-        with io.open(filename, 'r', encoding='utf8') as f:
-            nb = read(f, as_version=NO_CONVERT)
-        nb = strip_output(nb)
-        with io.open(filename, 'w', encoding='utf8') as f:
-            write(nb, f)
+        try:
+            with io.open(filename, 'r', encoding='utf8') as f:
+                nb = read(f, as_version=NO_CONVERT)
+            nb = strip_output(nb)
+            with io.open(filename, 'w', encoding='utf8') as f:
+                write(nb, f)
+        except Exception:
+            # Ignore exceptions for non-notebook files.
+            if filename.endswith('.ipynb'):
+                print("Could not strip '{}'".format(filename))
+                raise
     else:
         write(strip_output(read(sys.stdin, as_version=NO_CONVERT)), sys.stdout)
 

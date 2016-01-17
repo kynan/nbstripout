@@ -4,7 +4,7 @@ with open('README.rst') as f:
     long_description = f.read()
 
 setup(name='nbstripout',
-      version='0.1.0',
+      version='0.1.1',
       author='Min RK',
       author_email='benjaminrk@gmail.com',
       maintainer='Florian Rathgeber',
