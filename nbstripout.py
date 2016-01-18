@@ -17,6 +17,11 @@ Strip output from IPython / Jupyter notebook (modifies the file in-place): ::
 
     nbstripout <file.ipynb>
 
+By default, nbstripout will only modify files ending in '.ipynb', to
+process other files us the '-f' flag to force the application.
+
+    nbstripout -f <file.ipynb.bak>
+
 Use as part of a shell pipeline: ::
 
     FILE.ipynb | nbstripout > OUT.ipynb
@@ -120,12 +125,26 @@ def main():
             sys.exit(1)
         if sys.argv[1] in ['install', '--install']:
             sys.exit(install())
-        filename = sys.argv[1]
-        with io.open(filename, 'r', encoding='utf8') as f:
-            nb = read(f, as_version=NO_CONVERT)
-        nb = strip_output(nb)
-        with io.open(filename, 'w', encoding='utf8') as f:
-            write(nb, f)
+
+        force = False
+        filenames = sys.argv[1:]
+        if filenames[0] in ['-f', '--force']:
+            force = True
+            filenames.pop(0)
+
+        for filename in filenames:
+            if not force and not filename.endswith('.ipynb'):
+                continue
+            try:
+                with io.open(filename, 'r', encoding='utf8') as f:
+                    nb = read(f, as_version=NO_CONVERT)
+                nb = strip_output(nb)
+                with io.open(filename, 'w', encoding='utf8') as f:
+                    write(nb, f)
+            except Exception:
+                # Ignore exceptions for non-notebook files.
+                print("Could not strip '{}'".format(filename))
+                raise
     else:
         write(strip_output(read(sys.stdin, as_version=NO_CONVERT)), sys.stdout)
 
