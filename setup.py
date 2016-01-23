@@ -18,6 +18,8 @@ setup(name='nbstripout',
       maintainer_email='michael.forbes+python@gmail.com',
       url='https://github.com/mforbes/nbstripout',
 
+      license="License :: OSI Approved :: MIT License",
+
       description='Strips outputs from Jupyter and IPython notebooks',
       long_description=long_description,
       py_modules=['nbstripout'],
@@ -25,4 +27,13 @@ setup(name='nbstripout',
           'console_scripts': [
               'nbstripout = nbstripout:main'
           ]
-      })
+      },
+
+      classifiers=[
+          "Development Status :: 4 - Beta",
+          "Environment :: Other Environment",
+          "Framework :: IPython",
+          "Intended Audience :: Developers",
+          "Programming Language :: Python",
+          "Topic :: Software Development :: Version Control",
+      ])
