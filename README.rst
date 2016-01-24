@@ -15,9 +15,13 @@ Based on https://gist.github.com/minrk/6176788.
 Usage
 =====
 
-Strip output from IPython / Jupyter notebook (modifies the file in-place): ::
+Strip output from IPython / Jupyter notebook (modifies the files in-place): ::
 
-    nbstripout FILE.ipynb
+    nbstripout FILE.ipynb [FILE2.ipynb ...]
+
+Force processing of non ``.ipynb`` files:
+
+    nbstripout -f FILE.ipynb.bak
 
 Use as part of a shell pipeline: ::
 
@@ -44,3 +48,15 @@ Set up a git filter using nbstripout as follows: ::
 Create a file ``.gitattributes`` or ``.git/info/attributes`` with: ::
 
     *.ipynb filter=nbstripout
+
+Mercurial usage
+===============
+
+Mercurial does not have the equivalent of smudge filters.  One can use
+an encode/decode hook but this has some issues.  An alternative
+solution is to provide a set of commands that first run `nbstripout`,
+then perform there operations.  This is the approach of the
+[`mmf-setup` package](https://pypi.python.org/pypi/mmf-setup) which
+uses the 0.2.x branch of `nbstripout`:
+
+* http://bitbucket.org/mforbes/mmf_setup
