@@ -19,7 +19,7 @@ Strip output from IPython / Jupyter notebook (modifies the files in-place): ::
 
     nbstripout FILE.ipynb [FILE2.ipynb ...]
 
-Force processing of non ``.ipynb`` files:
+Force processing of non ``.ipynb`` files: ::
 
     nbstripout -f FILE.ipynb.bak
 
@@ -54,9 +54,8 @@ Mercurial usage
 
 Mercurial does not have the equivalent of smudge filters.  One can use
 an encode/decode hook but this has some issues.  An alternative
-solution is to provide a set of commands that first run `nbstripout`,
-then perform there operations.  This is the approach of the
-[`mmf-setup` package](https://pypi.python.org/pypi/mmf-setup) which
-uses the 0.2.x branch of `nbstripout`:
+solution is to provide a set of commands that first run ``nbstripout``,
+then perform these operations. This is the approach of the `mmf-setup`_
+package.
 
-* http://bitbucket.org/mforbes/mmf_setup
+.. _mmf-setup: http://bitbucket.org/mforbes/mmf_setup
