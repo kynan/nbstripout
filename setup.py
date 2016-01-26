@@ -3,6 +3,8 @@ from setuptools import setup
 with open('README.rst') as f:
     long_description = f.read()
 
+tests_require = ['flake8']
+
 setup(name='nbstripout',
       version='0.2.0',
       author='Min RK',
@@ -28,6 +30,8 @@ setup(name='nbstripout',
               'nbstripout = nbstripout:main'
           ]
       },
+
+      setup_requires=['flake8'],
 
       classifiers=[
           "Development Status :: 4 - Beta",
