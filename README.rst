@@ -1,3 +1,6 @@
+.. image:: https://travis-ci.org/kynan/nbstripout.svg?branch=master
+    :target: https://travis-ci.org/kynan/nbstripout
+
 nbstripout: strip output from Jupyter and IPython notebooks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
