@@ -3,10 +3,17 @@ from setuptools import setup
 with open('README.rst') as f:
     long_description = f.read()
 
-tests_require = ['flake8']
+setup_requires = [
+    'pytest-runner'
+]
+
+tests_require = [
+    'cram',
+    'flake8'
+]
 
 setup(name='nbstripout',
-      version='0.2.0',
+      version='0.2.1',
       author='Min RK',
       author_email='benjaminrk@gmail.com',
 
@@ -24,14 +31,18 @@ setup(name='nbstripout',
 
       description='Strips outputs from Jupyter and IPython notebooks',
       long_description=long_description,
-      py_modules=['nbstripout'],
+      py_modules=['pytest_cram', 'nbstripout'],
       entry_points={
           'console_scripts': [
               'nbstripout = nbstripout:main'
+          ],
+          'pytest11': [
+              'pytest_cram = pytest_cram',
           ]
       },
 
-      setup_requires=['flake8'],
+      setup_requires=setup_requires,
+      tests_require=tests_require,
 
       classifiers=[
           "Development Status :: 4 - Beta",
