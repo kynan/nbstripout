@@ -108,7 +108,7 @@ def install():
                (sys.executable, path.abspath(__file__))])
     check_call(['git', 'config', 'filter.nbstripout.smudge', 'cat'])
     check_call(['git', 'config', 'filter.nbstripout.required', 'true'])
-    attrfile = path.join(git_dir, 'info', 'attributes')
+    attrfile = path.join(git_dir.decode(), 'info', 'attributes')
     # Check if there is already a filter for ipynb files
     if path.exists(attrfile):
         with open(attrfile, 'r') as f:
