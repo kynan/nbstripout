@@ -18,15 +18,9 @@ setup(name='nbstripout',
       author='Min RK',
       author_email='benjaminrk@gmail.com',
 
-      # 0.1 branch
-      # maintainer='Florian Rathgeber',
-      # maintainer_email='florian.rathgeber@gmail.com',
-      # url='https://github.com/kynan/nbstripout',
-
-      # 0.2 branch
-      maintainer='Michael McNeil Forbes',
-      maintainer_email='michael.forbes+python@gmail.com',
-      url='https://github.com/mforbes/nbstripout',
+      maintainer='Florian, Rathgeber, Michael McNeil Forbes',
+      maintainer_email='florian.rathgeber@gmail.com, michael.forbes+python@gmail.com',
+      url='https://github.com/kynan/nbstripout',
 
       license="License :: OSI Approved :: MIT License",
 
