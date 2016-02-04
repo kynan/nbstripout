@@ -4,7 +4,6 @@ import re
 import py
 import pytest
 import os
-import tempfile
 
 import cram
 
