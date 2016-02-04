@@ -31,6 +31,10 @@ instructions below: ::
 
     nbstripout install
 
+Remove the git filter and attributes: ::
+
+    nbstripout uninstall
+
 Show this help page: ::
 
     nbstripout help
@@ -118,6 +122,27 @@ def install():
         f.write('\n*.ipynb filter=nbstripout')
 
 
+def uninstall():
+    """Uninstall the git filter and unset the git attributes."""
+    from os import devnull, path
+    from subprocess import call, check_output, CalledProcessError, STDOUT
+    try:
+        git_dir = check_output(['git', 'rev-parse', '--git-dir']).strip()
+    except CalledProcessError:
+        print('Installation failed: not a git repository!', file=sys.stderr)
+        sys.exit(1)
+    call(['git', 'config', '--remove-section', 'filter.nbstripout'],
+         stdout=open(devnull, 'w'), stderr=STDOUT)
+    attrfile = path.join(git_dir.decode(), 'info', 'attributes')
+    # Check if there is a filter for ipynb files
+    if path.exists(attrfile):
+        with open(attrfile, 'r') as f:
+            if '*.ipynb filter' not in f.read():
+                return
+        with open(attrfile, 'w+') as f:
+            f.write(''.join(l for l in f if '*.ipynb filter' not in l))
+
+
 def main():
     if len(sys.argv) > 1:
         if sys.argv[1] in ['help', '-h', '--help']:
@@ -125,6 +150,8 @@ def main():
             sys.exit(1)
         if sys.argv[1] in ['install', '--install']:
             sys.exit(install())
+        if sys.argv[1] in ['uninstall', '--uninstall']:
+            sys.exit(uninstall())
 
         force = False
         filenames = sys.argv[1:]
