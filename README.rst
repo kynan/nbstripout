@@ -35,6 +35,10 @@ instructions below: ::
 
     nbstripout install
 
+Remove the git filter and attributes: ::
+
+    nbstripout uninstall
+
 Show this help page: ::
 
     nbstripout help
