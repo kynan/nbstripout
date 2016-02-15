@@ -54,8 +54,11 @@ Create a file ``.gitattributes`` or ``.git/info/attributes`` with: ::
 """
 
 from __future__ import print_function
+import codecs
 import io
 import sys
+# Use UTF8 writer for stdout (http://stackoverflow.com/a/1169209)
+sys.stdout = codecs.getwriter('utf8')(sys.stdout)
 
 try:
     # Jupyter >= 4
