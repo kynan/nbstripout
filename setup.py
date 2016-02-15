@@ -8,7 +8,7 @@ setup_requires = [
 ]
 
 tests_require = [
-    'pytest',
+    'pytest >= 2.8',
     'pytest-flake8',
     'cram'
 ]
