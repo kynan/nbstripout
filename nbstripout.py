@@ -60,7 +60,7 @@ import sys
 # Use UTF8 writer for stdout (http://stackoverflow.com/a/1169209)
 sys.stdout = codecs.getwriter('utf8')(sys.stdout)
 
-__version__ = '0.2.3'
+__version__ = '0.2.4'
 
 try:
     # Jupyter >= 4
