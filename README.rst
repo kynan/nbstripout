@@ -39,6 +39,10 @@ Remove the git filter and attributes: ::
 
     nbstripout uninstall
 
+Print the version: ::
+
+    nbstripout version
+
 Show this help page: ::
 
     nbstripout help
