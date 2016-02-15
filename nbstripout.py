@@ -157,6 +157,9 @@ def main():
             sys.exit(install())
         if sys.argv[1] in ['uninstall', '--uninstall']:
             sys.exit(uninstall())
+        if sys.argv[1] in ['version', '--version']:
+            print(__version__)
+            sys.exit(0)
 
         force = False
         filenames = sys.argv[1:]
