@@ -60,6 +60,8 @@ import sys
 # Use UTF8 writer for stdout (http://stackoverflow.com/a/1169209)
 sys.stdout = codecs.getwriter('utf8')(sys.stdout)
 
+__version__ = '0.2.3'
+
 try:
     # Jupyter >= 4
     from nbformat import read, write, NO_CONVERT
