@@ -57,8 +57,10 @@ from __future__ import print_function
 import codecs
 import io
 import sys
-# Use UTF8 writer for stdout (http://stackoverflow.com/a/1169209)
-sys.stdout = codecs.getwriter('utf8')(sys.stdout)
+
+if sys.version_info < (3, 0):
+    # Use UTF8 writer for stdout (http://stackoverflow.com/a/1169209)
+    sys.stdout = codecs.getwriter('utf8')(sys.stdout)
 
 __version__ = '0.2.4'
 
