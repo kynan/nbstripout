@@ -62,7 +62,7 @@ if sys.version_info < (3, 0):
     # Use UTF8 writer for stdout (http://stackoverflow.com/a/1169209)
     sys.stdout = codecs.getwriter('utf8')(sys.stdout)
 
-__version__ = '0.2.4'
+__version__ = '0.2.5'
 
 try:
     # Jupyter >= 4
