@@ -15,6 +15,10 @@ environment:
 init:
   - set PATH=%PYTHON%;%PYTHON%\Scripts;%PATH%
 
+install:
+    - "%PYTHON%/Scripts/easy_install -U pip"
+    - "%PYTHON%/Scripts/pip install pytest"
+
 build: false  # Not a C# project, build stuff at the test step instead.
 
 test_script:
