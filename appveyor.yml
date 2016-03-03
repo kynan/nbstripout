@@ -1,0 +1,21 @@
+# What Python version is installed where:
+# http://www.appveyor.com/docs/installed-software#python
+
+environment:
+  matrix:
+    - PYTHON: "C:\\Python27"
+    - PYTHON: "C:\\Python27-x64"
+    - PYTHON: "C:\\Python33"
+    - PYTHON: "C:\\Python33-x64"
+    - PYTHON: "C:\\Python34"
+    - PYTHON: "C:\\Python34-x64"
+    - PYTHON: "C:\\Python35"
+    - PYTHON: "C:\\Python35-x64"
+
+init:
+  - set PATH=%PYTHON%;%PYTHON%\Scripts;%PATH%
+
+build: false  # Not a C# project, build stuff at the test step instead.
+
+test_script:
+  - python setup.py test
