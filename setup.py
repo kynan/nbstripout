@@ -8,7 +8,8 @@ setup_requires = [
 ]
 
 tests_require = [
-    'pytest',
+    'pytest',  # We cannot pin the pytest version due to inconsistent Travis
+               # environment https://github.com/travis-ci/travis-ci/issues/5635
     'pytest-flake8 == 0.1',
     'cram == 0.7'
 ]
