@@ -11,7 +11,7 @@ tests_require = [
     'pytest',  # We cannot pin the pytest version due to inconsistent Travis
                # environment https://github.com/travis-ci/travis-ci/issues/5635
     'pytest-flake8 == 0.1',
-    'cram == 0.7'
+    'pytest-cram',
 ]
 
 setup(name='nbstripout',
@@ -28,14 +28,11 @@ setup(name='nbstripout',
 
       description='Strips outputs from Jupyter and IPython notebooks',
       long_description=long_description,
-      py_modules=['pytest_cram', 'nbstripout'],
+      py_modules=['nbstripout'],
       entry_points={
           'console_scripts': [
               'nbstripout = nbstripout:main'
           ],
-          'pytest11': [
-              'pytest_cram = pytest_cram',
-          ]
       },
 
       setup_requires=setup_requires,
