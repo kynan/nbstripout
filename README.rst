@@ -2,6 +2,8 @@
     :target: https://travis-ci.org/kynan/nbstripout
 .. image:: https://img.shields.io/pypi/dm/nbstripout.svg
     :target: https://pypi.python.org/pypi/nbstripout
+.. image:: https://img.shields.io/pypi/v/nbstripout.svg
+    :target: https://pypi.python.org/pypi/nbstripout
 
 nbstripout: strip output from Jupyter and IPython notebooks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
