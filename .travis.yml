@@ -6,5 +6,6 @@ python:
   - "3.3"
   - "3.4"
   - "3.5"
-# command to run tests
+before_install:
+    - pip install --upgrade pytest
 script: python setup.py test
