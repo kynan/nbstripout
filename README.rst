@@ -4,8 +4,8 @@
     :target: https://pypi.python.org/pypi/nbstripout
 .. image:: https://img.shields.io/pypi/v/nbstripout.svg
     :target: https://pypi.python.org/pypi/nbstripout
-.. image:: https://img.shields.io/pypi/l/nbstripout.svg
-    :target: https://pypi.python.org/pypi/nbstripout
+.. image:: https://img.shields.io/badge/license-MIT-blue.svg
+    :target: https://raw.githubusercontent.com/kynan/nbstripout/master/LICENSE.txt
 .. image:: https://img.shields.io/pypi/pyversions/nbstripout.svg
     :target: https://pypi.python.org/pypi/nbstripout
 
