@@ -4,6 +4,8 @@
     :target: https://pypi.python.org/pypi/nbstripout
 .. image:: https://img.shields.io/pypi/v/nbstripout.svg
     :target: https://pypi.python.org/pypi/nbstripout
+.. image:: https://img.shields.io/pypi/l/nbstripout.svg
+    :target: https://pypi.python.org/pypi/nbstripout
 
 nbstripout: strip output from Jupyter and IPython notebooks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
