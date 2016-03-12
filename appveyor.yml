@@ -14,10 +14,13 @@ environment:
 
 init:
   - set PATH=%PYTHON%;%PYTHON%\Scripts;%PATH%
+  - set TMPDIR=C:\Temp
+  - set CRAMSHELL=bash
 
 install:
-    - "%PYTHON%/Scripts/easy_install -U pip"
-    - "%PYTHON%/Scripts/pip install pytest"
+  - mkdir -p C:\Temp
+  - "%PYTHON%/Scripts/easy_install -U pip"
+  - "%PYTHON%/Scripts/pip install pytest"
 
 build: false  # Not a C# project, build stuff at the test step instead.
 
