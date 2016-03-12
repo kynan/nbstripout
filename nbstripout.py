@@ -1,5 +1,7 @@
 #!/usr/bin/env python
-"""nbstripout: strip output from Jupyter and IPython notebooks
+"""
+Strip output from Jupyter and IPython notebooks
+===============================================
 
 Opens a notebook, strips its output, and writes the outputless version to the
 original file.
@@ -31,9 +33,17 @@ instructions below: ::
 
     nbstripout --install
 
+Set up the git filter using ``.gitattributes`` ::
+
+    nbstripout --install --attributes .gitattributes
+
 Remove the git filter and attributes: ::
 
     nbstripout --uninstall
+
+Remove the git filter and attributes from ``.gitattributes``: ::
+
+    nbstripout --uninstall --attributes .gitattributes
 
 Print the version: ::
 
