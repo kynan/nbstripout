@@ -54,6 +54,7 @@ Create a file ``.gitattributes`` or ``.git/info/attributes`` with: ::
 """
 
 from __future__ import print_function
+from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import codecs
 import io
 import sys
@@ -152,38 +153,41 @@ def uninstall():
 
 
 def main():
-    if len(sys.argv) > 1:
-        if sys.argv[1] in ['help', '-h', '--help']:
-            print(__doc__, file=sys.stderr)
-            sys.exit(1)
-        if sys.argv[1] in ['install', '--install']:
-            sys.exit(install())
-        if sys.argv[1] in ['uninstall', '--uninstall']:
-            sys.exit(uninstall())
-        if sys.argv[1] in ['version', '--version']:
-            print(__version__)
-            sys.exit(0)
+    parser = ArgumentParser(epilog=__doc__, formatter_class=RawDescriptionHelpFormatter)
+    task = parser.add_mutually_exclusive_group()
+    task.add_argument('--install', action='store_true',
+                      help='Install nbstripout in the current repository')
+    task.add_argument('--uninstall', action='store_true',
+                      help='Uninstall nbstripout from the current repository')
+    task.add_argument('--version', action='store_true',
+                      help='Print version')
+    parser.add_argument('--force', '-f', action='store_true',
+                        help='Strip output also from files with non ipynb extension')
+    parser.add_argument('files', nargs='*', help='Files to strip output from')
+    args = parser.parse_args()
 
-        force = False
-        filenames = sys.argv[1:]
-        if filenames[0] in ['-f', '--force']:
-            force = True
-            filenames.pop(0)
+    if args.install:
+        sys.exit(install())
+    if args.uninstall:
+        sys.exit(uninstall())
+    if args.version:
+        print(__version__)
+        sys.exit(0)
 
-        for filename in filenames:
-            if not force and not filename.endswith('.ipynb'):
-                continue
-            try:
-                with io.open(filename, 'r', encoding='utf8') as f:
-                    nb = read(f, as_version=NO_CONVERT)
-                nb = strip_output(nb)
-                with io.open(filename, 'w', encoding='utf8') as f:
-                    write(nb, f)
-            except Exception:
-                # Ignore exceptions for non-notebook files.
-                print("Could not strip '{}'".format(filename))
-                raise
-    else:
+    for filename in args.files:
+        if not (args.force or filename.endswith('.ipynb')):
+            continue
+        try:
+            with io.open(filename, 'r', encoding='utf8') as f:
+                nb = read(f, as_version=NO_CONVERT)
+            nb = strip_output(nb)
+            with io.open(filename, 'w', encoding='utf8') as f:
+                write(nb, f)
+        except Exception:
+            # Ignore exceptions for non-notebook files.
+            print("Could not strip '{}'".format(filename))
+            raise
+    if not args.files:
         write(strip_output(read(sys.stdin, as_version=NO_CONVERT)), sys.stdout)
 
 if __name__ == '__main__':
