@@ -162,9 +162,11 @@ def main():
     parser = ArgumentParser(epilog=__doc__, formatter_class=RawDescriptionHelpFormatter)
     task = parser.add_mutually_exclusive_group()
     task.add_argument('--install', action='store_true',
-                      help='Install nbstripout in the current repository')
+                      help="""Install nbstripout in the current repository (set
+                              up the git filter and attributes)""")
     task.add_argument('--uninstall', action='store_true',
-                      help='Uninstall nbstripout from the current repository')
+                      help="""Uninstall nbstripout from the current repository
+                              (remove the git filter and attributes)""")
     parser.add_argument('--attributes', metavar='FILEPATH', help="""Attributes
         file to add the filter to (in combination with --install/--uninstall),
         defaults to .git/info/attributes""")
