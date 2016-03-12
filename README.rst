@@ -43,9 +43,17 @@ instructions below: ::
 
     nbstripout --install
 
+Set up the git filter using ``.gitattributes`` ::
+
+    nbstripout --install --attributes .gitattributes
+
 Remove the git filter and attributes: ::
 
     nbstripout --uninstall
+
+Remove the git filter and attributes from ``.gitattributes``: ::
+
+    nbstripout --uninstall --attributes .gitattributes
 
 Print the version: ::
 
