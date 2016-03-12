@@ -41,19 +41,19 @@ Use as part of a shell pipeline: ::
 Set up the git filter and attributes as described in the manual installation
 instructions below: ::
 
-    nbstripout install
+    nbstripout --install
 
 Remove the git filter and attributes: ::
 
-    nbstripout uninstall
+    nbstripout --uninstall
 
 Print the version: ::
 
-    nbstripout version
+    nbstripout --version
 
 Show this help page: ::
 
-    nbstripout help
+    nbstripout --help
 
 Manual filter installation
 ==========================
