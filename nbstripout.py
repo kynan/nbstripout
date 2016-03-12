@@ -111,7 +111,7 @@ def strip_output(nb):
     return nb
 
 
-def install():
+def install(attrfile=None):
     """Install the git filter and set the git attributes."""
     from os import path
     from subprocess import check_call, check_output, CalledProcessError
@@ -125,7 +125,8 @@ def install():
                 path.abspath(__file__).replace('\\', '/'))])
     check_call(['git', 'config', 'filter.nbstripout.smudge', 'cat'])
     check_call(['git', 'config', 'filter.nbstripout.required', 'true'])
-    attrfile = path.join(git_dir.decode(), 'info', 'attributes')
+    if not attrfile:
+        attrfile = path.join(git_dir.decode(), 'info', 'attributes')
     # Check if there is already a filter for ipynb files
     if path.exists(attrfile):
         with open(attrfile, 'r') as f:
@@ -135,7 +136,7 @@ def install():
         f.write('\n*.ipynb filter=nbstripout')
 
 
-def uninstall():
+def uninstall(attrfile=None):
     """Uninstall the git filter and unset the git attributes."""
     from os import devnull, path
     from subprocess import call, check_output, CalledProcessError, STDOUT
@@ -146,7 +147,8 @@ def uninstall():
         sys.exit(1)
     call(['git', 'config', '--remove-section', 'filter.nbstripout'],
          stdout=open(devnull, 'w'), stderr=STDOUT)
-    attrfile = path.join(git_dir.decode(), 'info', 'attributes')
+    if not attrfile:
+        attrfile = path.join(git_dir.decode(), 'info', 'attributes')
     # Check if there is a filter for ipynb files
     if path.exists(attrfile):
         with open(attrfile, 'r') as f:
@@ -163,6 +165,9 @@ def main():
                       help='Install nbstripout in the current repository')
     task.add_argument('--uninstall', action='store_true',
                       help='Uninstall nbstripout from the current repository')
+    parser.add_argument('--attributes', metavar='FILEPATH', help="""Attributes
+        file to add the filter to (in combination with --install/--uninstall),
+        defaults to .git/info/attributes""")
     task.add_argument('--version', action='store_true',
                       help='Print version')
     parser.add_argument('--force', '-f', action='store_true',
@@ -171,9 +176,9 @@ def main():
     args = parser.parse_args()
 
     if args.install:
-        sys.exit(install())
+        sys.exit(install(args.attributes))
     if args.uninstall:
-        sys.exit(uninstall())
+        sys.exit(uninstall(args.attributes))
     if args.version:
         print(__version__)
         sys.exit(0)
