@@ -63,6 +63,30 @@ Show this help page: ::
 
     nbstripout --help
 
+Keeping some output
++++++++++++++++++++
+
+To mark special cells so that the output is not striped, set the
+``"keep_output": true`` metadata on the cell.  To do this, select the
+"Edit Metadata" Cell Toolbar, and then use the "Edit Metadata" button
+on the desired cell to enter something like::
+
+    {
+      "keep_output": true,
+    }
+
+Another use-case is to preserve initialization cells that might load
+customized CSS etc. critical for the display of the notebook.  To
+support this, we also keep output for cells with::
+
+    {
+      "init_cell": true,
+    }
+
+This is the same metadata used by the `init_cell nbextension`__.
+
+__ https://github.com/ipython-contrib/IPython-notebook-extensions/tree/master/nbextensions/usability/init_cell
+
 Manual filter installation
 ==========================
 

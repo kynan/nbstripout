@@ -7,14 +7,10 @@ Maintained by Florian Rathgeber
 0.1.0:
   * Based on Min RK's orginal but supports multiple versions of
     IPython/Jupyter and also strips the execution count.
-
-
-0.2.x branch
-------------
-Maintained by Michael McNeil Forbes
-
-* https://github.com/mforbes/nbstripout
-
 0.2.0:
   * Only process .ipynb files unless -f flag is used
   * Will process multiple files
+0.2.7:
+  * If you set either the `"init_cell": true` or `"keep_output": true`
+    in the cell metadata, then these cells will not be stripped out.
+    The former works in conjunction with the `init_cell` nbextension.
