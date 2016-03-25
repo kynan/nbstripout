@@ -9,7 +9,7 @@
      },
      "outputs": [],
      "source": [
-      "print u\"äöü\""
+      "print u\\"\xc3\xa4\xc3\xb6\xc3\xbc\\"" (esc)
      ]
     }
    ],
