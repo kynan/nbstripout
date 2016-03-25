@@ -1,4 +1,4 @@
-  $ cat ${TESTDIR}/test_metadata.ipynb | nbstripout
+  $ cat ${TESTDIR}/test_metadata.ipynb | ${NBSTRIPOUT_EXE:-nbstripout}
   {
    "cells": [
     {

@@ -1,4 +1,4 @@
-  $ cat ${TESTDIR}/test_unicode.ipynb | nbstripout
+  $ cat ${TESTDIR}/test_unicode.ipynb | ${NBSTRIPOUT_EXE:-nbstripout}
   {
    "cells": [
     {
