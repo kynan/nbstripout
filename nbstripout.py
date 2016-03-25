@@ -69,13 +69,20 @@ Create a file ``.gitattributes`` or ``.git/info/attributes`` with: ::
 
 from __future__ import print_function
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
-import codecs
 import io
 import sys
 
 if sys.version_info < (3, 0):
-    # Use UTF8 writer for stdout (http://stackoverflow.com/a/1169209)
-    sys.stdout = codecs.getwriter('utf8')(sys.stdout)
+    import codecs
+    # Use UTF8 reader/writer for stdin/stdout
+    # http://stackoverflow.com/a/1169209
+    input_stream = codecs.getreader('utf8')(sys.stdin)
+    output_stream = codecs.getwriter('utf8')(sys.stdout)
+else:
+    # Wrap input/output stream in UTF-8 encoded text wrapper
+    # https://stackoverflow.com/a/16549381
+    input_stream = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8')
+    output_stream = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 __version__ = '0.2.6'
 
@@ -212,7 +219,7 @@ def main():
             print("Could not strip '{}'".format(filename))
             raise
     if not args.files:
-        write(strip_output(read(sys.stdin, as_version=NO_CONVERT)), sys.stdout)
+        write(strip_output(read(input_stream, as_version=NO_CONVERT)), output_stream)
 
 if __name__ == '__main__':
     main()
