@@ -21,6 +21,7 @@ install:
   - mkdir -p C:\Temp
   - "%PYTHON%/Scripts/easy_install -U pip"
   - "%PYTHON%/Scripts/pip install pytest"
+  - "%PYTHON%/Scripts/pip install nbformat"
   - python setup.py install
 
 build: false  # Not a C# project, build stuff at the test step instead.
