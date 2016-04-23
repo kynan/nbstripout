@@ -55,6 +55,11 @@ Remove the git filter and attributes from ``.gitattributes``: ::
 
     nbstripout --uninstall --attributes .gitattributes
 
+Check if ``nbstripout`` is installed in the current repository
+(exits with code 0 if installed, 1 otherwise): ::
+
+    nbstripout --is-installed
+
 Print the version: ::
 
     nbstripout --version
