@@ -194,7 +194,7 @@ def is_installed():
                    stdout=open(devnull, 'w'), stderr=STDOUT)
         check_call(['git', 'config', 'filter.nbstripout.required'],
                    stdout=open(devnull, 'w'), stderr=STDOUT)
-        if check_output(['git', 'check-attr', 'filter', '--', '*.ipynb']).strip().endswith('unspecified'):
+        if check_output(['git', 'check-attr', 'filter', '--', '*.ipynb']).strip().endswith(b'unspecified'):
             return 1
         return 0
     except CalledProcessError:
