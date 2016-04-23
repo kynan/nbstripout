@@ -178,6 +178,24 @@ def uninstall(attrfile=None):
             f.write(''.join(l for l in f if '*.ipynb filter' not in l))
 
 
+def is_installed():
+    """Return 0 if nbstripout is installed in the current repo, 1 otherwise"""
+    from os import devnull
+    from subprocess import check_call, check_output, CalledProcessError, STDOUT
+    try:
+        check_call(['git', 'config', 'filter.nbstripout.clean'],
+                   stdout=open(devnull, 'w'), stderr=STDOUT)
+        check_call(['git', 'config', 'filter.nbstripout.smudge'],
+                   stdout=open(devnull, 'w'), stderr=STDOUT)
+        check_call(['git', 'config', 'filter.nbstripout.required'],
+                   stdout=open(devnull, 'w'), stderr=STDOUT)
+        if check_output(['git', 'check-attr', 'filter', '--', '*.ipynb']).strip().endswith('unspecified'):
+            return 1
+        return 0
+    except CalledProcessError:
+        return 1
+
+
 def main():
     parser = ArgumentParser(epilog=__doc__, formatter_class=RawDescriptionHelpFormatter)
     task = parser.add_mutually_exclusive_group()
@@ -187,6 +205,8 @@ def main():
     task.add_argument('--uninstall', action='store_true',
                       help="""Uninstall nbstripout from the current repository
                               (remove the git filter and attributes)""")
+    task.add_argument('--is-installed', action='store_true',
+                      help='Check if nbstripout is installed in the current repository')
     parser.add_argument('--attributes', metavar='FILEPATH', help="""Attributes
         file to add the filter to (in combination with --install/--uninstall),
         defaults to .git/info/attributes""")
@@ -201,6 +221,8 @@ def main():
         sys.exit(install(args.attributes))
     if args.uninstall:
         sys.exit(uninstall(args.attributes))
+    if args.is_installed:
+        sys.exit(is_installed())
     if args.version:
         print(__version__)
         sys.exit(0)
