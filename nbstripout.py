@@ -133,6 +133,9 @@ def strip_output(nb):
             cell['prompt_number'] = None
         if 'execution_count' in cell:
             cell['execution_count'] = None
+        for output_style in ['collapsed', 'scrolled']:
+            if output_style in cell.metadata:
+                cell.metadata[output_style] = False
     return nb
 
 
