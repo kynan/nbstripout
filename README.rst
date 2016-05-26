@@ -29,7 +29,7 @@ Screencast
 This screencast demonstrates the use and working principles behind the
 nbstripout utility and how to use it as a Git filter:
 
-.. image:: https://img.youtube.com/vi/BEMP4xacrVc/0.jpg
+.. image:: http://i.imgur.com/7oQHuJ5.png
     :target: https://www.youtube.com/watch?v=BEMP4xacrVc
 
 Usage
