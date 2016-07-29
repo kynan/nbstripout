@@ -69,6 +69,12 @@ Check if ``nbstripout`` is installed in the current repository
 
     nbstripout --is-installed
 
+Print status of ``nbstripout`` installation in the current repository and
+configuration summary of filter and attributes if installed
+(exits with code 0 if installed, 1 otherwise): ::
+
+    nbstripout --status
+
 Print the version: ::
 
     nbstripout --version
