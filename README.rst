@@ -32,6 +32,14 @@ nbstripout utility and how to use it as a Git filter:
 .. image:: http://i.imgur.com/7oQHuJ5.png
     :target: https://www.youtube.com/watch?v=BEMP4xacrVc
 
+Installation
+============
+
+You can download and install the latest version of this software from PyPI,
+the Python package index, as follows:
+
+    pip install --upgrade nbstripout
+
 Usage
 =====
 
