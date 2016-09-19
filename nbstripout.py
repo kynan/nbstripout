@@ -186,10 +186,9 @@ def uninstall(attrfile=None):
     # Check if there is a filter for ipynb files
     if path.exists(attrfile):
         with open(attrfile, 'r') as f:
-            if '*.ipynb filter' not in f.read():
-                return
-        with open(attrfile, 'w+') as f:
-            f.write(''.join(l for l in f if '*.ipynb filter' not in l))
+            lines = filter(lambda l: not l.startswith('*.ipynb filter'), f)
+        with open(attrfile, 'w') as f:
+            f.write(''.join(lines))
 
 
 def status(verbose=False):
