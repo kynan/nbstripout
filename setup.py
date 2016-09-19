@@ -14,7 +14,7 @@ tests_require = [
 ]
 
 setup(name='nbstripout',
-      version='0.2.7',
+      version='0.2.8',
 
       author='Min RK',
       author_email='benjaminrk@gmail.com',
