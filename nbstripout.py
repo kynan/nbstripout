@@ -26,7 +26,7 @@ process other files us the '-f' flag to force the application.
 
 Use as part of a shell pipeline: ::
 
-    FILE.ipynb | nbstripout > OUT.ipynb
+    cat FILE.ipynb | nbstripout > OUT.ipynb
 
 Set up the git filter and attributes as described in the manual installation
 instructions below: ::
