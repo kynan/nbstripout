@@ -26,7 +26,7 @@ process other files us the '-f' flag to force the application.
 
 Use as part of a shell pipeline: ::
 
-    FILE.ipynb | nbstripout > OUT.ipynb
+    cat FILE.ipynb | nbstripout > OUT.ipynb
 
 Set up the git filter and attributes as described in the manual installation
 instructions below: ::
@@ -142,6 +142,8 @@ def strip_output(nb):
         for output_style in ['collapsed', 'scrolled']:
             if output_style in cell.metadata:
                 cell.metadata[output_style] = False
+        for useless_metadata in ['ExecuteTime']:
+            cell.metadata.pop(useless_metadata, None)
     return nb
 
 
