@@ -187,10 +187,11 @@ def uninstall(attrfile=None):
         attrfile = path.join(git_dir.decode(), 'info', 'attributes')
     # Check if there is a filter for ipynb files
     if path.exists(attrfile):
-        with open(attrfile, 'r') as f:
-            lines = filter(lambda l: not l.startswith('*.ipynb filter'), f)
-        with open(attrfile, 'w') as f:
+        with open(attrfile, 'r+') as f:
+            lines = [l for l in f if not l.startswith('*.ipynb filter')]
+            f.seek(0)
             f.write(''.join(lines))
+            f.truncate()
 
 
 def status(verbose=False):
