@@ -169,7 +169,7 @@ def install(attrfile=None):
             if '*.ipynb filter' in f.read():
                 return
     with open(attrfile, 'a') as f:
-        print('\n*.ipynb filter=nbstripout', file=f)
+        print(('\n' if f.tell() else '') + '*.ipynb filter=nbstripout', file=f)
 
 
 def uninstall(attrfile=None):
