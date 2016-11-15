@@ -273,5 +273,6 @@ def main():
     if not args.files:
         write(strip_output(read(input_stream, as_version=NO_CONVERT)), output_stream)
 
+
 if __name__ == '__main__':
     main()
