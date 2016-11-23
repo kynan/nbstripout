@@ -129,6 +129,7 @@ def _cells(nb):
 def strip_output(nb):
     """strip the outputs from a notebook object"""
     nb.metadata.pop('signature', None)
+    nb.metadata.pop('widgets', None)
     for cell in _cells(nb):
         if (cell.metadata.get('init_cell') or cell.metadata.get('keep_output')):
             # Leave these cells alone
