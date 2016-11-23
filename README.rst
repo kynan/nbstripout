@@ -35,10 +35,15 @@ nbstripout utility and how to use it as a Git filter:
 Installation
 ============
 
-You can download and install the latest version of this software from PyPI,
-the Python package index, as follows:
+You can download and install the latest version of ``nbstripout`` from PyPI_,
+the Python package index, as follows: ::
 
     pip install --upgrade nbstripout
+
+When using the Anaconda_ Python distribution, install ``nbstripout`` via the
+conda_ package manager from conda-forge_: ::
+
+    conda install -c conda-forge nbstripout
 
 Usage
 =====
@@ -138,3 +143,7 @@ then perform these operations. This is the approach of the `mmf-setup`_
 package.
 
 .. _mmf-setup: http://bitbucket.org/mforbes/mmf_setup
+.. _Anaconda: https://www.continuum.io/anaconda-overview
+.. _conda: http://conda.pydata.org
+.. _conda-forge: http://conda-forge.github.io
+.. _PyPI: https://pypi.io
