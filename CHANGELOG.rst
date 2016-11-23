@@ -6,6 +6,7 @@ Change Log
 * Strip `ExecuteTime` metadata (#34, #39, @jdriordan)
 * Fix Python 3.5 bug: open attributes file only once (#40)
 * Do not add blank line at beginning of attribute file
+* Strip widget state from notebook metadata (#42)
 
 0.2.8 - 2016-09-19
 ------------------
