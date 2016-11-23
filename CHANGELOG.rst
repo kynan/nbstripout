@@ -1,7 +1,7 @@
 Change Log
 ==========
 
-0.2.9 - unreleased
+0.2.9 - 2016-11-23
 ------------------
 * Strip `ExecuteTime` metadata (#34, #39, @jdriordan)
 * Fix Python 3.5 bug: open attributes file only once (#40)
