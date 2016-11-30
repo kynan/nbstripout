@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+0.3.0 - unreleased
+------------------
+* Also ignore ``collapsed`` and ``scrolled`` metadata (#34)
+
 0.2.9 - 2016-11-23
 ------------------
 * Strip `ExecuteTime` metadata (#34, #39, @jdriordan)
