@@ -57,9 +57,7 @@
     {
      "cell_type": "code",
      "execution_count": null,
-     "metadata": {
-      "collapsed": false
-     },
+     "metadata": {},
      "outputs": [],
      "source": [
       "3+3"

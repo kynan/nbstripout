@@ -4,9 +4,7 @@
     {
      "cell_type": "code",
      "execution_count": null,
-     "metadata": {
-      "collapsed": false
-     },
+     "metadata": {},
      "outputs": [],
      "source": [
       "from ipywidgets import interact"
@@ -15,9 +13,7 @@
     {
      "cell_type": "code",
      "execution_count": null,
-     "metadata": {
-      "collapsed": false
-     },
+     "metadata": {},
      "outputs": [],
      "source": [
       "@interact(foo=1)\n",

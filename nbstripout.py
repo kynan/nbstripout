@@ -143,8 +143,9 @@ def strip_output(nb):
         for output_style in ['collapsed', 'scrolled']:
             if output_style in cell.metadata:
                 cell.metadata[output_style] = False
-        for useless_metadata in ['ExecuteTime']:
-            cell.metadata.pop(useless_metadata, None)
+        if 'metadata' in cell:
+            for field in ['collapsed', 'scrolled', 'ExecuteTime']:
+                cell.metadata.pop(field, None)
     return nb
 
 
