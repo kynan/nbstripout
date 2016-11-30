@@ -4,9 +4,7 @@
     {
      "cell_type": "code",
      "execution_count": null,
-     "metadata": {
-      "collapsed": false
-     },
+     "metadata": {},
      "outputs": [],
      "source": [
       "print u\\"\xc3\xa4\xc3\xb6\xc3\xbc\\"" (esc)
