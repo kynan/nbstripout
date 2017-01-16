@@ -108,6 +108,9 @@ except ImportError:
         # IPython < 3
         from IPython.nbformat import current
 
+        # Dummy value, ignored anyway
+        NO_CONVERT = None
+
         def read(f, as_version):
             return current.read(f, 'json')
 
