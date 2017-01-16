@@ -4,6 +4,7 @@ Change Log
 0.3.0 - unreleased
 ------------------
 * Also ignore ``collapsed`` and ``scrolled`` metadata (#34)
+* Define `NO_CONVERT` for IPython <3 import (#46)
 
 0.2.9 - 2016-11-23
 ------------------
