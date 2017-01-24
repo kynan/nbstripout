@@ -161,7 +161,7 @@ def install(attrfile=None):
     except CalledProcessError:
         print('Installation failed: not a git repository!', file=sys.stderr)
         sys.exit(1)
-    check_call(['git', 'config', 'filter.nbstripout.clean', '%s %s' %
+    check_call(['git', 'config', 'filter.nbstripout.clean', '"%s" "%s"' %
                (sys.executable.replace('\\', '/'),
                 path.abspath(__file__).replace('\\', '/'))])
     check_call(['git', 'config', 'filter.nbstripout.smudge', 'cat'])
