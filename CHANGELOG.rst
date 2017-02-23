@@ -1,8 +1,9 @@
 Change Log
 ==========
 
-0.3.0 - unreleased
+0.3.0 - 2017-02-23
 ------------------
+* Support whitespace in repository paths (#47, #48, @ehoepfner)
 * Also ignore ``collapsed`` and ``scrolled`` metadata (#34)
 * Define `NO_CONVERT` for IPython <3 import (#46)
 
