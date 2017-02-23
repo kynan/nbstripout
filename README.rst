@@ -118,7 +118,7 @@ support this, we also keep output for cells with::
 
 This is the same metadata used by the `init_cell nbextension`__.
 
-__ https://github.com/ipython-contrib/IPython-notebook-extensions/tree/master/nbextensions/usability/init_cell
+__ https://github.com/ipython-contrib/jupyter_contrib_nbextensions/tree/master/src/jupyter_contrib_nbextensions/nbextensions/init_cell
 
 Manual filter installation
 ==========================
