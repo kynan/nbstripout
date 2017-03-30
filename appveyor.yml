@@ -19,6 +19,7 @@ init:
   - set TMPDIR=C:\Temp
   - set CRAMSHELL=bash
   - set NBSTRIPOUT_EXE=%PYTHON%\Scripts\nbstripout.exe
+  - git config --global core.autocrlf true
 
 install:
   - mkdir -p C:\Temp
