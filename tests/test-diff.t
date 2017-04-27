@@ -4,7 +4,3 @@
   <     "print(\"aou\")"
   ---
   >     "print(\"aou now it is different\")"
-
-  
-
-  
