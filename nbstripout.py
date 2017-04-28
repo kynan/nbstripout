@@ -78,7 +78,7 @@ Create a file ``.gitattributes`` or ``.git/info/attributes`` with: ::
     *.ipynb filter=nbstripout
 
 Apply the filter for git diff of *.ipynb
-   
+
    git config diff.ipynb.textconv '/path/to/nbstripout -t'
 
 In file ``.gitattributes`` or ``.git/info/attributes`` add: ::
@@ -175,16 +175,16 @@ def install(attrfile=None):
     check_call(['git', 'config', 'filter.nbstripout.smudge', 'cat'])
     check_call(['git', 'config', 'filter.nbstripout.required', 'true'])
     check_call(['git', 'config', 'diff.ipynb.textconv', 'nbstripout -t'])
-    
+
     if not attrfile:
         attrfile = path.join(git_dir.decode(), 'info', 'attributes')
-   
+
     # Check if there is already a filter for ipynb files
     filt_exists = False
     diff_exists = False
     if path.exists(attrfile):
         with open(attrfile, 'r') as f:
-            filt_exists = '*.ipynb filter' in f.read() 
+            filt_exists = '*.ipynb filter' in f.read()
             diff_exists = '*.ipynb diff' in f.read()
             if filt_exists and diff_exists:
                 return
@@ -205,10 +205,11 @@ def uninstall(attrfile=None):
     except CalledProcessError:
         print('Installation failed: not a git repository!', file=sys.stderr)
         sys.exit(1)
+
     call(['git', 'config', '--remove-section', 'filter.nbstripout'],
          stdout=open(devnull, 'w'), stderr=STDOUT)
 
-    call(['git', 'config', '--remove-section', 'diff.ipynb.textconv'],
+    call(['git', 'config', '--remove-section', 'diff.ipynb'],
          stdout=open(devnull, 'w'), stderr=STDOUT)
 
     if not attrfile:
@@ -252,7 +253,8 @@ def status(verbose=False):
         if verbose and 'git_dir' in locals():
             print('nbstripout is not installed in repository', git_dir)
         return 1
-    
+
+
 def main():
     parser = ArgumentParser(epilog=__doc__, formatter_class=RawDescriptionHelpFormatter)
     task = parser.add_mutually_exclusive_group()
@@ -273,7 +275,7 @@ def main():
                       help='Print version')
     parser.add_argument('--force', '-f', action='store_true',
                         help='Strip output also from files with non ipynb extension')
-    
+
     parser.add_argument('--textconv', '-t', action='store_true',
                         help='Prints stripped files to STDOUT')
 
