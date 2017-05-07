@@ -2,10 +2,10 @@
   Initialized empty Git repository in .* (re)
   $ cd foobar
   $ echo -n "*.txt text" >> .git/info/attributes
-  $ nbstripout --is-installed
+  $ ${NBSTRIPOUT_EXE:-nbstripout} --is-installed
   [1]
-  $ nbstripout --install
-  $ nbstripout --is-installed
+  $ ${NBSTRIPOUT_EXE:-nbstripout} --install
+  $ ${NBSTRIPOUT_EXE:-nbstripout} --is-installed
   $ git diff --no-ext-diff --unified=0 --exit-code -a --no-prefix ${TESTDIR}/test_diff.ipynb ${TESTDIR}/test_diff_output.ipynb 
   [1]
   $ git diff ${TESTDIR}/test_diff.ipynb ${TESTDIR}/test_diff_different.ipynb 
@@ -23,8 +23,8 @@
      }
     ],
   [1]
-  $ nbstripout --uninstall
-  $ nbstripout --is-installed
+  $ ${NBSTRIPOUT_EXE:-nbstripout} --uninstall
+  $ ${NBSTRIPOUT_EXE:-nbstripout} --is-installed
   [1]
   $ cat .git/info/attributes
   *.txt text
