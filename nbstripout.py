@@ -129,20 +129,33 @@ def _cells(nb):
             yield cell
 
 
-def strip_output(nb):
-    """strip the outputs from a notebook object"""
+def strip_output(nb, keep_output, keep_count):
+    """
+    Strip the outputs, execution count/prompt number and miscellaneous
+    metadata from a notebook object, unless specified to keep either the outputs
+    or counts.
+    """
+
     nb.metadata.pop('signature', None)
     nb.metadata.pop('widgets', None)
+
     for cell in _cells(nb):
+
         if (cell.metadata.get('init_cell') or cell.metadata.get('keep_output')):
             # Leave these cells alone
             continue
-        if 'outputs' in cell:
+
+        # remove the outputs, unless directed otherwise
+        if 'outputs' in cell and not keep_output:
             cell['outputs'] = []
-        if 'prompt_number' in cell:
+
+        # remove the prompt_number/execution_count, unless directed otherwise
+        if 'prompt_number' in cell and not keep_count:
             cell['prompt_number'] = None
-        if 'execution_count' in cell:
+        if 'execution_count' in cell and not keep_count:
             cell['execution_count'] = None
+
+        # always remove this metadata
         for output_style in ['collapsed', 'scrolled']:
             if output_style in cell.metadata:
                 cell.metadata[output_style] = False
@@ -240,6 +253,10 @@ def main():
                       help='Check if nbstripout is installed in current repository')
     task.add_argument('--status', action='store_true',
                       help='Print status of nbstripout installation in current repository and configuration summary if installed')
+    parser.add_argument('-c', '--count', action='store_true', help="""
+                        Do not strip the execution count/prompt number""")
+    parser.add_argument('-o', '--output', action='store_true', help="""
+                        Do not strip the output""")
     parser.add_argument('--attributes', metavar='FILEPATH', help="""Attributes
         file to add the filter to (in combination with --install/--uninstall),
         defaults to .git/info/attributes""")
@@ -268,7 +285,7 @@ def main():
         try:
             with io.open(filename, 'r', encoding='utf8') as f:
                 nb = read(f, as_version=NO_CONVERT)
-            nb = strip_output(nb)
+            nb = strip_output(nb, args.output, args.count)
             with io.open(filename, 'w', encoding='utf8') as f:
                 write(nb, f)
         except Exception:
@@ -276,7 +293,9 @@ def main():
             print("Could not strip '{}'".format(filename))
             raise
     if not args.files:
-        write(strip_output(read(input_stream, as_version=NO_CONVERT)), output_stream)
+        nb = strip_output(read(input_stream, as_version=NO_CONVERT),
+                          args.output, args.count)
+        write(nb, output_stream)
 
 
 if __name__ == '__main__':
