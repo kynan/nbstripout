@@ -146,8 +146,13 @@ def strip_output(nb, keep_output, keep_count):
             continue
 
         # remove the outputs, unless directed otherwise
-        if 'outputs' in cell and not keep_output:
-            cell['outputs'] = []
+        if 'outputs' in cell:
+            if not keep_output:
+                cell['outputs'] = []
+            else:
+                for output in cell['outputs']:
+                    if 'execution_count' in output:
+                        output['execution_count'] = None
 
         # remove the prompt_number/execution_count, unless directed otherwise
         if 'prompt_number' in cell and not keep_count:
