@@ -76,6 +76,14 @@ Set up a git filter using nbstripout as follows: ::
 Create a file ``.gitattributes`` or ``.git/info/attributes`` with: ::
 
     *.ipynb filter=nbstripout
+
+Apply the filter for git diff of *.ipynb
+
+   git config diff.ipynb.textconv '/path/to/nbstripout -t'
+
+In file ``.gitattributes`` or ``.git/info/attributes`` add: ::
+
+    *.ipynb diff=ipynb
 """
 
 from __future__ import print_function
@@ -166,15 +174,26 @@ def install(attrfile=None):
                 path.abspath(__file__).replace('\\', '/'))])
     check_call(['git', 'config', 'filter.nbstripout.smudge', 'cat'])
     check_call(['git', 'config', 'filter.nbstripout.required', 'true'])
+    check_call(['git', 'config', 'diff.ipynb.textconv', 'nbstripout -t'])
+
     if not attrfile:
         attrfile = path.join(git_dir.decode(), 'info', 'attributes')
+
     # Check if there is already a filter for ipynb files
+    filt_exists = False
+    diff_exists = False
     if path.exists(attrfile):
         with open(attrfile, 'r') as f:
-            if '*.ipynb filter' in f.read():
+            filt_exists = '*.ipynb filter' in f.read()
+            diff_exists = '*.ipynb diff' in f.read()
+            if filt_exists and diff_exists:
                 return
+
     with open(attrfile, 'a') as f:
-        print(('\n' if f.tell() else '') + '*.ipynb filter=nbstripout', file=f)
+        if not filt_exists:
+            print(('\n' if f.tell() else '') + '*.ipynb filter=nbstripout', file=f)
+        if not diff_exists:
+            print(('\n' if f.tell() else '') + '*.ipynb diff=ipynb', file=f)
 
 
 def uninstall(attrfile=None):
@@ -186,14 +205,19 @@ def uninstall(attrfile=None):
     except CalledProcessError:
         print('Installation failed: not a git repository!', file=sys.stderr)
         sys.exit(1)
+
     call(['git', 'config', '--remove-section', 'filter.nbstripout'],
          stdout=open(devnull, 'w'), stderr=STDOUT)
+
+    call(['git', 'config', '--remove-section', 'diff.ipynb'],
+         stdout=open(devnull, 'w'), stderr=STDOUT)
+
     if not attrfile:
         attrfile = path.join(git_dir.decode(), 'info', 'attributes')
     # Check if there is a filter for ipynb files
     if path.exists(attrfile):
         with open(attrfile, 'r+') as f:
-            lines = [l for l in f if not l.startswith('*.ipynb filter')]
+            lines = [l for l in f if not (l.startswith('*.ipynb filter') or l.startswith('*.ipynb diff'))]
             f.seek(0)
             f.write(''.join(lines))
             f.truncate()
@@ -208,7 +232,9 @@ def status(verbose=False):
         clean = check_output(['git', 'config', 'filter.nbstripout.clean']).strip()
         smudge = check_output(['git', 'config', 'filter.nbstripout.smudge']).strip()
         required = check_output(['git', 'config', 'filter.nbstripout.required']).strip()
+        diff = check_output(['git', 'config', 'diff.ipynb.textconv']).strip()
         attributes = check_output(['git', 'check-attr', 'filter', '--', '*.ipynb']).strip()
+        diff_attributes = check_output(['git', 'check-attr', 'diff', '--', '*.ipynb']).strip()
         if attributes.endswith(b'unspecified'):
             if verbose:
                 print('nbstripout is not installed in repository', git_dir)
@@ -219,7 +245,9 @@ def status(verbose=False):
             print('  clean =', clean)
             print('  smudge =', smudge)
             print('  required =', required)
+            print('  diff=', diff)
             print('\nAttributes:\n ', attributes)
+            print('\nDiff Attributes:\n ', diff_attributes)
         return 0
     except CalledProcessError:
         if verbose and 'git_dir' in locals():
@@ -247,6 +275,10 @@ def main():
                       help='Print version')
     parser.add_argument('--force', '-f', action='store_true',
                         help='Strip output also from files with non ipynb extension')
+
+    parser.add_argument('--textconv', '-t', action='store_true',
+                        help='Prints stripped files to STDOUT')
+
     parser.add_argument('files', nargs='*', help='Files to strip output from')
     args = parser.parse_args()
 
@@ -269,12 +301,16 @@ def main():
             with io.open(filename, 'r', encoding='utf8') as f:
                 nb = read(f, as_version=NO_CONVERT)
             nb = strip_output(nb)
-            with io.open(filename, 'w', encoding='utf8') as f:
-                write(nb, f)
+            if args.textconv:
+                write(nb, output_stream)
+            else:
+                with io.open(filename, 'w', encoding='utf8') as f:
+                    write(nb, f)
         except Exception:
             # Ignore exceptions for non-notebook files.
             print("Could not strip '{}'".format(filename))
             raise
+
     if not args.files:
         write(strip_output(read(input_stream, as_version=NO_CONVERT)), output_stream)
 
