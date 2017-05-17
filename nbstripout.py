@@ -184,10 +184,11 @@ def install(attrfile=None):
     diff_exists = False
     if path.exists(attrfile):
         with open(attrfile, 'r') as f:
-            filt_exists = '*.ipynb filter' in f.read()
-            diff_exists = '*.ipynb diff' in f.read()
-            if filt_exists and diff_exists:
-                return
+            attrs = f.read()
+        filt_exists = '*.ipynb filter' in attrs
+        diff_exists = '*.ipynb diff' in attrs
+        if filt_exists and diff_exists:
+            return
 
     with open(attrfile, 'a') as f:
         if not filt_exists:
