@@ -133,6 +133,14 @@ Create a file ``.gitattributes`` or ``.git/info/attributes`` with: ::
 
     *.ipynb filter=nbstripout
 
+Apply the filter for git diff of ``*.ipynb`` files: ::
+
+    git config diff.ipynb.textconv '/path/to/nbstripout -t'
+
+In file ``.gitattributes`` or ``.git/info/attributes`` add: ::
+
+    *.ipynb diff=ipynb
+
 Mercurial usage
 ===============
 
