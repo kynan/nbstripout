@@ -1,5 +1,5 @@
 # What Python version is installed where:
-# http://www.appveyor.com/docs/installed-software#python
+# https://www.appveyor.com/docs/build-environment/#python
 
 environment:
   matrix:
@@ -11,6 +11,8 @@ environment:
     - PYTHON: "C:\\Python34-x64"
     - PYTHON: "C:\\Python35"
     - PYTHON: "C:\\Python35-x64"
+    - PYTHON: "C:\\Python36"
+    - PYTHON: "C:\\Python36-x64"
 
 init:
   - set PATH=%PYTHON%;%PYTHON%\Scripts;%PATH%
