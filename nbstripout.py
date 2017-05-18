@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """
 Strip output from Jupyter and IPython notebooks
 ===============================================
@@ -149,9 +149,9 @@ def strip_output(nb, keep_output, keep_count):
 
     for cell in _cells(nb):
 
+        # Keep the output for these cells, but strip count and metadata
         if (cell.metadata.get('init_cell') or cell.metadata.get('keep_output')):
-            # Leave these cells alone
-            continue
+            keep_output = True
 
         # Remove the outputs, unless directed otherwise
         if 'outputs' in cell:
