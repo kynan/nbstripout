@@ -145,22 +145,29 @@ def strip_output(nb, keep_output, keep_count):
             # Leave these cells alone
             continue
 
-        # remove the outputs, unless directed otherwise
+        # Remove the outputs, unless directed otherwise
         if 'outputs' in cell:
-            if not keep_output:
+
+            # Default behavior strips outputs. Since there are no outputs,
+            # there are no counts to keep and keep_count is ignored.
+            if not keep_out:
                 cell['outputs'] = []
-            else:
+
+            # If keep_out, but not keep_count, strip the counts from the output.
+            if keep_out and not keep_count:
                 for output in cell['outputs']:
                     if 'execution_count' in output:
                         output['execution_count'] = None
 
-        # remove the prompt_number/execution_count, unless directed otherwise
+            # If keep_out and keep_count, do nothing.
+
+        # Remove the prompt_number/execution_count, unless directed otherwise
         if 'prompt_number' in cell and not keep_count:
             cell['prompt_number'] = None
         if 'execution_count' in cell and not keep_count:
             cell['execution_count'] = None
 
-        # always remove this metadata
+        # Always remove this metadata
         for output_style in ['collapsed', 'scrolled']:
             if output_style in cell.metadata:
                 cell.metadata[output_style] = False
@@ -258,10 +265,10 @@ def main():
                       help='Check if nbstripout is installed in current repository')
     task.add_argument('--status', action='store_true',
                       help='Print status of nbstripout installation in current repository and configuration summary if installed')
-    parser.add_argument('-c', '--count', action='store_true', help="""
-                        Do not strip the execution count/prompt number""")
-    parser.add_argument('-o', '--output', action='store_true', help="""
-                        Do not strip the output""")
+    parser.add_argument('--keep-count', action='store_true',
+                        help='Do not strip the execution count/prompt number')
+    parser.add_argument('--keep-output', action='store_true',
+                        help='Do not strip output')
     parser.add_argument('--attributes', metavar='FILEPATH', help="""Attributes
         file to add the filter to (in combination with --install/--uninstall),
         defaults to .git/info/attributes""")
@@ -299,7 +306,7 @@ def main():
             raise
     if not args.files:
         nb = strip_output(read(input_stream, as_version=NO_CONVERT),
-                          args.output, args.count)
+                          args.keep_output, args.keep_count)
         write(nb, output_stream)
 
 
