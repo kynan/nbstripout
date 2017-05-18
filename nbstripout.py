@@ -330,7 +330,7 @@ def main():
         try:
             with io.open(filename, 'r', encoding='utf8') as f:
                 nb = read(f, as_version=NO_CONVERT)
-            nb = strip_output(nb)
+            nb = strip_output(nb, args.keep_output, args.keep_count)
             if args.textconv:
                 write(nb, output_stream)
             else:
