@@ -10,9 +10,8 @@
     },
     {
      "cell_type": "code",
-     "execution_count": 1,
+     "execution_count": null,
      "metadata": {
-      "collapsed": false,
       "init_cell": true
      },
      "outputs": [
@@ -22,7 +21,7 @@
          "2"
         ]
        },
-       "execution_count": 1,
+       "execution_count": null,
        "metadata": {},
        "output_type": "execute_result"
       }
@@ -33,9 +32,8 @@
     },
     {
      "cell_type": "code",
-     "execution_count": 2,
+     "execution_count": null,
      "metadata": {
-      "collapsed": false,
       "keep_output": true
      },
      "outputs": [
@@ -45,7 +43,7 @@
          "4"
         ]
        },
-       "execution_count": 2,
+       "execution_count": null,
        "metadata": {},
        "output_type": "execute_result"
       }
