@@ -149,25 +149,28 @@ def strip_output(nb, keep_output, keep_count):
 
     for cell in _cells(nb):
 
+        keep_output_this_cell = keep_output
+
         # Keep the output for these cells, but strip count and metadata
-        if (cell.metadata.get('init_cell') or cell.metadata.get('keep_output')):
-            keep_output = True
+        if cell.metadata.get('init_cell') or cell.metadata.get('keep_output'):
+            keep_output_this_cell = True
 
         # Remove the outputs, unless directed otherwise
         if 'outputs' in cell:
 
-            # Default behavior strips outputs. Since there are no outputs,
+            # Default behavior strips outputs. With all outputs stripped,
             # there are no counts to keep and keep_count is ignored.
-            if not keep_output:
+            if not keep_output_this_cell:
                 cell['outputs'] = []
 
-            # If keep_out, but not keep_count, strip the counts from the output.
-            if keep_output and not keep_count:
+            # If keep_output_this_cell, but not keep_count, strip the counts
+            # from the output.
+            if keep_output_this_cell and not keep_count:
                 for output in cell['outputs']:
                     if 'execution_count' in output:
                         output['execution_count'] = None
 
-            # If keep_out and keep_count, do nothing.
+            # If keep_output_this_cell and keep_count, do nothing.
 
         # Remove the prompt_number/execution_count, unless directed otherwise
         if 'prompt_number' in cell and not keep_count:
