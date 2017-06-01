@@ -1,4 +1,4 @@
-  $ cat ${TESTDIR}/test_metadata.ipynb | ${NBSTRIPOUT_EXE:-nbstripout}
+  $ cat ${TESTDIR}/test_metadata.ipynb | ${NBSTRIPOUT_EXE:-nbstripout --keep-count}
   {
    "cells": [
     {
@@ -10,7 +10,7 @@
     },
     {
      "cell_type": "code",
-     "execution_count": null,
+     "execution_count": 1,
      "metadata": {
       "init_cell": true
      },
@@ -21,7 +21,7 @@
          "2"
         ]
        },
-       "execution_count": null,
+       "execution_count": 1,
        "metadata": {},
        "output_type": "execute_result"
       }
@@ -32,7 +32,7 @@
     },
     {
      "cell_type": "code",
-     "execution_count": null,
+     "execution_count": 2,
      "metadata": {
       "keep_output": true
      },
@@ -43,7 +43,7 @@
          "4"
         ]
        },
-       "execution_count": null,
+       "execution_count": 2,
        "metadata": {},
        "output_type": "execute_result"
       }
@@ -54,7 +54,7 @@
     },
     {
      "cell_type": "code",
-     "execution_count": null,
+     "execution_count": 3,
      "metadata": {},
      "outputs": [],
      "source": [

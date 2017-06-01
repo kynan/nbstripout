@@ -1,4 +1,4 @@
-  $ cat ${TESTDIR}/test_metadata.ipynb | ${NBSTRIPOUT_EXE:-nbstripout}
+  $ cat ${TESTDIR}/test_metadata.ipynb | ${NBSTRIPOUT_EXE:-nbstripout --keep-output}
   {
    "cells": [
     {
@@ -56,7 +56,18 @@
      "cell_type": "code",
      "execution_count": null,
      "metadata": {},
-     "outputs": [],
+     "outputs": [
+      {
+       "data": {
+        "text/plain": [
+         "6"
+        ]
+       },
+       "execution_count": null,
+       "metadata": {},
+       "output_type": "execute_result"
+      }
+     ],
      "source": [
       "3+3"
      ]
