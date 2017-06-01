@@ -137,20 +137,48 @@ def _cells(nb):
             yield cell
 
 
-def strip_output(nb):
-    """strip the outputs from a notebook object"""
+def strip_output(nb, keep_output, keep_count):
+    """
+    Strip the outputs, execution count/prompt number and miscellaneous
+    metadata from a notebook object, unless specified to keep either the outputs
+    or counts.
+    """
+
     nb.metadata.pop('signature', None)
     nb.metadata.pop('widgets', None)
+
     for cell in _cells(nb):
-        if (cell.metadata.get('init_cell') or cell.metadata.get('keep_output')):
-            # Leave these cells alone
-            continue
+
+        keep_output_this_cell = keep_output
+
+        # Keep the output for these cells, but strip count and metadata
+        if cell.metadata.get('init_cell') or cell.metadata.get('keep_output'):
+            keep_output_this_cell = True
+
+        # Remove the outputs, unless directed otherwise
         if 'outputs' in cell:
-            cell['outputs'] = []
-        if 'prompt_number' in cell:
+
+            # Default behavior strips outputs. With all outputs stripped,
+            # there are no counts to keep and keep_count is ignored.
+            if not keep_output_this_cell:
+                cell['outputs'] = []
+
+            # If keep_output_this_cell, but not keep_count, strip the counts
+            # from the output.
+            if keep_output_this_cell and not keep_count:
+                for output in cell['outputs']:
+                    if 'execution_count' in output:
+                        output['execution_count'] = None
+
+            # If keep_output_this_cell and keep_count, do nothing.
+
+        # Remove the prompt_number/execution_count, unless directed otherwise
+        if 'prompt_number' in cell and not keep_count:
             cell['prompt_number'] = None
-        if 'execution_count' in cell:
+        if 'execution_count' in cell and not keep_count:
             cell['execution_count'] = None
+
+        # Always remove this metadata
         for output_style in ['collapsed', 'scrolled']:
             if output_style in cell.metadata:
                 cell.metadata[output_style] = False
@@ -269,6 +297,10 @@ def main():
                       help='Check if nbstripout is installed in current repository')
     task.add_argument('--status', action='store_true',
                       help='Print status of nbstripout installation in current repository and configuration summary if installed')
+    parser.add_argument('--keep-count', action='store_true',
+                        help='Do not strip the execution count/prompt number')
+    parser.add_argument('--keep-output', action='store_true',
+                        help='Do not strip output')
     parser.add_argument('--attributes', metavar='FILEPATH', help="""Attributes
         file to add the filter to (in combination with --install/--uninstall),
         defaults to .git/info/attributes""")
@@ -301,7 +333,7 @@ def main():
         try:
             with io.open(filename, 'r', encoding='utf8') as f:
                 nb = read(f, as_version=NO_CONVERT)
-            nb = strip_output(nb)
+            nb = strip_output(nb, args.keep_output, args.keep_count)
             if args.textconv:
                 write(nb, output_stream)
             else:
@@ -313,7 +345,9 @@ def main():
             raise
 
     if not args.files:
-        write(strip_output(read(input_stream, as_version=NO_CONVERT)), output_stream)
+        nb = strip_output(read(input_stream, as_version=NO_CONVERT),
+                          args.keep_output, args.keep_count)
+        write(nb, output_stream)
 
 
 if __name__ == '__main__':
