@@ -348,6 +348,7 @@ def main():
         nb = strip_output(read(input_stream, as_version=NO_CONVERT),
                           args.keep_output, args.keep_count)
         write(nb, output_stream)
+        output_stream.flush()
 
 
 if __name__ == '__main__':
