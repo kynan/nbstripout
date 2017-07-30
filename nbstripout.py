@@ -194,6 +194,9 @@ def install(attrfile=None):
     from subprocess import check_call, check_output, CalledProcessError
     try:
         git_dir = check_output(['git', 'rev-parse', '--git-dir']).strip()
+    except WindowsError:
+        print('Installation failed: git is not on path!')
+        sys.exit(1)
     except CalledProcessError:
         print('Installation failed: not a git repository!', file=sys.stderr)
         sys.exit(1)
