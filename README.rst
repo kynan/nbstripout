@@ -56,9 +56,13 @@ Force processing of non ``.ipynb`` files: ::
 
     nbstripout -f FILE.ipynb.bak
 
-Use as part of a shell pipeline: ::
+Write to stdout e.g. to use as part of a shell pipeline: ::
 
     cat FILE.ipynb | nbstripout > OUT.ipynb
+
+or ::
+
+    nbstripout -t FILE.ipynb | other-command
 
 Set up the git filter and attributes as described in the manual installation
 instructions below: ::
