@@ -1,6 +1,16 @@
 Change Log
 ==========
 
+0.3.1 - 2017-07-30
+------------------
+* Add option `-t`/`--textconv` to write to stdout e.g. for use as diff
+  filter (#53, @utsekaj42)
+* Flush output stream after write (#55, @reidpr)
+* Add options `--keep-count` and `--keep-output` to no strip execution
+  counts and output (#56, @jpeacock29)
+* Fix shell pipeline documentation (#59, @psthomas)
+* Catch `WindowsError` when `git` is not found in PATH (#62, @bdforbes)
+
 0.3.0 - 2017-02-23
 ------------------
 * Support whitespace in repository paths (#47, #48, @ehoepfner)
