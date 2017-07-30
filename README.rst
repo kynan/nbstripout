@@ -99,6 +99,14 @@ Show this help page: ::
 Keeping some output
 +++++++++++++++++++
 
+Do not strip the execution count/prompt number ::
+
+    nbstripout --keep-count
+
+Do not strip the output ::
+
+    nbstripout --keep-output
+
 To mark special cells so that the output is not striped, set the
 ``"keep_output": true`` metadata on the cell.  To do this, select the
 "Edit Metadata" Cell Toolbar, and then use the "Edit Metadata" button
