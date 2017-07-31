@@ -100,6 +100,28 @@ Show this help page: ::
 
     nbstripout --help
 
+Apply retroactively
++++++++++++++++++++
+
+``nbstripout`` can be used to rewrite an existing Git repository using
+``git filter-branch`` to strip output from existing notebooks. This invocation
+uses ``--index-filter`` and operates on all ipynb-files in the repo: ::
+
+    git filter-branch -f --index-filter '
+        git checkout -- :*.ipynb
+        find . -name '*.ipynb' -exec nbstripout {} +
+        git add . --ignore-removal
+    '
+
+If the repository is large and the notebooks are in a subdirectory it will run
+faster with ``git checkout -- :<subdir>/*.ipynb``. You will get a warning for
+commits that do not contain any notebooks, which can be suppressed by piping
+stderr to ``/dev/null``.
+
+This is a potentially slower but simpler invocation using ``--tree-filter``: ::
+
+    git filter-branch -f --tree-filter 'find . -name "*.ipynb" -exec nbstripout {} +'
+
 Keeping some output
 +++++++++++++++++++
 
