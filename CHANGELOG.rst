@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+0.3.2 - unreleased
+------------------
+* Add Code of Conduct #62
+* Document `git filter-branch` use case in README (#28, @belteshassar)
+
 0.3.1 - 2017-07-30
 ------------------
 * Add option `-t`/`--textconv` to write to stdout e.g. for use as diff
