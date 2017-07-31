@@ -3,7 +3,8 @@ Change Log
 
 0.3.2 - unreleased
 ------------------
-* Add Code of Conduct #62
+* Add Code of Conduct #63
+* Add MANIFEST.in #64
 * Document `git filter-branch` use case in README (#28, @belteshassar)
 
 0.3.1 - 2017-07-30
