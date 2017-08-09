@@ -344,7 +344,7 @@ def main():
                     write(nb, f)
         except Exception:
             # Ignore exceptions for non-notebook files.
-            print("Could not strip '{}'".format(filename))
+            print("Could not strip '{}'".format(filename), file=sys.stderr)
             raise
 
     if not args.files:
