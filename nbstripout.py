@@ -108,13 +108,16 @@ __version__ = '0.3.1'
 try:
     # Jupyter >= 4
     from nbformat import read, write, NO_CONVERT
+    from nbformat.reader import NotJSONError
 except ImportError:
     # IPython 3
     try:
         from IPython.nbformat import read, write, NO_CONVERT
+        from IPython.nbformat.reader import NotJSONError
     except ImportError:
         # IPython < 3
         from IPython.nbformat import current
+        from IPython.nbformat.reader import NotJSONError
 
         # Dummy value, ignored anyway
         NO_CONVERT = None
@@ -342,16 +345,23 @@ def main():
             else:
                 with io.open(filename, 'w', encoding='utf8') as f:
                     write(nb, f)
+        except NotJSONError:
+            print("'{}' is not a valid notebook".format(filename), file=sys.stderr)
+            sys.exit(1)
         except Exception:
             # Ignore exceptions for non-notebook files.
             print("Could not strip '{}'".format(filename), file=sys.stderr)
             raise
 
     if not args.files:
-        nb = strip_output(read(input_stream, as_version=NO_CONVERT),
-                          args.keep_output, args.keep_count)
-        write(nb, output_stream)
-        output_stream.flush()
+        try:
+            nb = strip_output(read(input_stream, as_version=NO_CONVERT),
+                              args.keep_output, args.keep_count)
+            write(nb, output_stream)
+            output_stream.flush()
+        except NotJSONError:
+            print('No valid notebook detected', file=sys.stderr)
+            sys.exit(1)
 
 
 if __name__ == '__main__':
