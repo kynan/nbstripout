@@ -3,6 +3,7 @@ Change Log
 
 0.3.2 - unreleased
 ------------------
+* Gracefully deal with empty/malformed input #66
 * Add Code of Conduct #63
 * Add MANIFEST.in #64
 * Document `git filter-branch` use case in README (#28, @belteshassar)
