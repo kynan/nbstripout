@@ -3,6 +3,10 @@ from setuptools import setup
 with open('README.rst') as f:
     long_description = f.read()
 
+install_requires = [
+    'nbformat'
+]
+
 setup_requires = [
     'pytest-runner'
 ]
@@ -34,6 +38,7 @@ setup(name='nbstripout',
           ],
       },
 
+      install_requires=install_requires,
       setup_requires=setup_requires,
       tests_require=tests_require,
 
