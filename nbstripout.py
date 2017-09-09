@@ -342,6 +342,7 @@ def main():
             nb = strip_output(nb, args.keep_output, args.keep_count)
             if args.textconv:
                 write(nb, output_stream)
+                output_stream.flush()
             else:
                 with io.open(filename, 'w', encoding='utf8') as f:
                     write(nb, f)
