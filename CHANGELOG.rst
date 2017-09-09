@@ -6,27 +6,33 @@ Change Log
 * Gracefully deal with empty/malformed input #66
 * Add Code of Conduct #63
 * Add MANIFEST.in #64
-* Document `git filter-branch` use case in README (#28, @belteshassar)
+* Document ``git filter-branch`` use case in README
+  (#28, @belteshassar)
+* Flush output when using ``-t`` (#67, @tnilanon)
+* Add ``nbformat`` and ``setuptools >= 30`` to ``setup_requires``
+  (#67, @tnilanon)
+* Use ``travis_retry`` (#67, @tnilanon)
 
 0.3.1 - 2017-07-30
 ------------------
-* Add option `-t`/`--textconv` to write to stdout e.g. for use as diff
-  filter (#53, @utsekaj42)
+* Add option ``-t``/``--textconv`` to write to stdout e.g. for use as
+  diff filter (#53, @utsekaj42)
 * Flush output stream after write (#55, @reidpr)
-* Add options `--keep-count` and `--keep-output` to no strip execution
-  counts and output (#56, @jpeacock29)
+* Add options ``--keep-count`` and ``--keep-output`` to no strip
+  execution counts and output (#56, @jpeacock29)
 * Fix shell pipeline documentation (#59, @psthomas)
-* Catch `WindowsError` when `git` is not found in PATH (#62, @bdforbes)
+* Catch ``WindowsError`` when ``git`` is not found in PATH
+  (#62, @bdforbes)
 
 0.3.0 - 2017-02-23
 ------------------
 * Support whitespace in repository paths (#47, #48, @ehoepfner)
 * Also ignore ``collapsed`` and ``scrolled`` metadata (#34)
-* Define `NO_CONVERT` for IPython <3 import (#46)
+* Define ``NO_CONVERT`` for IPython <3 import (#46)
 
 0.2.9 - 2016-11-23
 ------------------
-* Strip `ExecuteTime` metadata (#34, #39, @jdriordan)
+* Strip ``ExecuteTime`` metadata (#34, #39, @jdriordan)
 * Fix Python 3.5 bug: open attributes file only once (#40)
 * Do not add blank line at beginning of attribute file
 * Strip widget state from notebook metadata (#42)
