@@ -344,7 +344,7 @@ def main():
                 write(nb, output_stream)
                 output_stream.flush()
             else:
-                with io.open(filename, 'w', encoding='utf8') as f:
+                with io.open(filename, 'w', encoding='utf8', newline='\n') as f:
                     write(nb, f)
         except NotJSONError:
             print("'{}' is not a valid notebook".format(filename), file=sys.stderr)
