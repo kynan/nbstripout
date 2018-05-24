@@ -273,6 +273,22 @@ If you want the attributes be set for ``.ipynb`` files in any of your git
 repositories, add those two lines to ``~/.config/git/attributes``. Note that
 this file and the ``~/.config/git`` directory may not exist.
 
+`Pre-commit`__ integration
+==========================
+
+__ https://pre-commit.com/
+
+Once you have it installed, add this to the :code:`.pre-commit-config.yaml` in your repository: ::
+
+    repos:
+    - repo: https://github.com/kynan/nbstripout
+      rev: master
+      hooks:
+        - id: nbstripout
+          files: ".ipynb"
+
+Then run :code:`pre-commit install` and you're ready to go.
+
 Mercurial usage
 ===============
 
