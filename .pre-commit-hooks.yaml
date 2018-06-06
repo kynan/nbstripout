@@ -1,6 +1,5 @@
 -   id: nbstripout
     name: nbstripout
     description: 'nbstripout: strip output from Jupyter and IPython notebooks'
-    entry: nbstripout
+    entry: bash -c 'nbstripout "$@"; git add -u' --
     language: python
-    types: [python]
