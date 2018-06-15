@@ -96,7 +96,7 @@ import os
 for _name in ('stdin', 'stdout', 'stderr'):
     if getattr(sys, _name) is None:
         setattr(sys, _name, open(os.devnull, 'r' if _name == 'stdin' else 'w'))
-del _name # clean up this module's name space a little (optional)
+del _name  # clean up this module's name space a little (optional)
 
 if sys.version_info < (3, 0):
     import codecs
