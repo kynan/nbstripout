@@ -93,6 +93,7 @@ import sys
 import os
 
 # sys.stdin is None sometimes, make sure std* streams are well defined
+# from https://stackoverflow.com/a/17459258
 for _name in ('stdin', 'stdout', 'stderr'):
     if getattr(sys, _name) is None:
         setattr(sys, _name, open(os.devnull, 'r' if _name == 'stdin' else 'w'))
