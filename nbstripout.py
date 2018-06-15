@@ -90,6 +90,13 @@ from __future__ import print_function
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import io
 import sys
+import os
+
+# sys.stdin is None sometimes, make sure std* streams are well defined
+for _name in ('stdin', 'stdout', 'stderr'):
+    if getattr(sys, _name) is None:
+        setattr(sys, _name, open(os.devnull, 'r' if _name == 'stdin' else 'w'))
+del _name # clean up this module's name space a little (optional)
 
 if sys.version_info < (3, 0):
     import codecs
