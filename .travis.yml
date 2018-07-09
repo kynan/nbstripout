@@ -11,4 +11,3 @@ install:
   - travis_retry python setup.py install
 script:
   - travis_retry python setup.py test
-dist: precise
