@@ -1,7 +1,7 @@
 Change Log
 ==========
 
-0.3.2 - unreleased
+0.3.2 - 2018-07-09
 ------------------
 * Gracefully deal with empty/malformed input #66
 * Add Code of Conduct #63
@@ -12,6 +12,7 @@ Change Log
 * Add ``nbformat`` and ``setuptools >= 30`` to ``setup_requires``
   (#67, @tnilanon)
 * Use ``travis_retry`` (#67, @tnilanon)
+* Drop support for Python 3.3 (no longer supported by setuptools)
 
 0.3.1 - 2017-07-30
 ------------------
