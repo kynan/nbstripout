@@ -91,16 +91,19 @@ from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import io
 import sys
 
+input_stream = None
 if sys.version_info < (3, 0):
     import codecs
     # Use UTF8 reader/writer for stdin/stdout
     # http://stackoverflow.com/a/1169209
-    input_stream = codecs.getreader('utf8')(sys.stdin)
+    if sys.stdin is not None:
+        input_stream = codecs.getreader('utf8')(sys.stdin)
     output_stream = codecs.getwriter('utf8')(sys.stdout)
 else:
     # Wrap input/output stream in UTF-8 encoded text wrapper
     # https://stackoverflow.com/a/16549381
-    input_stream = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8')
+    if sys.stdin is not None:
+        input_stream = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8')
     output_stream = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 __version__ = '0.3.2'
@@ -354,7 +357,7 @@ def main():
             print("Could not strip '{}'".format(filename), file=sys.stderr)
             raise
 
-    if not args.files:
+    if not args.files and input_stream is not None:
         try:
             nb = strip_output(read(input_stream, as_version=NO_CONVERT),
                               args.keep_output, args.keep_count)
