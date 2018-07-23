@@ -96,13 +96,13 @@ if sys.version_info < (3, 0):
     import codecs
     # Use UTF8 reader/writer for stdin/stdout
     # http://stackoverflow.com/a/1169209
-    if sys.stdin is not None:
+    if sys.stdin:
         input_stream = codecs.getreader('utf8')(sys.stdin)
     output_stream = codecs.getwriter('utf8')(sys.stdout)
 else:
     # Wrap input/output stream in UTF-8 encoded text wrapper
     # https://stackoverflow.com/a/16549381
-    if sys.stdin is not None:
+    if sys.stdin:
         input_stream = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8')
     output_stream = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
@@ -357,7 +357,7 @@ def main():
             print("Could not strip '{}'".format(filename), file=sys.stderr)
             raise
 
-    if not args.files and input_stream is not None:
+    if not args.files and input_stream:
         try:
             nb = strip_output(read(input_stream, as_version=NO_CONVERT),
                               args.keep_output, args.keep_count)
