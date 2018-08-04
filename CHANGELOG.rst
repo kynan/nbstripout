@@ -1,11 +1,12 @@
 Change Log
 ==========
 
-0.3.3 - unreleased
+0.3.3 - 2018-08-04
 ------------------
 * Distribute tests in source package (#73 #76, @jluttine)
 * Fix git diff tests for newer Git versions (#74 #76, @jluttine)
 * Install full path for diff.ipynb.textconv (#68 #82, @ibressler)
+* Make sure sys.stdin is not None before reading from it (#68 #82, @ibressler)
 
 0.3.2 - 2018-07-09
 ------------------
