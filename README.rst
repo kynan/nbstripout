@@ -109,7 +109,7 @@ uses ``--index-filter`` and operates on all ipynb-files in the repo: ::
 
     git filter-branch -f --index-filter '
         git checkout -- :*.ipynb
-        find . -name '*.ipynb' -exec nbstripout {} +
+        find . -name "*.ipynb" -exec nbstripout "{}" +
         git add . --ignore-removal
     '
 
@@ -120,7 +120,7 @@ stderr to ``/dev/null``.
 
 This is a potentially slower but simpler invocation using ``--tree-filter``: ::
 
-    git filter-branch -f --tree-filter 'find . -name "*.ipynb" -exec nbstripout {} +'
+    git filter-branch -f --tree-filter 'find . -name "*.ipynb" -exec nbstripout "{}" +'
 
 Keeping some output
 +++++++++++++++++++
