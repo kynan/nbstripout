@@ -1,0 +1,9 @@
+- id: nbstripout
+  name: nbstripout
+  description: |
+    Make shure to clean jupyter notebooks before commit.
+    https://pypi.python.org/pypi/nbstripout
+  entry: nbstripout
+  language: python
+  files: '.*\.ipynb$'
+  stages: [commit, push, manual]
