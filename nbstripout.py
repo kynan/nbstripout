@@ -143,15 +143,31 @@ def _cells(nb):
             yield cell
 
 
-def strip_output(nb, keep_output, keep_count):
+def strip_output(nb, keep_output, keep_count, extra_keys=''):
     """
     Strip the outputs, execution count/prompt number and miscellaneous
     metadata from a notebook object, unless specified to keep either the outputs
     or counts.
     """
 
+    # extra_keys could be 'metadata.foo cell.metadata.bar'
+    extra_keys = extra_keys.split()
+    keys = {'metadata': [], 'cell': {'metadata': []}}
+    # generic extra_keys[] recursive split('.') => keys{}...{}[]
+    for i in extra_keys:
+        nested = i.split('.')
+        current = keys
+        for k in nested[:-2]:
+            current = current.setdefault(k, {})
+        if len(nested) >= 2:
+            current = current.setdefault(nested[-2], [])
+        current.append(nested[-1])
+    # sys.stderr.write(str(keys))
+
     nb.metadata.pop('signature', None)
     nb.metadata.pop('widgets', None)
+    for field in keys['metadata']:
+        nb.metadata.pop(field, None)  # TODO: recurse on field.split('.')
 
     for cell in _cells(nb):
 
@@ -191,6 +207,11 @@ def strip_output(nb, keep_output, keep_count):
         if 'metadata' in cell:
             for field in ['collapsed', 'scrolled', 'ExecuteTime']:
                 cell.metadata.pop(field, None)
+        for (extra, fields) in keys['cell'].items():
+            if extra in cell:
+                for field in fields:
+                    getattr(cell, extra).pop(field, None)
+                    # TODO: recurse on field.split('.')
     return nb
 
 
@@ -211,6 +232,11 @@ def install(attrfile=None):
     check_call(['git', 'config', 'filter.nbstripout.clean', filepath])
     check_call(['git', 'config', 'filter.nbstripout.smudge', 'cat'])
     check_call(['git', 'config', 'filter.nbstripout.required', 'true'])
+    try:
+        # don't override global config
+        check_output(['git', 'config', 'filter.nbstripout.extrakeys'])
+    except CalledProcessError:
+        check_call(['git', 'config', 'filter.nbstripout.extrakeys', ' '])
     check_call(['git', 'config', 'diff.ipynb.textconv', filepath + ' -t'])
 
     if not attrfile:
@@ -273,6 +299,7 @@ def status(verbose=False):
         diff = check_output(['git', 'config', 'diff.ipynb.textconv']).strip()
         attributes = check_output(['git', 'check-attr', 'filter', '--', '*.ipynb']).strip()
         diff_attributes = check_output(['git', 'check-attr', 'diff', '--', '*.ipynb']).strip()
+        extra_keys = check_output(['git', 'config', 'filter.nbstripout.extrakeys']).strip()
         if attributes.endswith(b'unspecified'):
             if verbose:
                 print('nbstripout is not installed in repository', git_dir)
@@ -284,6 +311,7 @@ def status(verbose=False):
             print('  smudge =', smudge)
             print('  required =', required)
             print('  diff=', diff)
+            print('  extrakeys=', extra_keys)
             print('\nAttributes:\n ', attributes)
             print('\nDiff Attributes:\n ', diff_attributes)
         return 0
@@ -294,6 +322,7 @@ def status(verbose=False):
 
 
 def main():
+    from subprocess import check_output, CalledProcessError
     parser = ArgumentParser(epilog=__doc__, formatter_class=RawDescriptionHelpFormatter)
     task = parser.add_mutually_exclusive_group()
     task.add_argument('--install', action='store_true',
@@ -336,13 +365,18 @@ def main():
         print(__version__)
         sys.exit(0)
 
+    try:
+        extra_keys = check_output(['git', 'config', 'filter.nbstripout.extrakeys']).strip()
+    except CalledProcessError:
+        extra_keys = ''
+
     for filename in args.files:
         if not (args.force or filename.endswith('.ipynb')):
             continue
         try:
             with io.open(filename, 'r', encoding='utf8') as f:
                 nb = read(f, as_version=NO_CONVERT)
-            nb = strip_output(nb, args.keep_output, args.keep_count)
+            nb = strip_output(nb, args.keep_output, args.keep_count, extra_keys)
             if args.textconv:
                 write(nb, output_stream)
                 output_stream.flush()
@@ -360,7 +394,7 @@ def main():
     if not args.files and input_stream:
         try:
             nb = strip_output(read(input_stream, as_version=NO_CONVERT),
-                              args.keep_output, args.keep_count)
+                              args.keep_output, args.keep_count, extra_keys)
             write(nb, output_stream)
             output_stream.flush()
         except NotJSONError:
