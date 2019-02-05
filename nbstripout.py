@@ -153,16 +153,13 @@ def strip_output(nb, keep_output, keep_count, extra_keys=''):
     # extra_keys could be 'metadata.foo cell.metadata.bar'
     extra_keys = extra_keys.split()
     keys = {'metadata': [], 'cell': {'metadata': []}}
-    # generic extra_keys[] recursive split('.') => keys{}...{}[]
     for i in extra_keys:
-        nested = i.split('.')
-        current = keys
-        for k in nested[:-2]:
-            current = current.setdefault(k, {})
-        if len(nested) >= 2:
-            current = current.setdefault(nested[-2], [])
-        current.append(nested[-1])
-    # sys.stderr.write(str(keys))
+        if i.startswith('metadata.'):
+            keys['metadata'].append(i[len('metadata.'):])
+        elif i.startswith('cell.metadata.'):
+            keys['cell']['metadata'].append(i[len('cell.metadata.'):])
+        else:
+            sys.stderr.write('ignoring ' + i)
 
     nb.metadata.pop('signature', None)
     nb.metadata.pop('widgets', None)
