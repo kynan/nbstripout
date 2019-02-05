@@ -143,6 +143,21 @@ def _cells(nb):
             yield cell
 
 
+def pop_recursive(d, key, default=None):
+    """
+    >>> d = {'a': {'b': 1, 'c': 2}}
+    >>> pop_recursive(d, 'a.c')
+    2
+    >>> d
+    {'a': {'b': 1}}
+    """
+    nested = key.split('.')
+    current = d
+    for k in nested[:-1]:
+        current = current.get(k, {})
+    return current.pop(nested[-1], default)
+
+
 def strip_output(nb, keep_output, keep_count, extra_keys=''):
     """
     Strip the outputs, execution count/prompt number and miscellaneous
@@ -164,7 +179,7 @@ def strip_output(nb, keep_output, keep_count, extra_keys=''):
     nb.metadata.pop('signature', None)
     nb.metadata.pop('widgets', None)
     for field in keys['metadata']:
-        nb.metadata.pop(field, None)  # TODO: recurse on field.split('.')
+        pop_recursive(nb.metadata, field)
 
     for cell in _cells(nb):
 
@@ -207,8 +222,7 @@ def strip_output(nb, keep_output, keep_count, extra_keys=''):
         for (extra, fields) in keys['cell'].items():
             if extra in cell:
                 for field in fields:
-                    getattr(cell, extra).pop(field, None)
-                    # TODO: recurse on field.split('.')
+                    pop_recursive(getattr(cell, extra), field)
     return nb
 
 
