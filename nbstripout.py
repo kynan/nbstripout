@@ -243,11 +243,6 @@ def install(attrfile=None):
     check_call(['git', 'config', 'filter.nbstripout.clean', filepath])
     check_call(['git', 'config', 'filter.nbstripout.smudge', 'cat'])
     check_call(['git', 'config', 'filter.nbstripout.required', 'true'])
-    try:
-        # don't override global config
-        check_output(['git', 'config', 'filter.nbstripout.extrakeys'])
-    except CalledProcessError:
-        check_call(['git', 'config', 'filter.nbstripout.extrakeys', ' '])
     check_call(['git', 'config', 'diff.ipynb.textconv', filepath + ' -t'])
 
     if not attrfile:
@@ -310,7 +305,10 @@ def status(verbose=False):
         diff = check_output(['git', 'config', 'diff.ipynb.textconv']).strip()
         attributes = check_output(['git', 'check-attr', 'filter', '--', '*.ipynb']).strip()
         diff_attributes = check_output(['git', 'check-attr', 'diff', '--', '*.ipynb']).strip()
-        extra_keys = check_output(['git', 'config', 'filter.nbstripout.extrakeys']).strip()
+        try:
+            extra_keys = check_output(['git', 'config', 'filter.nbstripout.extrakeys']).strip()
+        except CalledProcessError:
+            extra_keys = ''
         if attributes.endswith(b'unspecified'):
             if verbose:
                 print('nbstripout is not installed in repository', git_dir)
