@@ -144,7 +144,8 @@ def _cells(nb):
 
 
 def pop_recursive(d, key, default=None):
-    """
+    """dict.pop(key) where `key` is a `.`-delimited list of nested keys.
+
     >>> d = {'a': {'b': 1, 'c': 2}}
     >>> pop_recursive(d, 'a.c')
     2
@@ -163,9 +164,9 @@ def strip_output(nb, keep_output, keep_count, extra_keys=''):
     Strip the outputs, execution count/prompt number and miscellaneous
     metadata from a notebook object, unless specified to keep either the outputs
     or counts.
-    """
 
-    # extra_keys could be 'metadata.foo cell.metadata.bar'
+    `extra_keys` could be 'metadata.foo cell.metadata.bar metadata.baz'
+    """
     extra_keys = extra_keys.split()
     keys = {'metadata': [], 'cell': {'metadata': []}}
     for i in extra_keys:
