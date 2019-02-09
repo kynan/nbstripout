@@ -7,7 +7,8 @@
   [1]
   $ ${NBSTRIPOUT_EXE:-nbstripout} --install
   $ ${NBSTRIPOUT_EXE:-nbstripout} --is-installed
-  $ git diff --no-index --no-ext-diff --unified=0 --exit-code -a --no-prefix ${TESTDIR}/test_diff.ipynb ${TESTDIR}/test_diff_output.ipynb
+  $ git diff --no-index ${TESTDIR}/test_diff.ipynb ${TESTDIR}/test_diff_output.ipynb
+  [1]
   $ git diff --no-index ${TESTDIR}/test_diff.ipynb ${TESTDIR}/test_diff_different_extrakeys.ipynb
   (diff --git.*) (re)
   (index .*) (re)
