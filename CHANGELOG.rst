@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+0.3.4 - unreleased
+------------------
+* Fix ``WindowsError`` not defined on POSIX systems (#90)
+
 0.3.3 - 2018-08-04
 ------------------
 * Distribute tests in source package (#73 #76, @jluttine)
