@@ -196,11 +196,11 @@ def strip_output(nb, keep_output, keep_count):
 
 def install(attrfile=None):
     """Install the git filter and set the git attributes."""
-    from os import path
+    from os import name, path
     from subprocess import check_call, check_output, CalledProcessError
     try:
         git_dir = check_output(['git', 'rev-parse', '--git-dir']).strip()
-    except WindowsError:
+    except (WindowsError if name == 'nt' else FileNotFoundError):
         print('Installation failed: git is not on path!', file=sys.stderr)
         sys.exit(1)
     except CalledProcessError:
