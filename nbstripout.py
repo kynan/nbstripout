@@ -169,13 +169,13 @@ def strip_output(nb, keep_output, keep_count, extra_keys=''):
     """
     extra_keys = extra_keys.split()
     keys = {'metadata': [], 'cell': {'metadata': []}}
-    for i in extra_keys:
-        if i.startswith('metadata.'):
-            keys['metadata'].append(i[len('metadata.'):])
-        elif i.startswith('cell.metadata.'):
-            keys['cell']['metadata'].append(i[len('cell.metadata.'):])
+    for key in extra_keys:
+        if key.startswith('metadata.'):
+            keys['metadata'].append(key[len('metadata.'):])
+        elif key.startswith('cell.metadata.'):
+            keys['cell']['metadata'].append(key[len('cell.metadata.'):])
         else:
-            sys.stderr.write('ignoring ' + i)
+            sys.stderr.write('ignoring extra key `%s`' % key)
 
     nb.metadata.pop('signature', None)
     nb.metadata.pop('widgets', None)
