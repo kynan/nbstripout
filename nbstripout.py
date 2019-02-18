@@ -155,7 +155,12 @@ def pop_recursive(d, key, default=None):
     nested = key.split('.')
     current = d
     for k in nested[:-1]:
-        current = current.get(k, {})
+        if hasattr(current, 'get'):
+            current = current.get(k, {})
+        else:
+            return default
+    if not hasattr(current, 'pop'):
+        return default
     return current.pop(nested[-1], default)
 
 
