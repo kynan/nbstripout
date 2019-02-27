@@ -43,6 +43,8 @@ def strip_output(nb, keep_output, keep_count, extra_keys=''):
 
     `extra_keys` could be 'metadata.foo cell.metadata.bar metadata.baz'
     """
+    if hasattr(extra_keys, 'decode'):
+        extra_keys = extra_keys.decode()
     extra_keys = extra_keys.split()
     keys = {'metadata': [], 'cell': {'metadata': []}}
     for key in extra_keys:
