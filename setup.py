@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 with open('README.rst') as f:
     long_description = f.read()
@@ -32,10 +32,11 @@ setup(name='nbstripout',
 
       description='Strips outputs from Jupyter and IPython notebooks',
       long_description=long_description,
-      py_modules=['nbstripout'],
+      packages=find_packages(),
+      provides=['nbstripout'],
       entry_points={
           'console_scripts': [
-              'nbstripout = nbstripout:main'
+              'nbstripout = nbstripout._nbstripout:main'
           ],
       },
 
