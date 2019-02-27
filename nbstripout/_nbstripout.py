@@ -90,25 +90,6 @@ from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import io
 import sys
 from nbstripout._utils import strip_output
-__all__ = ["install", "uninstall", "status", "main"]
-
-input_stream = None
-if sys.version_info < (3, 0):
-    import codecs
-    # Use UTF8 reader/writer for stdin/stdout
-    # http://stackoverflow.com/a/1169209
-    if sys.stdin:
-        input_stream = codecs.getreader('utf8')(sys.stdin)
-    output_stream = codecs.getwriter('utf8')(sys.stdout)
-else:
-    # Wrap input/output stream in UTF-8 encoded text wrapper
-    # https://stackoverflow.com/a/16549381
-    if sys.stdin:
-        input_stream = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8')
-    output_stream = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
-
-__version__ = '0.3.3'
-
 try:
     # Jupyter >= 4
     from nbformat import read, write, NO_CONVERT
@@ -131,6 +112,9 @@ except ImportError:
 
         def write(nb, f):
             return current.write(nb, f, 'json')
+
+__all__ = ["install", "uninstall", "status", "main"]
+__version__ = '0.3.3'
 
 
 def install(attrfile=None):
@@ -285,6 +269,21 @@ def main():
         extra_keys = check_output(['git', 'config', 'filter.nbstripout.extrakeys']).strip()
     except CalledProcessError:
         extra_keys = ''
+
+    input_stream = None
+    if sys.version_info < (3, 0):
+        import codecs
+        # Use UTF8 reader/writer for stdin/stdout
+        # http://stackoverflow.com/a/1169209
+        if sys.stdin:
+            input_stream = codecs.getreader('utf8')(sys.stdin)
+        output_stream = codecs.getwriter('utf8')(sys.stdout)
+    else:
+        # Wrap input/output stream in UTF-8 encoded text wrapper
+        # https://stackoverflow.com/a/16549381
+        if sys.stdin:
+            input_stream = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8')
+        output_stream = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
     for filename in args.files:
         if not (args.force or filename.endswith('.ipynb')):
