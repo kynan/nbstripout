@@ -114,7 +114,7 @@ except ImportError:
             return current.write(nb, f, 'json')
 
 __all__ = ["install", "uninstall", "status", "main"]
-__version__ = '0.3.3'
+__version__ = '0.3.4'
 
 
 def install(attrfile=None):
