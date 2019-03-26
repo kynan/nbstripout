@@ -60,3 +60,7 @@ target/
 
 # tmp files
 *~
+*.sw[op]
+
+# PyCharm
+.idea
