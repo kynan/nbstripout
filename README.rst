@@ -158,7 +158,7 @@ Stripping metadata
 ++++++++++++++++++
 
 This is configurable via `git config (--global) filter.nbstripout.extrakeys`.
-An example would be:
+An example would be: ::
 
     git config --global filter.nbstripout.extrakeys '
       metadata.celltoolbar metadata.kernel_spec.display_name
