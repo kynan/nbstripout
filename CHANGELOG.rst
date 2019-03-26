@@ -1,9 +1,10 @@
 Change Log
 ==========
 
-0.3.4 - unreleased
+0.3.4 - 2019-03-26
 ------------------
 * Fix ``WindowsError`` not defined on POSIX systems (#90)
+* Add support for blacklisting custom metatdata fields (#92, @casperdcl)
 
 0.3.3 - 2018-08-04
 ------------------
