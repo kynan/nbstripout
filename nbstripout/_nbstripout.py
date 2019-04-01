@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Strip output from Jupyter and IPython notebooks
 ===============================================
@@ -129,8 +128,8 @@ def install(attrfile=None):
     except CalledProcessError:
         print('Installation failed: not a git repository!', file=sys.stderr)
         sys.exit(1)
-    filepath = '"%s" "%s"' % (sys.executable.replace('\\', '/'),
-                              path.abspath(__file__).replace('\\', '/'))
+    dir = path.abspath(path.dirname(__file__))
+    filepath = '"{}" "{}"'.format(sys.executable, dir).replace('\\', '/')
     check_call(['git', 'config', 'filter.nbstripout.clean', filepath])
     check_call(['git', 'config', 'filter.nbstripout.smudge', 'cat'])
     check_call(['git', 'config', 'filter.nbstripout.required', 'true'])
@@ -315,7 +314,3 @@ def main():
         except NotJSONError:
             print('No valid notebook detected', file=sys.stderr)
             sys.exit(1)
-
-
-if __name__ == '__main__':
-    main()

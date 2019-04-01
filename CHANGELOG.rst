@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+0.3.5 - 2019-04-02
+------------------
+
+* Make nbstripout package executable and fix regression (#94)
+
 0.3.4 - 2019-03-26
 ------------------
 * Fix ``WindowsError`` not defined on POSIX systems (#90)
