@@ -5,6 +5,7 @@ Change Log
 ------------------
 
 * Make nbstripout package executable and fix regression (#94)
+* Add package docstring
 
 0.3.4 - 2019-03-26
 ------------------
