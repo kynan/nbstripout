@@ -1,0 +1,6 @@
+-   id: nbstripout
+    name: nbstripout
+    description: "Apply nbstripout"
+    entry: nbstripout
+    language: python
+    files: ''
