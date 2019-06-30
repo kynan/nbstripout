@@ -124,6 +124,29 @@ none                                     ``.git/config``  ``.git/info/attributes
 ``--global --attributes=.gitattributes`` ``~/.gitconfig`` ``.gitattributes``
 ======================================== ================ ========================
 
+Install globally
+++++++++++++++++
+
+Usually, ``nbstripout`` is installed per repository so you can choose where to
+use it or not. You can choose to set the attributes in ``.gitattributes`` and
+commit this file to your repository, however there is no way to have git set up
+the filters automatically when someone clones a repository. This is by design,
+to prevent you from executing arbitrary and potentially malicious code when
+cloning a repository.
+
+To install ``nbstripout`` for all your repositories such that you no longer
+need to run the installation once per repository, install as follows: ::
+
+    mkdir -p ~/.config/git  # This folder may not exist
+    nbstripout --install --global --attributes=~/.config/git/attributes
+
+This will set up the filters and diff driver in your ``~/.gitconfig`` and
+instruct git to apply them to any ``.ipynb`` file in any repository.
+
+Note that you need to uninstall with the same flags: ::
+
+    nbstripout --uninstall --global --attributes=~/.config/git/attributes
+
 Apply retroactively
 +++++++++++++++++++
 
