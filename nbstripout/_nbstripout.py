@@ -145,6 +145,7 @@ def install(git_config, attrfile=None):
 
     if not attrfile:
         attrfile = path.join(git_dir.decode(), 'info', 'attributes')
+    attrfile = path.expanduser(attrfile)
 
     # Check if there is already a filter for ipynb files
     filt_exists = False
