@@ -150,10 +150,13 @@ def install(attrfile=None):
             return
 
     with open(attrfile, 'a') as f:
+        # If the file already exists, ensure it ends with a new line
+        if f.tell():
+            f.write('\n')
         if not filt_exists:
-            print(('\n' if f.tell() else '') + '*.ipynb filter=nbstripout', file=f)
+            print('*.ipynb filter=nbstripout', file=f)
         if not diff_exists:
-            print(('\n' if f.tell() else '') + '*.ipynb diff=ipynb', file=f)
+            print('*.ipynb diff=ipynb', file=f)
 
 
 def uninstall(attrfile=None):
