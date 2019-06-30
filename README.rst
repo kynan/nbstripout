@@ -192,6 +192,33 @@ An example would be: ::
       cell.metadata.heading_collapsed cell.metadata.hidden
       cell.metadata.code_folding cell.metadata.tags cell.metadata.init_cell'
 
+Excluding folders
++++++++++++++++++
+
+To exclude a certain folder from being processed by the ``nbstripout`` filter,
+add the following line to your ``.git/info/attributes`` (or ``.gitattributes``
+if you choose to use that): ::
+
+    docs/** filter= diff=
+
+This will disable ``nbstripout`` for any file in the ``docs`` directory.
+
+To check which attributes a given file has with the current config, run ::
+
+    git check-attr -a -- path/to/file
+
+For a file to which the filter applies you will see the following: ::
+
+    $ git check-attr -a -- foo.ipynb
+    foo.ipynb: diff: ipynb
+    foo.ipynb: filter: nbstripout
+
+For a file in your excluded folder you will see the following: ::
+
+    $ git check-attr -a -- docs/foo.ipynb
+    foo.ipynb: diff:
+    foo.ipynb: filter:
+
 Manual filter installation
 ==========================
 
