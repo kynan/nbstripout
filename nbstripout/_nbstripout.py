@@ -36,9 +36,17 @@ Set up the git filter using ``.gitattributes`` ::
 
     nbstripout --install --attributes .gitattributes
 
+Set up the git filter in your global ``~/.gitconfig`` ::
+
+    nbstripout --install --global
+
 Remove the git filter and attributes: ::
 
     nbstripout --uninstall
+
+Remove the git filter from your global ``~/.gitconfig`` and attributes ::
+
+    nbstripout --install --global
 
 Remove the git filter and attributes from ``.gitattributes``: ::
 
@@ -116,7 +124,7 @@ __all__ = ["install", "uninstall", "status", "main"]
 __version__ = '0.3.5'
 
 
-def install(attrfile=None):
+def install(git_config, attrfile=None):
     """Install the git filter and set the git attributes."""
     from os import name, path
     from subprocess import check_call, check_output, CalledProcessError
@@ -130,10 +138,10 @@ def install(attrfile=None):
         sys.exit(1)
     dir = path.abspath(path.dirname(__file__))
     filepath = '"{}" "{}"'.format(sys.executable, dir).replace('\\', '/')
-    check_call(['git', 'config', 'filter.nbstripout.clean', filepath])
-    check_call(['git', 'config', 'filter.nbstripout.smudge', 'cat'])
-    check_call(['git', 'config', 'filter.nbstripout.required', 'true'])
-    check_call(['git', 'config', 'diff.ipynb.textconv', filepath + ' -t'])
+    check_call(git_config + ['filter.nbstripout.clean', filepath])
+    check_call(git_config + ['filter.nbstripout.smudge', 'cat'])
+    check_call(git_config + ['filter.nbstripout.required', 'true'])
+    check_call(git_config + ['diff.ipynb.textconv', filepath + ' -t'])
 
     if not attrfile:
         attrfile = path.join(git_dir.decode(), 'info', 'attributes')
@@ -159,7 +167,7 @@ def install(attrfile=None):
             print('*.ipynb diff=ipynb', file=f)
 
 
-def uninstall(attrfile=None):
+def uninstall(git_config, attrfile=None):
     """Uninstall the git filter and unset the git attributes."""
     from os import devnull, path
     from subprocess import call, check_output, CalledProcessError, STDOUT
@@ -169,10 +177,10 @@ def uninstall(attrfile=None):
         print('Installation failed: not a git repository!', file=sys.stderr)
         sys.exit(1)
 
-    call(['git', 'config', '--remove-section', 'filter.nbstripout'],
+    call(git_config + ['--remove-section', 'filter.nbstripout'],
          stdout=open(devnull, 'w'), stderr=STDOUT)
 
-    call(['git', 'config', '--remove-section', 'diff.ipynb'],
+    call(git_config + ['--remove-section', 'diff.ipynb'],
          stdout=open(devnull, 'w'), stderr=STDOUT)
 
     if not attrfile:
@@ -186,20 +194,20 @@ def uninstall(attrfile=None):
             f.truncate()
 
 
-def status(verbose=False):
+def status(git_config, verbose=False):
     """Return 0 if nbstripout is installed in the current repo, 1 otherwise"""
     from os import path
     from subprocess import check_output, CalledProcessError
     try:
         git_dir = path.dirname(path.abspath(check_output(['git', 'rev-parse', '--git-dir']).strip()))
-        clean = check_output(['git', 'config', 'filter.nbstripout.clean']).strip()
-        smudge = check_output(['git', 'config', 'filter.nbstripout.smudge']).strip()
-        required = check_output(['git', 'config', 'filter.nbstripout.required']).strip()
-        diff = check_output(['git', 'config', 'diff.ipynb.textconv']).strip()
+        clean = check_output(git_config + ['filter.nbstripout.clean']).strip()
+        smudge = check_output(git_config + ['filter.nbstripout.smudge']).strip()
+        required = check_output(git_config + ['filter.nbstripout.required']).strip()
+        diff = check_output(git_config + ['diff.ipynb.textconv']).strip()
         attributes = check_output(['git', 'check-attr', 'filter', '--', '*.ipynb']).strip()
         diff_attributes = check_output(['git', 'check-attr', 'diff', '--', '*.ipynb']).strip()
         try:
-            extra_keys = check_output(['git', 'config', 'filter.nbstripout.extrakeys']).strip()
+            extra_keys = check_output(git_config + ['filter.nbstripout.extrakeys']).strip()
         except CalledProcessError:
             extra_keys = ''
         if attributes.endswith(b'unspecified'):
@@ -244,6 +252,8 @@ def main():
     parser.add_argument('--attributes', metavar='FILEPATH', help="""Attributes
         file to add the filter to (in combination with --install/--uninstall),
         defaults to .git/info/attributes""")
+    parser.add_argument('--global', dest='_global', action='store_true',
+                        help='Use global git config (default is local config)')
     task.add_argument('--version', action='store_true',
                       help='Print version')
     parser.add_argument('--force', '-f', action='store_true',
@@ -255,20 +265,21 @@ def main():
     parser.add_argument('files', nargs='*', help='Files to strip output from')
     args = parser.parse_args()
 
+    git_config = ['git', 'config'] + (['--global'] if args._global else [])
     if args.install:
-        sys.exit(install(args.attributes))
+        sys.exit(install(git_config, attrfile=args.attributes))
     if args.uninstall:
-        sys.exit(uninstall(args.attributes))
+        sys.exit(uninstall(git_config, attrfile=args.attributes))
     if args.is_installed:
-        sys.exit(status(verbose=False))
+        sys.exit(status(git_config, verbose=False))
     if args.status:
-        sys.exit(status(verbose=True))
+        sys.exit(status(git_config, verbose=True))
     if args.version:
         print(__version__)
         sys.exit(0)
 
     try:
-        extra_keys = check_output(['git', 'config', 'filter.nbstripout.extrakeys']).strip()
+        extra_keys = check_output(git_config + ['filter.nbstripout.extrakeys']).strip()
     except CalledProcessError:
         extra_keys = ''
 
