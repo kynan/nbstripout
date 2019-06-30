@@ -73,9 +73,17 @@ Set up the git filter using ``.gitattributes`` ::
 
     nbstripout --install --attributes .gitattributes
 
+Set up the git filter in your global ``~/.gitconfig`` ::
+
+    nbstripout --install --global
+
 Remove the git filter and attributes: ::
 
     nbstripout --uninstall
+
+Remove the git filter from your global ``~/.gitconfig`` and attributes ::
+
+    nbstripout --install --global
 
 Remove the git filter and attributes from ``.gitattributes``: ::
 
@@ -99,6 +107,22 @@ Print the version: ::
 Show this help page: ::
 
     nbstripout --help
+
+Configuration files
++++++++++++++++++++
+
+The following table shows in which files the ``nbstripout`` filter and
+attribute configuration is written to for given extra flags to ``--install``
+and ``--uninstall``:
+
+======================================== ================ ========================
+flags                                    filters          attributes
+======================================== ================ ========================
+none                                     ``.git/config``  ``.git/info/attributes``
+``--global``                             ``~/.gitconfig`` ``.git/info/attributes``
+``--attributes=.gitattributes``          ``.git/config``  ``.gitattributes``
+``--global --attributes=.gitattributes`` ``~/.gitconfig`` ``.gitattributes``
+======================================== ================ ========================
 
 Apply retroactively
 +++++++++++++++++++
@@ -157,7 +181,7 @@ __ https://github.com/ipython-contrib/jupyter_contrib_nbextensions/tree/master/s
 Stripping metadata
 ++++++++++++++++++
 
-This is configurable via `git config (--global) filter.nbstripout.extrakeys`.
+This is configurable via ``git config (--global) filter.nbstripout.extrakeys``.
 An example would be: ::
 
     git config --global filter.nbstripout.extrakeys '
@@ -171,23 +195,33 @@ An example would be: ::
 Manual filter installation
 ==========================
 
-Set up a git filter using nbstripout as follows: ::
+Set up a git filter and diff driver using nbstripout as follows: ::
 
     git config filter.nbstripout.clean '/path/to/nbstripout'
     git config filter.nbstripout.smudge cat
     git config filter.nbstripout.required true
-
-Create a file ``.gitattributes`` or ``.git/info/attributes`` with: ::
-
-    *.ipynb filter=nbstripout
-
-Apply the filter for git diff of ``*.ipynb`` files: ::
-
     git config diff.ipynb.textconv '/path/to/nbstripout -t'
 
-In file ``.gitattributes`` or ``.git/info/attributes`` add: ::
+This will add a section to the ``.git/config`` file of the current repository.
 
+If you want the filter to be installed globally for your user, add the
+``--global`` flag to the ``git config`` invocations above to have the
+configuration written to your ``~/.gitconfig`` and apply to all repositories.
+
+Create a file ``.gitattributes`` (if you want it versioned with the repository)
+or ``.git/info/attributes`` (to apply it only to the current repository) with
+the following content: ::
+
+    *.ipynb filter=nbstripout
     *.ipynb diff=ipynb
+
+This instructs git to use the filter named _nbstripout_ and the diff driver
+named _ipynb_ set up in the git config above for every ``.ipynb`` file in the
+repository.
+
+If you want the attributes be set for ``.ipynb`` files in any of your git
+repositories, add those two lines to ``~/.config/git/attributes``. Note that
+this file and the ``~/.config/git`` directory may not exist.
 
 Mercurial usage
 ===============
