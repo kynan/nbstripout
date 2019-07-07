@@ -53,4 +53,4 @@
   [1]
   $ cat .git/info/attributes
   *.txt text
-  
+
