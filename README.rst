@@ -289,6 +289,10 @@ Once you have it installed, add this to the :code:`.pre-commit-config.yaml` in y
 
 Then run :code:`pre-commit install` and you're ready to go.
 
+.. warning::
+    :code:`nbstripout` is used as a git hook instead as as filter. A filter only modifies what git gets to see for committing or diffing. The working copy stays intact. A pre-commit hook is used to perform checks on a commit just before the snapshot is taken. It's only supposed to abort the commit if checks fails, not intended to modify the commit.
+    The hook is intended to fail so that the user is forced to double check the results.
+
 Mercurial usage
 ===============
 
