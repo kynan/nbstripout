@@ -1,6 +1,15 @@
 Change Log
 ==========
 
+0.3.6 - 2019-07-18
+------------------
+
+* Document global installation in README (#100)
+* Document how to exclude folders in README (#99)
+* Expand ``~`` when looking up attributes file
+* Add ``--global`` flag for ``--install`` / ``--uninstall`` to write the filter
+  config to ``~/.gitconfig`` (#98)
+
 0.3.5 - 2019-04-02
 ------------------
 
