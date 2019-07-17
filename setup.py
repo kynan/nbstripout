@@ -15,7 +15,7 @@ setup_requires = [
 tests_require = [
     'pytest',
     'pytest-flake8',
-    'pytest-cram == 0.1.1',
+    'pytest-cram == 0.2.1.dev0',
 ]
 
 setup(name='nbstripout',
@@ -43,6 +43,7 @@ setup(name='nbstripout',
       install_requires=install_requires,
       setup_requires=setup_requires,
       tests_require=tests_require,
+      dependency_links=['https://github.com/kynan/pytest-cram/archive/nbstripout.zip#egg=pytest-cram-0.2.1.dev0'],
 
       classifiers=[
           "Development Status :: 4 - Beta",
