@@ -121,7 +121,7 @@ except ImportError:
             return current.write(nb, f, 'json')
 
 __all__ = ["install", "uninstall", "status", "main"]
-__version__ = '0.3.5'
+__version__ = '0.3.6'
 
 
 def install(git_config, attrfile=None):
