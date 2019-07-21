@@ -273,6 +273,33 @@ If you want the attributes be set for ``.ipynb`` files in any of your git
 repositories, add those two lines to ``~/.config/git/attributes``. Note that
 this file and the ``~/.config/git`` directory may not exist.
 
+Using ``nbstripout`` as a pre-commit hook
+=========================================
+
+`pre-commit`_ is a framework for managing git `pre-commit hooks`_.
+
+Once you have `pre-commit`_ installed, add the follwong to the
+``.pre-commit-config.yaml`` in your repository: ::
+
+    repos:
+    - repo: https://github.com/kynan/nbstripout
+      rev: master
+      hooks:
+        - id: nbstripout
+          files: ".ipynb"
+
+Then run ``pre-commit install`` to activate the hook.
+
+.. warning::
+  In this mode, ``nbstripout`` is used as a git hook to strip any ``.ipynb``
+  files before committing. This also modifies your working copy!
+
+  In its regular mode, ``nbstripout`` acts as a filter and only modifies what
+  git gets to see for committing or diffing. The working copy stays intact.
+
+.. _pre-commit: https://pre-commit.com
+.. _pre-commit hooks: https://git-scm.com/docs/githooks
+
 Mercurial usage
 ===============
 
