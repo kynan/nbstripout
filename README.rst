@@ -273,12 +273,13 @@ If you want the attributes be set for ``.ipynb`` files in any of your git
 repositories, add those two lines to ``~/.config/git/attributes``. Note that
 this file and the ``~/.config/git`` directory may not exist.
 
-`Pre-commit`__ integration
-==========================
+Using ``nbstripout`` as a pre-commit hook
+=========================================
 
-__ https://pre-commit.com/
+`pre-commit`_ is a framework for managing git `pre-commit hooks`_.
 
-Once you have it installed, add this to the :code:`.pre-commit-config.yaml` in your repository: ::
+Once you have `pre-commit`_ installed, add the follwong to the
+``.pre-commit-config.yaml`` in your repository: ::
 
     repos:
     - repo: https://github.com/kynan/nbstripout
@@ -287,11 +288,17 @@ Once you have it installed, add this to the :code:`.pre-commit-config.yaml` in y
         - id: nbstripout
           files: ".ipynb"
 
-Then run :code:`pre-commit install` and you're ready to go.
+Then run ``pre-commit install`` to activate the hook.
 
 .. warning::
-    :code:`nbstripout` is used as a git hook instead as as filter. A filter only modifies what git gets to see for committing or diffing. The working copy stays intact. A pre-commit hook is used to perform checks on a commit just before the snapshot is taken. It's only supposed to abort the commit if checks fails, not intended to modify the commit.
-    The hook is intended to fail so that the user is forced to double check the results.
+  In this mode, ``nbstripout`` is used as a git hook to strip any ``.ipynb``
+  files before committing. This also modifies your working copy!
+
+  In its regular mode, ``nbstripout`` acts as a filter and only modifies what
+  git gets to see for committing or diffing. The working copy stays intact.
+
+.. _pre-commit: https://pre-commit.com
+.. _pre-commit hooks: https://git-scm.com/docs/githooks
 
 Mercurial usage
 ===============
