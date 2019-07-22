@@ -78,7 +78,6 @@ Set up a git filter using nbstripout as follows: ::
 
     git config filter.nbstripout.clean '/path/to/nbstripout'
     git config filter.nbstripout.smudge cat
-    git config filter.nbstripout.required true
 
 Create a file ``.gitattributes`` or ``.git/info/attributes`` with: ::
 
@@ -140,7 +139,6 @@ def install(git_config, attrfile=None):
     filepath = '"{}" "{}"'.format(sys.executable, dir).replace('\\', '/')
     check_call(git_config + ['filter.nbstripout.clean', filepath])
     check_call(git_config + ['filter.nbstripout.smudge', 'cat'])
-    check_call(git_config + ['filter.nbstripout.required', 'true'])
     check_call(git_config + ['diff.ipynb.textconv', filepath + ' -t'])
 
     if not attrfile:
@@ -203,7 +201,6 @@ def status(git_config, verbose=False):
         git_dir = path.dirname(path.abspath(check_output(['git', 'rev-parse', '--git-dir']).strip()))
         clean = check_output(git_config + ['filter.nbstripout.clean']).strip()
         smudge = check_output(git_config + ['filter.nbstripout.smudge']).strip()
-        required = check_output(git_config + ['filter.nbstripout.required']).strip()
         diff = check_output(git_config + ['diff.ipynb.textconv']).strip()
         attributes = check_output(['git', 'check-attr', 'filter', '--', '*.ipynb']).strip()
         diff_attributes = check_output(['git', 'check-attr', 'diff', '--', '*.ipynb']).strip()
@@ -220,7 +217,6 @@ def status(git_config, verbose=False):
             print('\nFilter:')
             print('  clean =', clean)
             print('  smudge =', smudge)
-            print('  required =', required)
             print('  diff=', diff)
             print('  extrakeys=', extra_keys)
             print('\nAttributes:\n ', attributes)
