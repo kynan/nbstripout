@@ -176,7 +176,10 @@ def uninstall(git_config, attrfile=None):
         print('Installation failed: not a git repository!', file=sys.stderr)
         sys.exit(1)
 
-    call(git_config + ['--remove-section', 'filter.nbstripout'],
+    call(git_config + ['--unset', 'filter.nbstripout.clean'],
+         stdout=open(devnull, 'w'), stderr=STDOUT)
+
+    call(git_config + ['--unset', 'filter.nbstripout.smudge'],
          stdout=open(devnull, 'w'), stderr=STDOUT)
 
     call(git_config + ['--remove-section', 'diff.ipynb'],
