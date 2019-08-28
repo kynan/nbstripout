@@ -83,7 +83,7 @@ Remove the git filter and attributes: ::
 
 Remove the git filter from your global ``~/.gitconfig`` and attributes ::
 
-    nbstripout --install --global
+    nbstripout --uninstall --global
 
 Remove the git filter and attributes from ``.gitattributes``: ::
 
@@ -215,16 +215,21 @@ An example would be: ::
       cell.metadata.heading_collapsed cell.metadata.hidden
       cell.metadata.code_folding cell.metadata.tags cell.metadata.init_cell'
 
-Excluding folders
-+++++++++++++++++
+Excluding files and folders
++++++++++++++++++++++++++++
 
-To exclude a certain folder from being processed by the ``nbstripout`` filter,
-add the following line to your ``.git/info/attributes`` (or ``.gitattributes``
-if you choose to use that): ::
+To exclude specific files or folders from being processed by the ``nbstripout``
+filters, add the path and exception to your filter specifications
+defined in ``.git/info/attributes`` or ``.gitattributes``: ::
 
     docs/** filter= diff=
 
-This will disable ``nbstripout`` for any file in the ``docs`` directory.
+This will disable ``nbstripout`` for any file in the ``docs`` directory.: ::
+
+    notebooks/Analysis.ipynb filter= diff=
+
+This will disable ``nbstripout`` for the file ``Analysis.ipynb`` located in
+the ``notebooks`` directory.
 
 To check which attributes a given file has with the current config, run ::
 
