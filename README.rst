@@ -305,6 +305,22 @@ Then run ``pre-commit install`` to activate the hook.
 .. _pre-commit: https://pre-commit.com
 .. _pre-commit hooks: https://git-scm.com/docs/githooks
 
+Troubleshooting
+===============
+
+Show files processed by nbstripout filter
++++++++++++++++++++++++++++++++++++++++++
+
+Git has `no builtin support <https://stackoverflow.com/a/52065333/396967>`_
+for listing files a clean or smudge filter operates on. As a workaround,
+change the setup of your filter in ``.git/config`` or ``~/.gitconfig`` as
+follows to see the filenames either filter operates on: ::
+
+    [filter "nbstripout"]
+        clean  = "f() { echo >&2 \"clean: nbstripout $1\"; nbstripout; }; f %f"
+        smudge = "f() { echo >&2 \"smudge: cat $1\"; cat; }; f %f"
+        required = true
+
 Mercurial usage
 ===============
 
