@@ -1,6 +1,6 @@
 -   id: nbstripout
     name: nbstripout
     description: 'nbstripout: strip output from Jupyter and IPython notebooks'
-    entry: bash -c 'nbstripout "$@"' --
+    entry: nbstripout
     language: python
     files: '\.ipynb$'
