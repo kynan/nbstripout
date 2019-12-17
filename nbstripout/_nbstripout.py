@@ -248,7 +248,7 @@ def main():
     parser.add_argument('--keep-count', action='store_true',
                         help='Do not strip the execution count/prompt number')
     parser.add_argument('--keep-output', action='store_true',
-                        help='Do not strip output')
+                        help='Do not strip output', default=None)
     parser.add_argument('--attributes', metavar='FILEPATH', help="""Attributes
         file to add the filter to (in combination with --install/--uninstall),
         defaults to .git/info/attributes""")

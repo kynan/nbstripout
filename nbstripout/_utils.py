@@ -43,6 +43,9 @@ def strip_output(nb, keep_output, keep_count, extra_keys=''):
 
     `extra_keys` could be 'metadata.foo cell.metadata.bar metadata.baz'
     """
+    if keep_output is None and 'keep_output' in nb.metadata:
+        keep_output = bool(nb.metadata['keep_output'])
+
     if hasattr(extra_keys, 'decode'):
         extra_keys = extra_keys.decode()
     extra_keys = extra_keys.split()
@@ -57,6 +60,7 @@ def strip_output(nb, keep_output, keep_count, extra_keys=''):
 
     nb.metadata.pop('signature', None)
     nb.metadata.pop('widgets', None)
+
     for field in keys['metadata']:
         pop_recursive(nb.metadata, field)
 
@@ -64,8 +68,10 @@ def strip_output(nb, keep_output, keep_count, extra_keys=''):
         keep_output_this_cell = keep_output
 
         # Keep the output for these cells, but strip count and metadata
-        if cell.metadata.get('init_cell') or cell.metadata.get('keep_output'):
-            keep_output_this_cell = True
+        if 'init_cell' in cell.metadata:
+            keep_output_this_cell = bool(cell.metadata['init_cell'])
+        elif 'keep_output' in cell.metadata:
+            keep_output_this_cell = bool(cell.metadata['keep_output'])
 
         # Remove the outputs, unless directed otherwise
         if 'outputs' in cell:
