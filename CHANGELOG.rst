@@ -1,6 +1,18 @@
 Change Log
 ==========
 
+0.3.7 - 2020-01-05
+------------------
+
+* Notebook-level ``keep_output`` (#112, @jonashaag)
+* Fix quoting of Python path and call module entrypoint (#111, @jonashaag)
+* Do not run ``git add`` in pre-commit hook (#106, @SimonBiggs)
+* Troubleshooting instructions (#65)
+* Exclusion instructions for folders (#104, @jraviotta)
+* Only remove ``filter.nbstripout.{clean,smudge}`` on ``--uninstall``
+* Remove unnecessary ``filter.nbstripout.required`` config setting
+* pre-commit configuration (#79, @Ohjeah)
+
 0.3.6 - 2019-07-18
 ------------------
 
