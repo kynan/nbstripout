@@ -135,7 +135,7 @@ def install(git_config, attrfile=None):
     except CalledProcessError:
         print('Installation failed: not a git repository!', file=sys.stderr)
         sys.exit(1)
-    filepath = "'{}' -m nbstripout".format(sys.executable.replace('\\', '/'))
+    filepath = '"{}" -m nbstripout'.format(sys.executable.replace('\\', '/'))
     check_call(git_config + ['filter.nbstripout.clean', filepath])
     check_call(git_config + ['filter.nbstripout.smudge', 'cat'])
     check_call(git_config + ['diff.ipynb.textconv', filepath + ' -t'])
