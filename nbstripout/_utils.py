@@ -1,6 +1,10 @@
 import sys
 
-__all__ = ["pop_recursive", "strip_output"]
+__all__ = ["pop_recursive", "strip_output", "NBStripoutError"]
+
+
+class NBStripoutError(Exception):
+    pass
 
 
 def pop_recursive(d, key, default=None):
@@ -35,6 +39,32 @@ def _cells(nb):
             yield cell
 
 
+def determine_keep_output(cell, default):
+    """Given a cell, determine whether output should be kept
+
+    Based on whether the metadata has "init_cell": true,
+    "keep_output": true, or the tags contain "keep_output" """
+    if 'init_cell' in cell.metadata:
+        return bool(cell.metadata.init_cell)
+
+    has_keep_output_metadata = 'keep_output' in cell.metadata
+    keep_output_metadata_bool = bool(cell.metadata.get('keep_output', False))
+
+    has_keep_output_tag = 'keep_output' in cell.metadata.get('tags', [])
+
+    # keep_output between metadata and tags should not contradict each other
+    if has_keep_output_metadata and has_keep_output_tag and not keep_output_metadata_bool:
+        raise NBStripoutError(
+            "cell metadata contradicts tags: "
+            "\"keep_output\": false, but keep_output in tags"
+        )
+
+    if has_keep_output_metadata or has_keep_output_tag:
+        return keep_output_metadata_bool or has_keep_output_tag
+    else:
+        return default
+
+
 def strip_output(nb, keep_output, keep_count, extra_keys=''):
     """
     Strip the outputs, execution count/prompt number and miscellaneous
@@ -65,13 +95,7 @@ def strip_output(nb, keep_output, keep_count, extra_keys=''):
         pop_recursive(nb.metadata, field)
 
     for cell in _cells(nb):
-        keep_output_this_cell = keep_output
-
-        # Keep the output for these cells, but strip count and metadata
-        if 'init_cell' in cell.metadata:
-            keep_output_this_cell = bool(cell.metadata['init_cell'])
-        elif 'keep_output' in cell.metadata:
-            keep_output_this_cell = bool(cell.metadata['keep_output'])
+        keep_output_this_cell = determine_keep_output(cell, keep_output)
 
         # Remove the outputs, unless directed otherwise
         if 'outputs' in cell:
