@@ -1,4 +1,4 @@
-  $ cat ${TESTDIR}/test_metadata.ipynb | ${NBSTRIPOUT_EXE:-nbstripout --keep-output --keep-count}
+  $ cat ${TESTDIR}/test_metadata.ipynb | ${NBSTRIPOUT_EXE:-nbstripout} --keep-output --keep-count
   {
    "cells": [
     {
