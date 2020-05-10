@@ -100,6 +100,10 @@ configuration summary of filter and attributes if installed
 
     nbstripout --status
 
+Do a dry run and only list which files would have been stripped: ::
+
+    nbstripout --dry-run FILE.ipynb [FILE2.ipynb ...]
+
 Print the version: ::
 
     nbstripout --version

@@ -5,6 +5,7 @@ Change Log
 ------------------
 
 * Windows compatibility: "" quote Python interpreter path (#115, @fcollonval)
+* Add ``--dry-run`` flag (#122)
 
 0.3.7 - 2020-01-05
 ------------------
