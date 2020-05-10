@@ -21,11 +21,8 @@ tests_require = [
 setup(name='nbstripout',
       version='0.3.7',
 
-      author='Min RK',
-      author_email='benjaminrk@gmail.com',
-
-      maintainer='Florian Rathgeber, Michael McNeil Forbes',
-      maintainer_email='florian.rathgeber@gmail.com, michael.forbes+python@gmail.com',
+      author='Florian Rathgeber',
+      author_email='florian.rathgeber@gmail.com',
       url='https://github.com/kynan/nbstripout',
 
       license="License :: OSI Approved :: MIT License",
