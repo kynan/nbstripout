@@ -63,6 +63,10 @@ configuration summary of filter and attributes if installed
 
     nbstripout --status
 
+Do a dry run and only list which files would have been stripped: ::
+
+    nbstripout --dry-run FILE.ipynb [FILE2.ipynb ...]
+
 Print the version: ::
 
     nbstripout --version
@@ -234,6 +238,8 @@ def main():
     from subprocess import check_output, CalledProcessError
     parser = ArgumentParser(epilog=__doc__, formatter_class=RawDescriptionHelpFormatter)
     task = parser.add_mutually_exclusive_group()
+    task.add_argument('--dry-run', action='store_true',
+                      help='Print which notebooks would have been stripped')
     task.add_argument('--install', action='store_true',
                       help='Install nbstripout in the current repository (set '
                       'up the git filter and attributes)')
@@ -306,6 +312,10 @@ def main():
             with io.open(filename, 'r', encoding='utf8') as f:
                 nb = read(f, as_version=NO_CONVERT)
             nb = strip_output(nb, args.keep_output, args.keep_count, extra_keys)
+            if args.dry_run:
+                output_stream.write('Dry run: would have stripped {}\n'.format(
+                    filename))
+                continue
             if args.textconv:
                 write(nb, output_stream)
                 output_stream.flush()
@@ -324,8 +334,12 @@ def main():
         try:
             nb = strip_output(read(input_stream, as_version=NO_CONVERT),
                               args.keep_output, args.keep_count, extra_keys)
-            write(nb, output_stream)
-            output_stream.flush()
+            if args.dry_run:
+                output_stream.write('Dry run: would have stripped input from '
+                                    'stdin\n')
+            else:
+                write(nb, output_stream)
+                output_stream.flush()
         except NotJSONError:
             print('No valid notebook detected', file=sys.stderr)
             sys.exit(1)
