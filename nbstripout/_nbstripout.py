@@ -235,22 +235,24 @@ def main():
     parser = ArgumentParser(epilog=__doc__, formatter_class=RawDescriptionHelpFormatter)
     task = parser.add_mutually_exclusive_group()
     task.add_argument('--install', action='store_true',
-                      help="""Install nbstripout in the current repository (set
-                              up the git filter and attributes)""")
+                      help='Install nbstripout in the current repository (set '
+                      'up the git filter and attributes)')
     task.add_argument('--uninstall', action='store_true',
-                      help="""Uninstall nbstripout from the current repository
-                              (remove the git filter and attributes)""")
+                      help='Uninstall nbstripout from the current repository '
+                      '(remove the git filter and attributes)')
     task.add_argument('--is-installed', action='store_true',
                       help='Check if nbstripout is installed in current repository')
     task.add_argument('--status', action='store_true',
-                      help='Print status of nbstripout installation in current repository and configuration summary if installed')
+                      help='Print status of nbstripout installation in current '
+                      'repository and configuration summary if installed')
     parser.add_argument('--keep-count', action='store_true',
                         help='Do not strip the execution count/prompt number')
     parser.add_argument('--keep-output', action='store_true',
                         help='Do not strip output', default=None)
-    parser.add_argument('--attributes', metavar='FILEPATH', help="""Attributes
-        file to add the filter to (in combination with --install/--uninstall),
-        defaults to .git/info/attributes""")
+    parser.add_argument('--attributes', metavar='FILEPATH',
+                        help='Attributes file to add the filter to (in '
+                        'combination with --install/--uninstall), '
+                        'defaults to .git/info/attributes')
     parser.add_argument('--global', dest='_global', action='store_true',
                         help='Use global git config (default is local config)')
     task.add_argument('--version', action='store_true',
