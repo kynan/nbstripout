@@ -1,9 +1,9 @@
 import sys
 
-__all__ = ["pop_recursive", "strip_output", "NBStripoutError"]
+__all__ = ["pop_recursive", "strip_output", "MetadataError"]
 
 
-class NBStripoutError(Exception):
+class MetadataError(Exception):
     pass
 
 
@@ -48,21 +48,20 @@ def determine_keep_output(cell, default):
         return bool(cell.metadata.init_cell)
 
     has_keep_output_metadata = 'keep_output' in cell.metadata
-    keep_output_metadata_bool = bool(cell.metadata.get('keep_output', False))
+    keep_output_metadata = bool(cell.metadata.get('keep_output', False))
 
     has_keep_output_tag = 'keep_output' in cell.metadata.get('tags', [])
 
     # keep_output between metadata and tags should not contradict each other
-    if has_keep_output_metadata and has_keep_output_tag and not keep_output_metadata_bool:
-        raise NBStripoutError(
+    if has_keep_output_metadata and has_keep_output_tag and not keep_output_metadata:
+        raise MetadataError(
             "cell metadata contradicts tags: "
             "\"keep_output\": false, but keep_output in tags"
         )
 
     if has_keep_output_metadata or has_keep_output_tag:
-        return keep_output_metadata_bool or has_keep_output_tag
-    else:
-        return default
+        return keep_output_metadata or has_keep_output_tag
+    return default
 
 
 def strip_output(nb, keep_output, keep_count, extra_keys=''):
