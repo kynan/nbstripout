@@ -6,6 +6,7 @@ Change Log
 
 * Windows compatibility: "" quote Python interpreter path (#115, @fcollonval)
 * Add ``--dry-run`` flag (#122)
+* Support specifying ``keep_output`` as a cell tag (#117, @scottcode)
 
 0.3.7 - 2020-01-05
 ------------------
