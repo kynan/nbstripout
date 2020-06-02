@@ -159,7 +159,7 @@ def install(git_config, attrfile=None):
         if filt_exists and diff_exists:
             return
 
-    with open(attrfile, 'a') as f:
+    with open(attrfile, 'a', newline='') as f:
         # If the file already exists, ensure it ends with a new line
         if f.tell():
             f.write('\n')
@@ -309,7 +309,7 @@ def main():
         # https://stackoverflow.com/a/16549381
         if sys.stdin:
             input_stream = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8')
-        output_stream = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+        output_stream = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', newline='')
 
     for filename in args.files:
         if not (args.force or filename.endswith('.ipynb')):
@@ -326,7 +326,7 @@ def main():
                 write(nb, output_stream)
                 output_stream.flush()
             else:
-                with io.open(filename, 'w', encoding='utf8') as f:
+                with io.open(filename, 'w', encoding='utf8', newline='') as f:
                     write(nb, f)
         except NotJSONError:
             print("'{}' is not a valid notebook".format(filename), file=sys.stderr)
