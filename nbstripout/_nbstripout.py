@@ -128,7 +128,7 @@ except ImportError:
             return current.write(nb, f, 'json')
 
 __all__ = ["install", "uninstall", "status", "main"]
-__version__ = '0.3.7'
+__version__ = '0.3.8'
 
 
 def _get_attrfile(git_config, user=False, attrfile=None):
