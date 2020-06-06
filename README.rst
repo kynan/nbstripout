@@ -184,14 +184,19 @@ Do not strip the output ::
 
     nbstripout --keep-output
 
-To mark special cells so that the output is not stripped, set the
-``"keep_output": true`` metadata on the cell.  To do this, select the
-"Edit Metadata" Cell Toolbar, and then use the "Edit Metadata" button
-on the desired cell to enter something like::
+To mark special cells so that the output is not stripped, you can either:
 
-    {
-      "keep_output": true,
-    }
+1.  Set the ``keep_output`` tag on the cell. To do this, enable the tags
+    toolbar (View > Cell Toolbar > Tags) and then add the ``keep_output`` tag
+    for each cell you would like to keep the output for.
+
+2.  Set the ``"keep_output": true`` metadata on the cell.  To do this, select
+    the "Edit Metadata" Cell Toolbar, and then use the "Edit Metadata" button
+    on the desired cell to enter something like::
+
+        {
+          "keep_output": true,
+        }
 
 You can also keep output for an entire notebook. This is useful if you want to
 strip output by default in an automated environment (e.g. CI pipeline), but want
