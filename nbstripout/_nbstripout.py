@@ -331,6 +331,9 @@ def main():
         except NotJSONError:
             print("'{}' is not a valid notebook".format(filename), file=sys.stderr)
             sys.exit(1)
+        except FileNotFoundError:
+            print("Could not strip '{}': file not found".format(filename), file=sys.stderr)
+            sys.exit(1)
         except Exception:
             # Ignore exceptions for non-notebook files.
             print("Could not strip '{}'".format(filename), file=sys.stderr)
