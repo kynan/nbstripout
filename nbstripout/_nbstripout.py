@@ -95,10 +95,14 @@ In file ``.gitattributes`` or ``.git/info/attributes`` add: ::
 
     *.ipynb diff=ipynb
 """
+
 from __future__ import print_function
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import io
+from os import devnull, environ, path
+from subprocess import call, check_call, check_output, CalledProcessError, STDOUT
 import sys
+
 from nbstripout._utils import strip_output
 try:
     # Jupyter >= 4
@@ -127,26 +131,33 @@ __all__ = ["install", "uninstall", "status", "main"]
 __version__ = '0.3.7'
 
 
-def install(git_config, attrfile=None):
-    """Install the git filter and set the git attributes."""
-    from os import path
-    from subprocess import check_call, check_output, CalledProcessError
-    try:
+def _get_attrfile(git_config, user=False, attrfile=None):
+    if user and not attrfile:
+        try:
+            attrfile = check_output(git_config + ['core.attributesFile']).strip()
+        except CalledProcessError:
+            config_dir = environ.get('XDG_CONFIG_DIR', path.join(environ['HOME'], '.config'))
+            attrfile = path.join(config_dir, 'git', 'attributes')
+    elif not attrfile:
         git_dir = check_output(['git', 'rev-parse', '--git-dir']).strip()
+        attrfile = path.join(git_dir.decode(), 'info', 'attributes')
+    return path.expanduser(attrfile)
+
+
+def install(git_config, user=False, attrfile=None):
+    """Install the git filter and set the git attributes."""
+    try:
+        filepath = '"{}" -m nbstripout'.format(sys.executable.replace('\\', '/'))
+        check_call(git_config + ['filter.nbstripout.clean', filepath])
+        check_call(git_config + ['filter.nbstripout.smudge', 'cat'])
+        check_call(git_config + ['diff.ipynb.textconv', filepath + ' -t'])
+        attrfile = _get_attrfile(git_config, user, attrfile)
     except FileNotFoundError:
         print('Installation failed: git is not on path!', file=sys.stderr)
         sys.exit(1)
     except CalledProcessError:
         print('Installation failed: not a git repository!', file=sys.stderr)
         sys.exit(1)
-    filepath = '"{}" -m nbstripout'.format(sys.executable.replace('\\', '/'))
-    check_call(git_config + ['filter.nbstripout.clean', filepath])
-    check_call(git_config + ['filter.nbstripout.smudge', 'cat'])
-    check_call(git_config + ['diff.ipynb.textconv', filepath + ' -t'])
-
-    if not attrfile:
-        attrfile = path.join(git_dir.decode(), 'info', 'attributes')
-    attrfile = path.expanduser(attrfile)
 
     # Check if there is already a filter for ipynb files
     filt_exists = False
@@ -169,12 +180,13 @@ def install(git_config, attrfile=None):
             print('*.ipynb diff=ipynb', file=f)
 
 
-def uninstall(git_config, attrfile=None):
+def uninstall(git_config, user=False, attrfile=None):
     """Uninstall the git filter and unset the git attributes."""
-    from os import devnull, path
-    from subprocess import call, check_output, CalledProcessError, STDOUT
     try:
-        git_dir = check_output(['git', 'rev-parse', '--git-dir']).strip()
+        call(git_config + ['--unset', 'filter.nbstripout.clean'], stdout=open(devnull, 'w'), stderr=STDOUT)
+        call(git_config + ['--unset', 'filter.nbstripout.smudge'], stdout=open(devnull, 'w'), stderr=STDOUT)
+        call(git_config + ['--remove-section', 'diff.ipynb'], stdout=open(devnull, 'w'), stderr=STDOUT)
+        attrfile = _get_attrfile(git_config, user, attrfile)
     except FileNotFoundError:
         print('Uninstall failed: git is not on path!', file=sys.stderr)
         sys.exit(1)
@@ -182,17 +194,6 @@ def uninstall(git_config, attrfile=None):
         print('Uninstall failed: not a git repository!', file=sys.stderr)
         sys.exit(1)
 
-    call(git_config + ['--unset', 'filter.nbstripout.clean'],
-         stdout=open(devnull, 'w'), stderr=STDOUT)
-
-    call(git_config + ['--unset', 'filter.nbstripout.smudge'],
-         stdout=open(devnull, 'w'), stderr=STDOUT)
-
-    call(git_config + ['--remove-section', 'diff.ipynb'],
-         stdout=open(devnull, 'w'), stderr=STDOUT)
-
-    if not attrfile:
-        attrfile = path.join(git_dir.decode(), 'info', 'attributes')
     # Check if there is a filter for ipynb files
     if path.exists(attrfile):
         with open(attrfile, 'r+') as f:
@@ -202,27 +203,39 @@ def uninstall(git_config, attrfile=None):
             f.truncate()
 
 
-def status(git_config, verbose=False):
+def status(git_config, user=False, verbose=False):
     """Return 0 if nbstripout is installed in the current repo, 1 otherwise"""
-    from os import path
-    from subprocess import check_output, CalledProcessError
     try:
-        git_dir = path.dirname(path.abspath(check_output(['git', 'rev-parse', '--git-dir']).strip()))
+        if user:
+            location = 'globally'
+        else:
+            git_dir = path.dirname(path.abspath(check_output(['git', 'rev-parse', '--git-dir']).strip()))
+            location = "in repository '{}'".format(git_dir)
         clean = check_output(git_config + ['filter.nbstripout.clean']).strip()
         smudge = check_output(git_config + ['filter.nbstripout.smudge']).strip()
         diff = check_output(git_config + ['diff.ipynb.textconv']).strip()
-        attributes = check_output(['git', 'check-attr', 'filter', '--', '*.ipynb']).strip()
-        diff_attributes = check_output(['git', 'check-attr', 'diff', '--', '*.ipynb']).strip()
+        if user:
+            attrfile = _get_attrfile(git_config, user)
+            attributes = ''
+            diff_attributes = ''
+            if path.exists(attrfile):
+                with open(attrfile, 'r') as f:
+                    attrs = f.readlines()
+                attributes = ''.join(l for l in attrs if 'filter' in l).strip()
+                diff_attributes = ''.join(l for l in attrs if 'diff' in l).strip()
+        else:
+            attributes = check_output(['git', 'check-attr', 'filter', '--', '*.ipynb']).strip()
+            diff_attributes = check_output(['git', 'check-attr', 'diff', '--', '*.ipynb']).strip()
         try:
             extra_keys = check_output(git_config + ['filter.nbstripout.extrakeys']).strip()
         except CalledProcessError:
             extra_keys = ''
         if attributes.endswith(b'unspecified'):
             if verbose:
-                print('nbstripout is not installed in repository', git_dir)
+                print('nbstripout is not installed', location)
             return 1
         if verbose:
-            print('nbstripout is installed in repository', git_dir)
+            print('nbstripout is installed', git_dir)
             print('\nFilter:')
             print('  clean =', clean)
             print('  smudge =', smudge)
@@ -235,13 +248,12 @@ def status(git_config, verbose=False):
         print('Cannot determine status: git is not on path!', file=sys.stderr)
         return 1
     except CalledProcessError:
-        if verbose and 'git_dir' in locals():
-            print('nbstripout is not installed in repository', git_dir)
+        if verbose and 'location' in locals():
+            print('nbstripout is not installed', location)
         return 1
 
 
 def main():
-    from subprocess import check_output, CalledProcessError
     parser = ArgumentParser(epilog=__doc__, formatter_class=RawDescriptionHelpFormatter)
     task = parser.add_mutually_exclusive_group()
     task.add_argument('--dry-run', action='store_true',
@@ -280,13 +292,13 @@ def main():
 
     git_config = ['git', 'config'] + (['--global'] if args._global else [])
     if args.install:
-        sys.exit(install(git_config, attrfile=args.attributes))
+        sys.exit(install(git_config, user=args._global, attrfile=args.attributes))
     if args.uninstall:
-        sys.exit(uninstall(git_config, attrfile=args.attributes))
+        sys.exit(uninstall(git_config, user=args._global, attrfile=args.attributes))
     if args.is_installed:
-        sys.exit(status(git_config, verbose=False))
+        sys.exit(status(git_config, user=args._global, verbose=False))
     if args.status:
-        sys.exit(status(git_config, verbose=True))
+        sys.exit(status(git_config, user=args._global, verbose=True))
     if args.version:
         print(__version__)
         sys.exit(0)
