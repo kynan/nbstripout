@@ -197,7 +197,7 @@ def uninstall(git_config, user=False, attrfile=None):
     # Check if there is a filter for ipynb files
     if path.exists(attrfile):
         with open(attrfile, 'r+') as f:
-            lines = [l for l in f if not (l.startswith('*.ipynb filter') or l.startswith('*.ipynb diff'))]
+            lines = [line for line in f if not (line.startswith('*.ipynb filter') or line.startswith('*.ipynb diff'))]
             f.seek(0)
             f.write(''.join(lines))
             f.truncate()
@@ -221,8 +221,8 @@ def status(git_config, user=False, verbose=False):
             if path.exists(attrfile):
                 with open(attrfile, 'r') as f:
                     attrs = f.readlines()
-                attributes = ''.join(l for l in attrs if 'filter' in l).strip()
-                diff_attributes = ''.join(l for l in attrs if 'diff' in l).strip()
+                attributes = ''.join(line for line in attrs if 'filter' in line).strip()
+                diff_attributes = ''.join(line for line in attrs if 'diff' in line).strip()
         else:
             attributes = check_output(['git', 'check-attr', 'filter', '--', '*.ipynb']).strip()
             diff_attributes = check_output(['git', 'check-attr', 'diff', '--', '*.ipynb']).strip()
