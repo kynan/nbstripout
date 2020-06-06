@@ -1,12 +1,18 @@
 Change Log
 ==========
 
-0.3.8 - unreleased
+0.3.8 - 2020-06-06
 ------------------
 
 * Windows compatibility: "" quote Python interpreter path (#115, @fcollonval)
 * Add ``--dry-run`` flag (#122)
 * Support specifying ``keep_output`` as a cell tag (#117, @scottcode)
+* Improved error handling for the case where git is not installed (#124)
+* Nicer error message when input file is not found
+* Use universal newlines without conversion (#110, #126, @ooiM)
+* Strip execution timing from cell metadata (#118)
+* Document which metadata is stripped by default
+* Make ``--global`` commands work outside of git repository (#123)
 
 0.3.7 - 2020-01-05
 ------------------
