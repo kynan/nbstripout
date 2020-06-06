@@ -1,13 +1,23 @@
-.. image:: https://travis-ci.org/kynan/nbstripout.svg?branch=master
+.. image:: https://img.shields.io/travis/kynan/nbstripout
     :target: https://travis-ci.org/kynan/nbstripout
-.. image:: https://img.shields.io/pypi/dm/nbstripout.svg
-    :target: https://pypi.python.org/pypi/nbstripout
-.. image:: https://img.shields.io/pypi/v/nbstripout.svg
-    :target: https://pypi.python.org/pypi/nbstripout
-.. image:: https://img.shields.io/badge/license-MIT-blue.svg
+.. image:: https://img.shields.io/appveyor/build/kynan/nbstripout
+    :target: https://ci.appveyor.com/project/kynan/nbstripout
+.. image:: https://img.shields.io/pypi/dm/nbstripout
+    :target: https://pypi.org/project/nbstripout
+.. image:: https://img.shields.io/pypi/v/nbstripout
+    :target: https://pypi.org/project/nbstripout
+.. image:: https://img.shields.io/conda/vn/conda-forge/nbstripout
+    :target: https://anaconda.org/conda-forge/nbstripout
+.. image:: https://img.shields.io/pypi/pyversions/nbstripout
+    :target: https://pypi.org/project/nbstripout
+.. image:: https://img.shields.io/pypi/format/nbstripout
+    :target: https://pypi.org/project/nbstripout
+.. image:: https://img.shields.io/pypi/l/nbstripout
     :target: https://raw.githubusercontent.com/kynan/nbstripout/master/LICENSE.txt
-.. image:: https://img.shields.io/pypi/pyversions/nbstripout.svg
-    :target: https://pypi.python.org/pypi/nbstripout
+.. image:: https://img.shields.io/github/stars/kynan/nbstripout?style=social
+    :target: https://github.com/kynan/nbstripout/stargazers
+.. image:: https://img.shields.io/github/forks/kynan/nbstripout?style=social
+    :target: https://github.com/kynan/nbstripout/network/members
 
 nbstripout: strip output from Jupyter and IPython notebooks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
