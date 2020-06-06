@@ -29,6 +29,7 @@ setup(name='nbstripout',
 
       description='Strips outputs from Jupyter and IPython notebooks',
       long_description=long_description,
+      long_description_content_type='text/x-rst',
       packages=find_packages(),
       provides=['nbstripout'],
       entry_points={
