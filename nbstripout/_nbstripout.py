@@ -129,11 +129,11 @@ __version__ = '0.3.7'
 
 def install(git_config, attrfile=None):
     """Install the git filter and set the git attributes."""
-    from os import name, path
+    from os import path
     from subprocess import check_call, check_output, CalledProcessError
     try:
         git_dir = check_output(['git', 'rev-parse', '--git-dir']).strip()
-    except (WindowsError if name == 'nt' else OSError):
+    except FileNotFoundError:
         print('Installation failed: git is not on path!', file=sys.stderr)
         sys.exit(1)
     except CalledProcessError:
@@ -175,8 +175,11 @@ def uninstall(git_config, attrfile=None):
     from subprocess import call, check_output, CalledProcessError, STDOUT
     try:
         git_dir = check_output(['git', 'rev-parse', '--git-dir']).strip()
+    except FileNotFoundError:
+        print('Uninstall failed: git is not on path!', file=sys.stderr)
+        sys.exit(1)
     except CalledProcessError:
-        print('Installation failed: not a git repository!', file=sys.stderr)
+        print('Uninstall failed: not a git repository!', file=sys.stderr)
         sys.exit(1)
 
     call(git_config + ['--unset', 'filter.nbstripout.clean'],
@@ -228,6 +231,9 @@ def status(git_config, verbose=False):
             print('\nAttributes:\n ', attributes)
             print('\nDiff Attributes:\n ', diff_attributes)
         return 0
+    except FileNotFoundError:
+        print('Cannot determine status: git is not on path!', file=sys.stderr)
+        return 1
     except CalledProcessError:
         if verbose and 'git_dir' in locals():
             print('nbstripout is not installed in repository', git_dir)
@@ -287,7 +293,7 @@ def main():
 
     try:
         extra_keys = check_output(git_config + ['filter.nbstripout.extrakeys']).strip()
-    except CalledProcessError:
+    except (CalledProcessError, FileNotFoundError):
         extra_keys = ''
 
     input_stream = None
