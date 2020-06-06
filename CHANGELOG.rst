@@ -4,6 +4,7 @@ Change Log
 0.3.8 - 2020-06-06
 ------------------
 
+* Drop Python 2 support
 * Windows compatibility: "" quote Python interpreter path (#115, @fcollonval)
 * Add ``--dry-run`` flag (#122)
 * Support specifying ``keep_output`` as a cell tag (#117, @scottcode)
