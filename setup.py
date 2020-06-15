@@ -41,6 +41,7 @@ setup(name='nbstripout',
       install_requires=install_requires,
       setup_requires=setup_requires,
       tests_require=tests_require,
+      python_requires='>=3.4',
 
       classifiers=[
           "Development Status :: 4 - Beta",
