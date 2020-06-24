@@ -33,6 +33,14 @@ notebook UI.
 
 Based on https://gist.github.com/minrk/6176788.
 
+Python 3 only
+=============
+
+As of version 0.3.8, nbstripout supports Python 3 *only*. If you need to use
+Python 2, install nbstripout 0.3.7 ::
+
+    pip install nbstripout==0.3.7
+
 Screencast
 ==========
 
