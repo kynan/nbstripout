@@ -102,6 +102,8 @@ import io
 from os import devnull, environ, path
 from subprocess import call, check_call, check_output, CalledProcessError, STDOUT
 import sys
+import warnings
+# warnings.simplefilter("ignore")
 
 from nbstripout._utils import strip_output
 try:
@@ -328,18 +330,24 @@ def main():
             continue
         try:
             with io.open(filename, 'r', encoding='utf8') as f:
-                nb = read(f, as_version=NO_CONVERT)
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore", category=UserWarning)
+                    nb = read(f, as_version=NO_CONVERT)
             nb = strip_output(nb, args.keep_output, args.keep_count, extra_keys)
             if args.dry_run:
                 output_stream.write('Dry run: would have stripped {}\n'.format(
                     filename))
                 continue
             if args.textconv:
-                write(nb, output_stream)
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore", category=UserWarning)
+                    write(nb, output_stream)
                 output_stream.flush()
             else:
                 with io.open(filename, 'w', encoding='utf8', newline='') as f:
-                    write(nb, f)
+                    with warnings.catch_warnings():
+                        warnings.simplefilter("ignore", category=UserWarning)
+                        write(nb, f)
         except NotJSONError:
             print("'{}' is not a valid notebook".format(filename), file=sys.stderr)
             sys.exit(1)
@@ -353,13 +361,17 @@ def main():
 
     if not args.files and input_stream:
         try:
-            nb = strip_output(read(input_stream, as_version=NO_CONVERT),
-                              args.keep_output, args.keep_count, extra_keys)
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", category=UserWarning)
+                nb = read(input_stream, as_version=NO_CONVERT)
+            nb = strip_output(nb, args.keep_output, args.keep_count, extra_keys)
             if args.dry_run:
                 output_stream.write('Dry run: would have stripped input from '
                                     'stdin\n')
             else:
-                write(nb, output_stream)
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore", category=UserWarning)
+                    write(nb, output_stream)
                 output_stream.flush()
         except NotJSONError:
             print('No valid notebook detected', file=sys.stderr)
