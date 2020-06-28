@@ -3,4 +3,4 @@
     description: 'nbstripout: strip output from Jupyter and IPython notebooks'
     entry: nbstripout
     language: python
-    files: '\.ipynb$'
+    types: [jupyter]
