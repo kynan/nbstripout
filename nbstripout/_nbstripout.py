@@ -275,6 +275,8 @@ def main():
                         help='Do not strip the execution count/prompt number')
     parser.add_argument('--keep-output', action='store_true',
                         help='Do not strip output', default=None)
+    parser.add_argument('--extra-keys', default='',
+                        help='Extra keys to strip from metadata, e.g. metadata.foo cell.metadata.bar')
     parser.add_argument('--attributes', metavar='FILEPATH',
                         help='Attributes file to add the filter to (in '
                         'combination with --install/--uninstall), '
@@ -307,8 +309,10 @@ def main():
 
     try:
         extra_keys = check_output(git_config + ['filter.nbstripout.extrakeys']).strip()
+        if args.extra_keys:
+            extra_keys = ' '.join((extra_keys, args.extra_keys))
     except (CalledProcessError, FileNotFoundError):
-        extra_keys = ''
+        extra_keys = args.extra_keys
 
     input_stream = None
     if sys.version_info < (3, 0):
