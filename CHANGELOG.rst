@@ -1,6 +1,16 @@
 Change Log
 ==========
 
+0.3.9 - 2020-06-28
+------------------
+
+* Document Python 3 support only. Fail to install on Python 2 (#128, @casperdcl)
+* Drop support for Python 3.4 (end of life 2019-03-18)
+* Ignore warnings from nbformat.{read,write}
+* Support nbformat 2 notebooks without cell metadata
+* Add ``--extra-keys`` flag to pass extra keys to strip (#119)
+* Apply pre-commit hook to files of type Jupyter
+
 0.3.8 - 2020-06-06
 ------------------
 
