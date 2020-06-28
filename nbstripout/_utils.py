@@ -44,6 +44,8 @@ def determine_keep_output(cell, default):
 
     Based on whether the metadata has "init_cell": true,
     "keep_output": true, or the tags contain "keep_output" """
+    if 'metadata' not in cell:
+        return default
     if 'init_cell' in cell.metadata:
         return bool(cell.metadata.init_cell)
 
@@ -119,11 +121,11 @@ def strip_output(nb, keep_output, keep_count, extra_keys=''):
         if 'execution_count' in cell and not keep_count:
             cell['execution_count'] = None
 
-        # Always remove this metadata
-        for output_style in ['collapsed', 'scrolled']:
-            if output_style in cell.metadata:
-                cell.metadata[output_style] = False
+        # Always remove some metadata
         if 'metadata' in cell:
+            for output_style in ['collapsed', 'scrolled']:
+                if output_style in cell.metadata:
+                    cell.metadata[output_style] = False
             for field in ['ExecuteTime', 'collapsed', 'execution', 'scrolled']:
                 cell.metadata.pop(field, None)
         for (extra, fields) in keys['cell'].items():
