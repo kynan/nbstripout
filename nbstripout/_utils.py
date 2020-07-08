@@ -1,7 +1,7 @@
 from collections import defaultdict
 import sys
 
-__all__ = ["pop_recursive", "strip_output", "MetadataError"]
+__all__ = ["pop_recursive", "strip_output", "strip_zeppelin_output", "MetadataError"]
 
 
 class MetadataError(Exception):
@@ -80,6 +80,18 @@ def determine_keep_output(cell, default):
     if has_keep_output_metadata or has_keep_output_tag:
         return keep_output_metadata or has_keep_output_tag
     return default
+
+
+def _zeppelin_cells(nb):
+    for pg in nb['paragraphs']:
+        yield pg
+
+
+def strip_zeppelin_output(nb):
+    for cell in _zeppelin_cells(nb):
+        if 'results' in cell:
+            cell['results'] = {}
+    return nb
 
 
 def strip_output(nb, keep_output, keep_count, extra_keys=[], strip_empty_cells=False, max_size=0):

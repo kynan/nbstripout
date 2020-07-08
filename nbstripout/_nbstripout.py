@@ -14,18 +14,23 @@ notebook UI.
 Usage
 =====
 
-Strip output from IPython / Jupyter notebook (modifies the file in-place): ::
+Strip output from IPython / Jupyter / Zeppelin notebook (modifies the file in-place): ::
 
     nbstripout <file.ipynb>
+    nbstripout <file.zpln>
 
-By default, nbstripout will only modify files ending in '.ipynb', to
+By default, nbstripout will only modify files ending in '.ipynb' or '.zpln', to
 process other files us the '-f' flag to force the application.
 
     nbstripout -f <file.ipynb.bak>
 
+For using Zeppelin mode while processing files with other extensions use:
+    nbstripout -m zeppelin -f <file.ext>
+
 Use as part of a shell pipeline: ::
 
     cat FILE.ipynb | nbstripout > OUT.ipynb
+    cat FILE.zpln | nbstripout -m zeppelin > OUT.zpln
 
 Set up the git filter and attributes as described in the manual installation
 instructions below: ::
@@ -113,8 +118,9 @@ import re
 import sys
 import warnings
 # warnings.simplefilter("ignore")
+import json
 
-from nbstripout._utils import strip_output
+from nbstripout._utils import strip_output, strip_zeppelin_output
 try:
     # Jupyter >= 4
     from nbformat import read, write, NO_CONVERT
@@ -224,6 +230,7 @@ def install(git_config, install_location=INSTALL_LOCATION_LOCAL, attrfile=None):
 
     # Check if there is already a filter for ipynb files
     filt_exists = False
+    zeppelin_filt_exists = False
     diff_exists = False
 
     if path.exists(attrfile):
@@ -231,6 +238,7 @@ def install(git_config, install_location=INSTALL_LOCATION_LOCAL, attrfile=None):
             attrs = f.read()
 
         filt_exists = '*.ipynb filter' in attrs
+        zeppelin_filt_exists = '*.zpln filter' in attrs
         diff_exists = '*.ipynb diff' in attrs
 
         if filt_exists and diff_exists:
@@ -243,6 +251,8 @@ def install(git_config, install_location=INSTALL_LOCATION_LOCAL, attrfile=None):
                 f.write('\n')
             if not filt_exists:
                 print('*.ipynb filter=nbstripout', file=f)
+            if not zeppelin_filt_exists:
+                print('*.zpln filter=nbstripout', file=f)
             if not diff_exists:
                 print('*.ipynb diff=ipynb', file=f)
     except PermissionError:
@@ -271,7 +281,8 @@ def uninstall(git_config, install_location=INSTALL_LOCATION_LOCAL, attrfile=None
     # Check if there is a filter for ipynb files
     if path.exists(attrfile):
         with open(attrfile, 'r+') as f:
-            lines = [line for line in f if not (line.startswith('*.ipynb filter') or line.startswith('*.ipynb diff'))]
+            patterns = ('*.ipynb filter', '*.zpln filter', '*.ipynb diff')
+            lines = [line for line in f if not any(line.startswith(p) for p in patterns)]
             f.seek(0)
             f.write(''.join(lines))
             f.truncate()
@@ -379,6 +390,8 @@ def main():
                         help='Strip output also from files with non ipynb extension')
     parser.add_argument('--max-size', metavar='SIZE',
                         help='Keep outputs smaller than SIZE', default='0')
+    parser.add_argument('--mode', '-m', default='jupyter', choices=['jupyter', 'zeppelin'],
+                        help='Specify mode between [jupyter (default) | zeppelin] (to be used in combination with -f)')
 
     parser.add_argument('--textconv', '-t', action='store_true',
                         help='Prints stripped files to STDOUT')
@@ -434,11 +447,22 @@ def main():
     output_stream = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', newline='')
 
     for filename in args.files:
-        if not (args.force or filename.endswith('.ipynb')):
+        if not (args.force or filename.endswith('.ipynb') or filename.endswith('.zpln')):
             continue
 
         try:
             with io.open(filename, 'r', encoding='utf8') as f:
+                if args.mode == 'zeppelin' or filename.endswith('.zpln'):
+                    if args.dry_run:
+                        output_stream.write('Dry run: would have stripped {}\n'.format(
+                            filename))
+                        continue
+                    nb = json.load(f)
+                    nb_stripped = strip_zeppelin_output(nb)
+
+                    with open(filename, 'w') as f:
+                        json.dump(nb_stripped, f, indent=2)
+                    continue
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore", category=UserWarning)
                     nb = read(f, as_version=NO_CONVERT)
@@ -474,6 +498,16 @@ def main():
 
     if not args.files and input_stream:
         try:
+            if args.mode == 'zeppelin':
+                if args.dry_run:
+                    output_stream.write('Dry run: would have stripped input from stdin\n')
+                    sys.exit(0)
+                nb = json.load(input_stream)
+                nb_stripped = strip_zeppelin_output(nb)
+                json.dump(nb_stripped, output_stream, indent=2)
+                output_stream.write('\n')
+                output_stream.flush()
+                sys.exit(0)
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore", category=UserWarning)
                 nb = read(input_stream, as_version=NO_CONVERT)

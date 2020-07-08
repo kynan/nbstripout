@@ -64,17 +64,23 @@ conda_ package manager from conda-forge_: ::
 Usage
 =====
 
-Strip output from IPython / Jupyter notebook (modifies the files in-place): ::
+Strip output from IPython / Jupyter / Zeppelin notebook (modifies the file in-place): ::
 
     nbstripout FILE.ipynb [FILE2.ipynb ...]
+    nbstripout FILE.zpln
 
 Force processing of non ``.ipynb`` files: ::
 
     nbstripout -f FILE.ipynb.bak
 
+For using Zeppelin mode while processing files with other extensions use: ::
+
+    nbstripout -m zeppelin -f <file.ext>
+
 Write to stdout e.g. to use as part of a shell pipeline: ::
 
     cat FILE.ipynb | nbstripout > OUT.ipynb
+    cat FILE.zpln | nbstripout -m zeppelin > OUT.zpln
 
 or ::
 
