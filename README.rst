@@ -342,7 +342,6 @@ Once you have `pre-commit`_ installed, add the follwong to the
       rev: master
       hooks:
         - id: nbstripout
-          files: ".ipynb"
 
 Then run ``pre-commit install`` to activate the hook.
 
