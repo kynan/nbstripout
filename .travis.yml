@@ -5,7 +5,7 @@ python:
   - "3.7"
   - "3.8"
 before_install:
-  - travis_retry pip install --upgrade pytest
+  - travis_retry pip install pytest==5.4.3
   - travis_retry pip install nbformat
 install:
   - travis_retry python setup.py install
