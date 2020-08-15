@@ -1,5 +1,6 @@
 from collections import defaultdict
 import sys
+import functools
 
 __all__ = ["pop_recursive", "strip_output", "MetadataError"]
 
@@ -44,6 +45,18 @@ def _cells(nb, conditional=None):
             yield cell
 
 
+def get_size(item):
+    """ Recursively sums length of all strings in `item` """
+    if isinstance(item, str):
+        return len(item)
+    elif isinstance(item, list):
+        return functools.reduce(lambda a, b: a + get_size(b), item, 0)
+    elif isinstance(item, dict):
+        return get_size(list(item.values()))
+    else:
+        return len(str(item))
+
+
 def determine_keep_output(cell, default):
     """Given a cell, determine whether output should be kept
 
@@ -70,7 +83,7 @@ def determine_keep_output(cell, default):
     return default
 
 
-def strip_output(nb, keep_output, keep_count, extra_keys=[], strip_empty_cells=False):
+def strip_output(nb, keep_output, keep_count, extra_keys=[], strip_empty_cells=False, max_size=0):
     """
     Strip the outputs, execution count/prompt number and miscellaneous
     metadata from a notebook object, unless specified to keep either the outputs
@@ -106,10 +119,19 @@ def strip_output(nb, keep_output, keep_count, extra_keys=[], strip_empty_cells=F
         # Remove the outputs, unless directed otherwise
         if 'outputs' in cell:
 
-            # Default behavior strips outputs. With all outputs stripped,
-            # there are no counts to keep and keep_count is ignored.
             if not keep_output_this_cell:
-                cell['outputs'] = []
+                if not max_size:
+                    # Default behavior strips outputs. With all outputs stripped,
+                    # there are no counts to keep and keep_count is ignored.
+                    cell['outputs'] = []
+                else:
+                    # otherwise remove outputs larger than max_size
+                    for idx, output in enumerate(cell['outputs']):
+                        if get_size(output) > max_size:
+                            cell['outputs'][idx] = None
+                        elif 'execution_count' in output and not keep_count:
+                            output['execution_count'] = None
+                    cell['outputs'] = [out for out in cell['outputs'] if out is not None]
 
             # If keep_output_this_cell, but not keep_count, strip the counts
             # from the output.
