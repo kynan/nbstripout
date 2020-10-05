@@ -308,7 +308,7 @@ def main():
         sys.exit(0)
 
     try:
-        extra_keys = check_output(git_config + ['filter.nbstripout.extrakeys']).strip()
+        extra_keys = check_output(git_config + ['filter.nbstripout.extrakeys']).strip().decode()
         if args.extra_keys:
             extra_keys = ' '.join((extra_keys, args.extra_keys))
     except (CalledProcessError, FileNotFoundError):

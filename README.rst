@@ -248,8 +248,8 @@ Additional metadata to be stripped can be configured via either
 
         git config --global filter.nbstripout.extrakeys '
           metadata.celltoolbar
-          metadata.kernel_spec.display_name
-          metadata.kernel_spec.name
+          metadata.kernelspec.display_name
+          metadata.kernelspec.name
           metadata.language_info.codemirror_mode.version
           metadata.language_info.pygments_lexer
           metadata.language_info.version
