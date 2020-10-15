@@ -46,7 +46,7 @@ Remove the git filter and attributes: ::
 
 Remove the git filter from your global ``~/.gitconfig`` and attributes ::
 
-    nbstripout --install --global
+    nbstripout --uninstall --global
 
 Remove the git filter and attributes from ``.gitattributes``: ::
 
