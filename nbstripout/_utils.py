@@ -16,6 +16,8 @@ def pop_recursive(d, key, default=None):
     >>> d
     {'a': {'b': 1}}
     """
+    if key in d:
+        return d.pop(key)
     nested = key.split('.')
     current = d
     for k in nested[:-1]:
