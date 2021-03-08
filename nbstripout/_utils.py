@@ -98,6 +98,10 @@ def strip_output(nb, keep_output, keep_count, extra_keys=''):
     for cell in _cells(nb):
         keep_output_this_cell = determine_keep_output(cell, keep_output)
 
+        # Remove cell IDs
+        if 'id' in cell:
+            cell['id'] = None
+
         # Remove the outputs, unless directed otherwise
         if 'outputs' in cell:
 
