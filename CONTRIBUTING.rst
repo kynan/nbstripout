@@ -8,22 +8,21 @@ Releasing a new version
 -----------------------
 
 To simplify updating the version number consistently across different files
-and creating the appropriate annotated tag, we use bumpversion_. For a new
+and creating the appropriate annotated tag, we use bump2version_. For a new
 patch release, run ::
 
-    bumpversion patch
+    bump2version patch
 
 and for a minor release ::
 
-    bumpversion minor
+    bump2version minor
 
-**Note:** bumpversion_ does not (as of 0.5.3) support creating annotated tags.
-We therefore use a fork_ which you can install with ::
+Remember to also push the release tag with ``git push --tags``.
 
-    pip install git+https://github.com/ekohl/bumpversion@annotated-tags
+Use twine_ to upload the new release to PyPI.
 
 .. _GitHub: https://github.com/kynan/nbstripout
 .. _bug reports: https://github.com/kynan/nbstripout/issues
 .. _pull requests: https://github.com/kynan/nbstripout/pulls
-.. _bumpversion: https://github.com/peritus/bumpversion
-.. _fork: https://github.com/ekohl/bumpversion/tree/annotated-tags
+.. _bump2version: https://github.com/c4urself/bump2version
+.. _twine: https://twine.readthedocs.io/en/latest/#using-twine
