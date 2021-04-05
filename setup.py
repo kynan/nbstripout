@@ -15,7 +15,7 @@ setup_requires = [
 tests_require = [
     'pytest',
     'pytest-flake8',
-    'pytest-cram == 0.2.1',
+    'pytest-cram == 0.2.2',
 ]
 
 setup(name='nbstripout',
