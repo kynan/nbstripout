@@ -99,7 +99,7 @@ In file ``.gitattributes`` or ``.git/info/attributes`` add: ::
 from __future__ import print_function
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import io
-from os import devnull, environ, path
+from os import devnull, environ, makedirs, path
 from subprocess import call, check_call, check_output, CalledProcessError, STDOUT
 import sys
 import warnings
@@ -143,7 +143,9 @@ def _get_attrfile(git_config, user=False, attrfile=None):
     elif not attrfile:
         git_dir = check_output(['git', 'rev-parse', '--git-dir']).strip()
         attrfile = path.join(git_dir.decode(), 'info', 'attributes')
-    return path.expanduser(attrfile)
+    attrfile = path.expanduser(attrfile)
+    makedirs(path.dirname(attrfile), exist_ok=True)
+    return attrfile
 
 
 def install(git_config, user=False, attrfile=None):
