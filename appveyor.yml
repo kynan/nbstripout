@@ -21,8 +21,8 @@ init:
 
 install:
   - mkdir -p C:\Temp
-  - "%PYTHON%/Scripts/easy_install -U pip"
-  - "%PYTHON%/Scripts/pip install pytest==5.4.3"
+  - "%PYTHON%/Scripts/pip install pytest"
+  - "%PYTHON%/Scripts/pip install 'traitlets<5'"
   - "%PYTHON%/Scripts/pip install nbformat"
   - "%PYTHON%/Scripts/pip install --upgrade setuptools"
   - python setup.py install
