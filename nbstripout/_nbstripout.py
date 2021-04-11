@@ -138,7 +138,7 @@ def _get_attrfile(git_config, user=False, attrfile=None):
         try:
             attrfile = check_output(git_config + ['core.attributesFile']).strip()
         except CalledProcessError:
-            config_dir = environ.get('XDG_CONFIG_DIR', path.join(environ['HOME'], '.config'))
+            config_dir = environ.get('XDG_CONFIG_DIR', path.expanduser('~/.config'))
             attrfile = path.join(config_dir, 'git', 'attributes')
     elif not attrfile:
         git_dir = check_output(['git', 'rev-parse', '--git-dir']).strip()
