@@ -278,7 +278,8 @@ def main():
     parser.add_argument('--keep-output', action='store_true',
                         help='Do not strip output', default=None)
     parser.add_argument('--extra-keys', default='',
-                        help='Extra keys to strip from metadata, e.g. metadata.foo cell.metadata.bar')
+                        help='Space separated list of extra keys to strip '
+                        'from metadata, e.g. metadata.foo cell.metadata.bar')
     parser.add_argument('--strip-empty-cells', action='store_true',
                         help='Remove cells where `source` is empty or contains only whitepace')
     parser.add_argument('--attributes', metavar='FILEPATH',
