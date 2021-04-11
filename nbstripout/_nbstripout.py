@@ -279,6 +279,8 @@ def main():
                         help='Do not strip output', default=None)
     parser.add_argument('--extra-keys', default='',
                         help='Extra keys to strip from metadata, e.g. metadata.foo cell.metadata.bar')
+    parser.add_argument('--strip-empty-cells', action='store_true',
+                        help='Remove cells where `source` is empty or contains only whitepace')
     parser.add_argument('--attributes', metavar='FILEPATH',
                         help='Attributes file to add the filter to (in '
                         'combination with --install/--uninstall), '
@@ -339,7 +341,7 @@ def main():
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore", category=UserWarning)
                     nb = read(f, as_version=NO_CONVERT)
-            nb = strip_output(nb, args.keep_output, args.keep_count, extra_keys)
+            nb = strip_output(nb, args.keep_output, args.keep_count, extra_keys, args.strip_empty_cells)
             if args.dry_run:
                 output_stream.write('Dry run: would have stripped {}\n'.format(
                     filename))
@@ -370,7 +372,7 @@ def main():
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore", category=UserWarning)
                 nb = read(input_stream, as_version=NO_CONVERT)
-            nb = strip_output(nb, args.keep_output, args.keep_count, extra_keys)
+            nb = strip_output(nb, args.keep_output, args.keep_count, extra_keys, args.strip_empty_cells)
             if args.dry_run:
                 output_stream.write('Dry run: would have stripped input from '
                                     'stdin\n')

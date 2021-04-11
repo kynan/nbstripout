@@ -30,13 +30,17 @@ def pop_recursive(d, key, default=None):
     return current.pop(nested[-1], default)
 
 
-def _cells(nb):
-    """Yield all cells in an nbformat-insensitive manner"""
+def _cells(nb, conditional=None):
+    """Remove cells not satisfying conditional and yield all other cells."""
     if nb.nbformat < 4:
         for ws in nb.worksheets:
+            if conditional:
+                ws.cells = list(filter(conditional, ws.cells))
             for cell in ws.cells:
                 yield cell
     else:
+        if conditional:
+            nb.cells = list(filter(conditional, nb.cells))
         for cell in nb.cells:
             yield cell
 
@@ -68,7 +72,7 @@ def determine_keep_output(cell, default):
     return default
 
 
-def strip_output(nb, keep_output, keep_count, extra_keys=''):
+def strip_output(nb, keep_output, keep_count, extra_keys='', strip_empty_cells=False):
     """
     Strip the outputs, execution count/prompt number and miscellaneous
     metadata from a notebook object, unless specified to keep either the outputs
@@ -97,7 +101,15 @@ def strip_output(nb, keep_output, keep_count, extra_keys=''):
     for field in keys['metadata']:
         pop_recursive(nb.metadata, field)
 
-    for cell in _cells(nb):
+    # Keep cells if they have any `source` line that contains non-whitespace
+    if strip_empty_cells:
+        def conditional(cell):
+            return any(line.strip() for line in cell.get('source', []))
+    # Keep all cells
+    else:
+        conditional = None
+
+    for cell in _cells(nb, conditional):
         keep_output_this_cell = determine_keep_output(cell, keep_output)
 
         # Remove the outputs, unless directed otherwise

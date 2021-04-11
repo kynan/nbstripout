@@ -191,6 +191,14 @@ This is a potentially slower but simpler invocation using ``--tree-filter``: ::
 
     git filter-branch -f --tree-filter 'find . -name "*.ipynb" -exec nbstripout "{}" +'
 
+Removing empty cells
+++++++++++++++++++++
+
+Strip empty cells i.e. cells where ``source`` is either empty or only contains
+whitespace ::
+
+    nbstripout --strip-empty-cells
+
 Keeping some output
 +++++++++++++++++++
 
