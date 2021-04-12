@@ -4,7 +4,6 @@
     {
      "cell_type": "code",
      "execution_count": null,
-     "id": "random-blackberry",
      "metadata": {},
      "outputs": [],
      "source": [
@@ -13,7 +12,6 @@
     },
     {
      "cell_type": "markdown",
-     "id": "quantitative-canberra",
      "metadata": {},
      "source": [
       "# This cell will also be kept"
@@ -22,7 +20,6 @@
     {
      "cell_type": "code",
      "execution_count": null,
-     "id": "typical-atlanta",
      "metadata": {},
      "outputs": [],
      "source": []
@@ -30,7 +27,6 @@
     {
      "cell_type": "code",
      "execution_count": null,
-     "id": "tamil-owner",
      "metadata": {},
      "outputs": [],
      "source": [
@@ -41,7 +37,6 @@
     },
     {
      "cell_type": "markdown",
-     "id": "average-revolution",
      "metadata": {},
      "source": []
     }
@@ -66,7 +61,7 @@
     }
    },
    "nbformat": 4,
-   "nbformat_minor": 5
+   "nbformat_minor": 4
   }
   $ cat ${TESTDIR}/test_strip_empty_cells.ipynb | ${NBSTRIPOUT_EXE:-nbstripout} --strip-empty-cells
   {
@@ -74,7 +69,6 @@
     {
      "cell_type": "code",
      "execution_count": null,
-     "id": "random-blackberry",
      "metadata": {},
      "outputs": [],
      "source": [
@@ -83,7 +77,6 @@
     },
     {
      "cell_type": "markdown",
-     "id": "quantitative-canberra",
      "metadata": {},
      "source": [
       "# This cell will also be kept"
@@ -110,5 +103,5 @@
     }
    },
    "nbformat": 4,
-   "nbformat_minor": 5
+   "nbformat_minor": 4
   }
