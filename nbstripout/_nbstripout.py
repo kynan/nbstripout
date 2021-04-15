@@ -166,11 +166,14 @@ def install(git_config, user=False, attrfile=None):
     # Check if there is already a filter for ipynb files
     filt_exists = False
     diff_exists = False
+
     if path.exists(attrfile):
         with open(attrfile, 'r') as f:
             attrs = f.read()
+
         filt_exists = '*.ipynb filter' in attrs
         diff_exists = '*.ipynb diff' in attrs
+
         if filt_exists and diff_exists:
             return
 
@@ -215,13 +218,16 @@ def status(git_config, user=False, verbose=False):
         else:
             git_dir = path.dirname(path.abspath(check_output(['git', 'rev-parse', '--git-dir']).strip()))
             location = "in repository '{}'".format(git_dir)
+
         clean = check_output(git_config + ['filter.nbstripout.clean']).strip()
         smudge = check_output(git_config + ['filter.nbstripout.smudge']).strip()
         diff = check_output(git_config + ['diff.ipynb.textconv']).strip()
+
         if user:
             attrfile = _get_attrfile(git_config, user)
             attributes = ''
             diff_attributes = ''
+
             if path.exists(attrfile):
                 with open(attrfile, 'r') as f:
                     attrs = f.readlines()
@@ -230,14 +236,18 @@ def status(git_config, user=False, verbose=False):
         else:
             attributes = check_output(['git', 'check-attr', 'filter', '--', '*.ipynb']).strip()
             diff_attributes = check_output(['git', 'check-attr', 'diff', '--', '*.ipynb']).strip()
+
         try:
             extra_keys = check_output(git_config + ['filter.nbstripout.extrakeys']).strip()
         except CalledProcessError:
             extra_keys = ''
+
         if attributes.endswith(b'unspecified'):
             if verbose:
                 print('nbstripout is not installed', location)
+
             return 1
+
         if verbose:
             print('nbstripout is installed', git_dir)
             print('\nFilter:')
@@ -247,13 +257,16 @@ def status(git_config, user=False, verbose=False):
             print('  extrakeys=', extra_keys)
             print('\nAttributes:\n ', attributes)
             print('\nDiff Attributes:\n ', diff_attributes)
+
         return 0
     except FileNotFoundError:
         print('Cannot determine status: git is not on path!', file=sys.stderr)
+
         return 1
     except CalledProcessError:
         if verbose and 'location' in locals():
             print('nbstripout is not installed', location)
+
         return 1
 
 
@@ -300,6 +313,7 @@ def main():
     args = parser.parse_args()
 
     git_config = ['git', 'config'] + (['--global'] if args._global else [])
+
     if args.install:
         sys.exit(install(git_config, user=args._global, attrfile=args.attributes))
     if args.uninstall:
@@ -322,10 +336,12 @@ def main():
         'cell.metadata.hidden',
         'cell.metadata.scrolled',
     ]
+
     try:
         extra_keys.extend(check_output(git_config + ['filter.nbstripout.extrakeys']).strip().decode().split())
     except (CalledProcessError, FileNotFoundError):
         pass
+
     extra_keys.extend(args.extra_keys.split())
 
     # Wrap input/output stream in UTF-8 encoded text wrapper
@@ -336,20 +352,25 @@ def main():
     for filename in args.files:
         if not (args.force or filename.endswith('.ipynb')):
             continue
+
         try:
             with io.open(filename, 'r', encoding='utf8') as f:
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore", category=UserWarning)
                     nb = read(f, as_version=NO_CONVERT)
+
             nb = strip_output(nb, args.keep_output, args.keep_count, extra_keys, args.strip_empty_cells)
+
             if args.dry_run:
-                output_stream.write('Dry run: would have stripped {}\n'.format(
-                    filename))
+                output_stream.write('Dry run: would have stripped {}\n'.format(filename))
+
                 continue
+
             if args.textconv:
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore", category=UserWarning)
                     write(nb, output_stream)
+
                 output_stream.flush()
             else:
                 with io.open(filename, 'w', encoding='utf8', newline='') as f:
@@ -372,7 +393,9 @@ def main():
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore", category=UserWarning)
                 nb = read(input_stream, as_version=NO_CONVERT)
+
             nb = strip_output(nb, args.keep_output, args.keep_count, extra_keys, args.strip_empty_cells)
+
             if args.dry_run:
                 output_stream.write('Dry run: would have stripped input from '
                                     'stdin\n')
@@ -380,6 +403,7 @@ def main():
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore", category=UserWarning)
                     write(nb, output_stream)
+
                 output_stream.flush()
         except NotJSONError:
             print('No valid notebook detected', file=sys.stderr)
