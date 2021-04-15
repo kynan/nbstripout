@@ -149,13 +149,13 @@ INSTALL_LOCATION_SYSTEM = 'system'
 
 def _get_system_gitconfig_folder():
     try:
-        git_config_output = check_output(['git', 'config', '--system', '--list', '--show-origin'], text=True, stderr=STDOUT).strip()
+        git_config_output = check_output(['git', 'config', '--system', '--list', '--show-origin'], universal_newlines=True, stderr=STDOUT).strip()
 
         # If the output is empty, it means the file exists but is empty, so we cannot get the path.
         # To still get it, we're setting a temporary config parameter.
         if git_config_output == '':
             check_call(['git', 'config', '--system', 'filter.nbstripoutput.test', 'test'])
-            git_config_output = check_output(['git', 'config', '--system', '--list', '--show-origin'], text=True).strip()
+            git_config_output = check_output(['git', 'config', '--system', '--list', '--show-origin'], universal_newlines=True).strip()
             check_call(['git', 'config', '--system', '--unset', 'filter.nbstripoutput.test'])
 
         output_lines = git_config_output.split('\n')
@@ -173,19 +173,19 @@ def _get_attrfile(git_config, install_location=INSTALL_LOCATION_LOCAL, attrfile=
     if not attrfile:
         if install_location == INSTALL_LOCATION_SYSTEM:
             try:
-                attrfile = check_output(git_config + ['core.attributesFile']).strip()
+                attrfile = check_output(git_config + ['core.attributesFile'], universal_newlines=True).strip()
             except CalledProcessError:
                 config_dir = _get_system_gitconfig_folder()
                 attrfile = path.join(config_dir, 'gitattributes')
         elif install_location == INSTALL_LOCATION_GLOBAL:
             try:
-                attrfile = check_output(git_config + ['core.attributesFile']).strip()
+                attrfile = check_output(git_config + ['core.attributesFile'], universal_newlines=True).strip()
             except CalledProcessError:
                 config_dir = environ.get('XDG_CONFIG_DIR', path.expanduser('~/.config'))
                 attrfile = path.join(config_dir, 'git', 'attributes')
         else:
-            git_dir = check_output(['git', 'rev-parse', '--git-dir']).strip()
-            attrfile = path.join(git_dir.decode(), 'info', 'attributes')
+            git_dir = check_output(['git', 'rev-parse', '--git-dir'], universal_newlines=True).strip()
+            attrfile = path.join(git_dir, 'info', 'attributes')
 
     attrfile = path.expanduser(attrfile)
     makedirs(path.dirname(attrfile), exist_ok=True)
@@ -271,12 +271,12 @@ def status(git_config, install_location=INSTALL_LOCATION_LOCAL, verbose=False):
         elif install_location == INSTALL_LOCATION_GLOBAL:
             location = 'globally'
         else:
-            git_dir = path.dirname(path.abspath(check_output(['git', 'rev-parse', '--git-dir']).strip()))
+            git_dir = path.dirname(path.abspath(check_output(['git', 'rev-parse', '--git-dir'], universal_newlines=True).strip()))
             location = "in repository '{}'".format(git_dir)
 
-        clean = check_output(git_config + ['filter.nbstripout.clean']).strip()
-        smudge = check_output(git_config + ['filter.nbstripout.smudge']).strip()
-        diff = check_output(git_config + ['diff.ipynb.textconv']).strip()
+        clean = check_output(git_config + ['filter.nbstripout.clean'], universal_newlines=True).strip()
+        smudge = check_output(git_config + ['filter.nbstripout.smudge'], universal_newlines=True).strip()
+        diff = check_output(git_config + ['diff.ipynb.textconv'], universal_newlines=True).strip()
 
         if install_location in {INSTALL_LOCATION_SYSTEM, INSTALL_LOCATION_GLOBAL}:
             attrfile = _get_attrfile(git_config, install_location)
@@ -289,22 +289,22 @@ def status(git_config, install_location=INSTALL_LOCATION_LOCAL, verbose=False):
                 attributes = ''.join(line for line in attrs if 'filter' in line).strip()
                 diff_attributes = ''.join(line for line in attrs if 'diff' in line).strip()
         else:
-            attributes = check_output(['git', 'check-attr', 'filter', '--', '*.ipynb']).strip()
-            diff_attributes = check_output(['git', 'check-attr', 'diff', '--', '*.ipynb']).strip()
+            attributes = check_output(['git', 'check-attr', 'filter', '--', '*.ipynb'], universal_newlines=True).strip()
+            diff_attributes = check_output(['git', 'check-attr', 'diff', '--', '*.ipynb'], universal_newlines=True).strip()
 
         try:
-            extra_keys = check_output(git_config + ['filter.nbstripout.extrakeys']).strip()
+            extra_keys = check_output(git_config + ['filter.nbstripout.extrakeys'], universal_newlines=True).strip()
         except CalledProcessError:
             extra_keys = ''
 
-        if attributes.endswith(b'unspecified'):
+        if attributes.endswith('unspecified'):
             if verbose:
                 print('nbstripout is not installed', location)
 
             return 1
 
         if verbose:
-            print('nbstripout is installed', git_dir)
+            print('nbstripout is installed', location)
             print('\nFilter:')
             print('  clean =', clean)
             print('  smudge =', smudge)
@@ -406,7 +406,7 @@ def main():
     ]
 
     try:
-        extra_keys.extend(check_output((git_config if args._system or args._global else ['git', 'config']) + ['filter.nbstripout.extrakeys']).strip().decode().split())
+        extra_keys.extend(check_output((git_config if args._system or args._global else ['git', 'config']) + ['filter.nbstripout.extrakeys'], universal_newlines=True).strip().split())
     except (CalledProcessError, FileNotFoundError):
         pass
 
