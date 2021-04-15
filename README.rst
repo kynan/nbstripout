@@ -95,6 +95,10 @@ Set up the git filter in your global ``~/.gitconfig`` ::
 
     nbstripout --install --global
 
+Set up the git filter in your system-wide ``$(prefix)/etc/gitconfig`` (most installations will require you to ``sudo``) ::
+
+    [sudo] nbstripout --install --system
+
 Remove the git filter and attributes: ::
 
     nbstripout --uninstall
@@ -102,6 +106,10 @@ Remove the git filter and attributes: ::
 Remove the git filter from your global ``~/.gitconfig`` and attributes ::
 
     nbstripout --uninstall --global
+
+Remove the git filter from your system-wide ``$(prefix)/etc/gitconfig`` and attributes ::
+
+    [sudo] nbstripout --uninstall --system
 
 Remove the git filter and attributes from ``.gitattributes``: ::
 
@@ -137,14 +145,15 @@ The following table shows in which files the ``nbstripout`` filter and
 attribute configuration is written to for given extra flags to ``--install``
 and ``--uninstall``:
 
-======================================== ================ ========================
-flags                                    filters          attributes
-======================================== ================ ========================
-none                                     ``.git/config``  ``.git/info/attributes``
-``--global``                             ``~/.gitconfig`` ``.git/info/attributes``
-``--attributes=.gitattributes``          ``.git/config``  ``.gitattributes``
-``--global --attributes=.gitattributes`` ``~/.gitconfig`` ``.gitattributes``
-======================================== ================ ========================
+======================================== =========================== ===============================
+flags                                    filters                     attributes
+======================================== =========================== ===============================
+none                                     ``.git/config``             ``.git/info/attributes``
+``--global``                             ``~/.gitconfig``            ``~/.config/git/attributes``
+``--system``                             ``$(prefix)/etc/gitconfig`` ``$(prefix)/etc/gitattributes``
+``--attributes=.gitattributes``          ``.git/config``             ``.gitattributes``
+``--global --attributes=.gitattributes`` ``~/.gitconfig``            ``.gitattributes``
+======================================== =========================== ===============================
 
 Install globally
 ++++++++++++++++
@@ -168,6 +177,21 @@ instruct git to apply them to any ``.ipynb`` file in any repository.
 Note that you need to uninstall with the same flags: ::
 
     nbstripout --uninstall --global --attributes=~/.config/git/attributes
+
+Install system-wide
++++++++++++++++++++
+
+To install ``nbstripout`` system-wide so that it applies to all repositories
+for all users, install as follows (most installations will require you to ``sudo``): ::
+
+    [sudo] nbstripout --install --system
+
+This will set up the filters and diff driver in ``$(prefix)/etc/gitconfig`` and
+instruct git to apply them to any ``.ipynb`` file in any repository for any user.
+
+Note that you need to uninstall with the same flags: ::
+
+    [sudo] nbstripout --uninstall --system
 
 Apply retroactively
 +++++++++++++++++++
@@ -252,7 +276,7 @@ The following metadata is stripped by default:
 
 Additional metadata to be stripped can be configured via either
 
-*   ``git config (--global) filter.nbstripout.extrakeys``, e.g. ::
+*   ``git config (--global/--system) filter.nbstripout.extrakeys``, e.g. ::
 
         git config --global filter.nbstripout.extrakeys '
           metadata.celltoolbar
@@ -326,6 +350,10 @@ If you want the filter to be installed globally for your user, add the
 ``--global`` flag to the ``git config`` invocations above to have the
 configuration written to your ``~/.gitconfig`` and apply to all repositories.
 
+If you want the filter to be installed system-wide, add the ``--system`` flag
+to the ``git config`` invocations above to have the configuration written to
+``$(prefix)/etc/gitconfig`` and apply to all repositories for all users.
+
 Create a file ``.gitattributes`` (if you want it versioned with the repository)
 or ``.git/info/attributes`` (to apply it only to the current repository) with
 the following content: ::
@@ -340,6 +368,10 @@ repository.
 If you want the attributes be set for ``.ipynb`` files in any of your git
 repositories, add those two lines to ``~/.config/git/attributes``. Note that
 this file and the ``~/.config/git`` directory may not exist.
+
+If you want the attributes be set for ``.ipynb`` files in any git
+repository on your system, add those two lines to ``$(prefix)/etc/gitattributes``.
+Note that this file may not exist.
 
 Using ``nbstripout`` as a pre-commit hook
 =========================================
@@ -375,8 +407,8 @@ Show files processed by nbstripout filter
 
 Git has `no builtin support <https://stackoverflow.com/a/52065333/396967>`_
 for listing files a clean or smudge filter operates on. As a workaround,
-change the setup of your filter in ``.git/config`` or ``~/.gitconfig`` as
-follows to see the filenames either filter operates on: ::
+change the setup of your filter in ``.git/config``, ``~/.gitconfig`` or
+``$(prefix)/etc/gitconfig`` as follows to see the filenames either filter operates on: ::
 
     [filter "nbstripout"]
         clean  = "f() { echo >&2 \"clean: nbstripout $1\"; nbstripout; }; f %f"

@@ -40,6 +40,10 @@ Set up the git filter in your global ``~/.gitconfig`` ::
 
     nbstripout --install --global
 
+Set up the git filter in your system-wide ``$(prefix)/etc/gitconfig`` (most installations will require you to ``sudo``) ::
+
+    [sudo] nbstripout --install --system
+
 Remove the git filter and attributes: ::
 
     nbstripout --uninstall
@@ -47,6 +51,10 @@ Remove the git filter and attributes: ::
 Remove the git filter from your global ``~/.gitconfig`` and attributes ::
 
     nbstripout --uninstall --global
+
+Remove the git filter from your system-wide ``$(prefix)/etc/gitconfig`` and attributes ::
+
+    nbstripout --uninstall --system
 
 Remove the git filter and attributes from ``.gitattributes``: ::
 
@@ -101,6 +109,7 @@ from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import io
 from os import devnull, environ, makedirs, path
 from subprocess import call, check_call, check_output, CalledProcessError, STDOUT
+import re
 import sys
 import warnings
 # warnings.simplefilter("ignore")
@@ -133,29 +142,65 @@ __all__ = ["install", "uninstall", "status", "main"]
 __version__ = '0.3.9'
 
 
-def _get_attrfile(git_config, user=False, attrfile=None):
-    if user and not attrfile:
-        try:
-            attrfile = check_output(git_config + ['core.attributesFile']).strip()
-        except CalledProcessError:
-            config_dir = environ.get('XDG_CONFIG_DIR', path.expanduser('~/.config'))
-            attrfile = path.join(config_dir, 'git', 'attributes')
-    elif not attrfile:
-        git_dir = check_output(['git', 'rev-parse', '--git-dir']).strip()
-        attrfile = path.join(git_dir.decode(), 'info', 'attributes')
+INSTALL_LOCATION_LOCAL = 'local'
+INSTALL_LOCATION_GLOBAL = 'global'
+INSTALL_LOCATION_SYSTEM = 'system'
+
+
+def _get_system_gitconfig_folder():
+    try:
+        git_config_output = check_output(['git', 'config', '--system', '--list', '--show-origin'], text=True, stderr=STDOUT).strip()
+
+        # If the output is empty, it means the file exists but is empty, so we cannot get the path.
+        # To still get it, we're setting a temporary config parameter.
+        if git_config_output == '':
+            check_call(['git', 'config', '--system', 'filter.nbstripoutput.test', 'test'])
+            git_config_output = check_output(['git', 'config', '--system', '--list', '--show-origin'], text=True).strip()
+            check_call(['git', 'config', '--system', '--unset', 'filter.nbstripoutput.test'])
+
+        output_lines = git_config_output.split('\n')
+
+        system_gitconfig_file_path = re.sub(r'^file:', '', output_lines[0].split('\t')[0])
+    except CalledProcessError as e:
+        git_config_output = e.output
+
+        system_gitconfig_file_path = re.match(r"fatal:.*file '([^']+)'.*", git_config_output).group(1)
+
+    return path.abspath(path.dirname(system_gitconfig_file_path))
+
+
+def _get_attrfile(git_config, install_location=INSTALL_LOCATION_LOCAL, attrfile=None):
+    if not attrfile:
+        if install_location == INSTALL_LOCATION_SYSTEM:
+            try:
+                attrfile = check_output(git_config + ['core.attributesFile']).strip()
+            except CalledProcessError:
+                config_dir = _get_system_gitconfig_folder()
+                attrfile = path.join(config_dir, 'gitattributes')
+        elif install_location == INSTALL_LOCATION_GLOBAL:
+            try:
+                attrfile = check_output(git_config + ['core.attributesFile']).strip()
+            except CalledProcessError:
+                config_dir = environ.get('XDG_CONFIG_DIR', path.expanduser('~/.config'))
+                attrfile = path.join(config_dir, 'git', 'attributes')
+        else:
+            git_dir = check_output(['git', 'rev-parse', '--git-dir']).strip()
+            attrfile = path.join(git_dir.decode(), 'info', 'attributes')
+
     attrfile = path.expanduser(attrfile)
     makedirs(path.dirname(attrfile), exist_ok=True)
+
     return attrfile
 
 
-def install(git_config, user=False, attrfile=None):
+def install(git_config, install_location=INSTALL_LOCATION_LOCAL, attrfile=None):
     """Install the git filter and set the git attributes."""
     try:
         filepath = '"{}" -m nbstripout'.format(sys.executable.replace('\\', '/'))
         check_call(git_config + ['filter.nbstripout.clean', filepath])
         check_call(git_config + ['filter.nbstripout.smudge', 'cat'])
         check_call(git_config + ['diff.ipynb.textconv', filepath + ' -t'])
-        attrfile = _get_attrfile(git_config, user, attrfile)
+        attrfile = _get_attrfile(git_config, install_location, attrfile)
     except FileNotFoundError:
         print('Installation failed: git is not on path!', file=sys.stderr)
         sys.exit(1)
@@ -177,23 +222,31 @@ def install(git_config, user=False, attrfile=None):
         if filt_exists and diff_exists:
             return
 
-    with open(attrfile, 'a', newline='') as f:
-        # If the file already exists, ensure it ends with a new line
-        if f.tell():
-            f.write('\n')
-        if not filt_exists:
-            print('*.ipynb filter=nbstripout', file=f)
-        if not diff_exists:
-            print('*.ipynb diff=ipynb', file=f)
+    try:
+        with open(attrfile, 'a', newline='') as f:
+            # If the file already exists, ensure it ends with a new line
+            if f.tell():
+                f.write('\n')
+            if not filt_exists:
+                print('*.ipynb filter=nbstripout', file=f)
+            if not diff_exists:
+                print('*.ipynb diff=ipynb', file=f)
+    except PermissionError:
+        print('Installation failed: could not write to {}'.format(attrfile), file=sys.stderr)
+
+        if install_location == INSTALL_LOCATION_GLOBAL:
+            print('Did you forget to sudo?', file=sys.stderr)
+
+        sys.exit(1)
 
 
-def uninstall(git_config, user=False, attrfile=None):
+def uninstall(git_config, install_location=INSTALL_LOCATION_LOCAL, attrfile=None):
     """Uninstall the git filter and unset the git attributes."""
     try:
         call(git_config + ['--unset', 'filter.nbstripout.clean'], stdout=open(devnull, 'w'), stderr=STDOUT)
         call(git_config + ['--unset', 'filter.nbstripout.smudge'], stdout=open(devnull, 'w'), stderr=STDOUT)
         call(git_config + ['--remove-section', 'diff.ipynb'], stdout=open(devnull, 'w'), stderr=STDOUT)
-        attrfile = _get_attrfile(git_config, user, attrfile)
+        attrfile = _get_attrfile(git_config, install_location, attrfile)
     except FileNotFoundError:
         print('Uninstall failed: git is not on path!', file=sys.stderr)
         sys.exit(1)
@@ -210,10 +263,12 @@ def uninstall(git_config, user=False, attrfile=None):
             f.truncate()
 
 
-def status(git_config, user=False, verbose=False):
+def status(git_config, install_location=INSTALL_LOCATION_LOCAL, verbose=False):
     """Return 0 if nbstripout is installed in the current repo, 1 otherwise"""
     try:
-        if user:
+        if install_location == INSTALL_LOCATION_SYSTEM:
+            location = 'system-wide'
+        elif install_location == INSTALL_LOCATION_GLOBAL:
             location = 'globally'
         else:
             git_dir = path.dirname(path.abspath(check_output(['git', 'rev-parse', '--git-dir']).strip()))
@@ -223,8 +278,8 @@ def status(git_config, user=False, verbose=False):
         smudge = check_output(git_config + ['filter.nbstripout.smudge']).strip()
         diff = check_output(git_config + ['diff.ipynb.textconv']).strip()
 
-        if user:
-            attrfile = _get_attrfile(git_config, user)
+        if install_location in {INSTALL_LOCATION_SYSTEM, INSTALL_LOCATION_GLOBAL}:
+            attrfile = _get_attrfile(git_config, install_location)
             attributes = ''
             diff_attributes = ''
 
@@ -286,6 +341,8 @@ def main():
     task.add_argument('--status', action='store_true',
                       help='Print status of nbstripout installation in current '
                       'repository and configuration summary if installed')
+    task.add_argument('--version', action='store_true',
+                      help='Print version')
     parser.add_argument('--keep-count', action='store_true',
                         help='Do not strip the execution count/prompt number')
     parser.add_argument('--keep-output', action='store_true',
@@ -299,10 +356,11 @@ def main():
                         help='Attributes file to add the filter to (in '
                         'combination with --install/--uninstall), '
                         'defaults to .git/info/attributes')
-    parser.add_argument('--global', dest='_global', action='store_true',
-                        help='Use global git config (default is local config)')
-    task.add_argument('--version', action='store_true',
-                      help='Print version')
+    location = parser.add_mutually_exclusive_group()
+    location.add_argument('--global', dest='_global', action='store_true',
+                          help='Use global git config (default is local config)')
+    location.add_argument('--system', dest='_system', action='store_true',
+                          help='Use system git config (default is local config)')
     parser.add_argument('--force', '-f', action='store_true',
                         help='Strip output also from files with non ipynb extension')
 
@@ -312,16 +370,26 @@ def main():
     parser.add_argument('files', nargs='*', help='Files to strip output from')
     args = parser.parse_args()
 
-    git_config = ['git', 'config'] + (['--global'] if args._global else [])
+    git_config = ['git', 'config']
+
+    if args._system:
+        git_config.append('--system')
+        install_location = INSTALL_LOCATION_SYSTEM
+    elif args._global:
+        git_config.append('--global')
+        install_location = INSTALL_LOCATION_GLOBAL
+    else:
+        git_config.append('--local')
+        install_location = INSTALL_LOCATION_LOCAL
 
     if args.install:
-        sys.exit(install(git_config, user=args._global, attrfile=args.attributes))
+        sys.exit(install(git_config, install_location, attrfile=args.attributes))
     if args.uninstall:
-        sys.exit(uninstall(git_config, user=args._global, attrfile=args.attributes))
+        sys.exit(uninstall(git_config, install_location, attrfile=args.attributes))
     if args.is_installed:
-        sys.exit(status(git_config, user=args._global, verbose=False))
+        sys.exit(status(git_config, install_location, verbose=False))
     if args.status:
-        sys.exit(status(git_config, user=args._global, verbose=True))
+        sys.exit(status(git_config, install_location, verbose=True))
     if args.version:
         print(__version__)
         sys.exit(0)
@@ -338,7 +406,7 @@ def main():
     ]
 
     try:
-        extra_keys.extend(check_output(git_config + ['filter.nbstripout.extrakeys']).strip().decode().split())
+        extra_keys.extend(check_output((git_config if args._system or args._global else ['git', 'config']) + ['filter.nbstripout.extrakeys']).strip().decode().split())
     except (CalledProcessError, FileNotFoundError):
         pass
 
