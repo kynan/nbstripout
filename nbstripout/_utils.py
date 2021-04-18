@@ -1,3 +1,4 @@
+from collections import defaultdict
 import sys
 
 __all__ = ["pop_recursive", "strip_output", "MetadataError"]
@@ -70,7 +71,7 @@ def determine_keep_output(cell, default):
     return default
 
 
-def strip_output(nb, keep_output, keep_count, extra_keys='', strip_empty_cells=False):
+def strip_output(nb, keep_output, keep_count, extra_keys=[], strip_empty_cells=False):
     """
     Strip the outputs, execution count/prompt number and miscellaneous
     metadata from a notebook object, unless specified to keep either the outputs
@@ -81,20 +82,13 @@ def strip_output(nb, keep_output, keep_count, extra_keys='', strip_empty_cells=F
     if keep_output is None and 'keep_output' in nb.metadata:
         keep_output = bool(nb.metadata['keep_output'])
 
-    if hasattr(extra_keys, 'decode'):
-        extra_keys = extra_keys.decode()
-    extra_keys = extra_keys.split()
-    keys = {'metadata': [], 'cell': {'metadata': []}}
+    keys = defaultdict(list)
     for key in extra_keys:
-        if key.startswith('metadata.'):
-            keys['metadata'].append(key[len('metadata.'):])
-        elif key.startswith('cell.metadata.'):
-            keys['cell']['metadata'].append(key[len('cell.metadata.'):])
-        else:
+        if '.' not in key or key.split('.')[0] not in ['cell', 'metadata']:
             sys.stderr.write('ignoring extra key `%s`' % key)
-
-    nb.metadata.pop('signature', None)
-    nb.metadata.pop('widgets', None)
+        else:
+            namespace, subkey = key.split('.', maxsplit=1)
+            keys[namespace].append(subkey)
 
     for field in keys['metadata']:
         pop_recursive(nb.metadata, field)
@@ -134,14 +128,6 @@ def strip_output(nb, keep_output, keep_count, extra_keys='', strip_empty_cells=F
             cell['execution_count'] = None
 
         # Always remove some metadata
-        if 'metadata' in cell:
-            for output_style in ['collapsed', 'scrolled']:
-                if output_style in cell.metadata:
-                    cell.metadata[output_style] = False
-            for field in ['ExecuteTime', 'collapsed', 'execution', 'scrolled', 'heading_collapsed', 'hidden']:
-                cell.metadata.pop(field, None)
-        for (extra, fields) in keys['cell'].items():
-            if extra in cell:
-                for field in fields:
-                    pop_recursive(getattr(cell, extra), field)
+        for field in keys['cell']:
+            pop_recursive(cell, field)
     return nb

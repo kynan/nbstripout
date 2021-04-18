@@ -312,12 +312,21 @@ def main():
         print(__version__)
         sys.exit(0)
 
+    extra_keys = [
+        'metadata.signature',
+        'metadata.widgets',
+        'cell.metadata.collapsed',
+        'cell.metadata.ExecuteTime',
+        'cell.metadata.execution',
+        'cell.metadata.heading_collapsed',
+        'cell.metadata.hidden',
+        'cell.metadata.scrolled',
+    ]
     try:
-        extra_keys = check_output(git_config + ['filter.nbstripout.extrakeys']).strip().decode()
-        if args.extra_keys:
-            extra_keys = ' '.join((extra_keys, args.extra_keys))
+        extra_keys.extend(check_output(git_config + ['filter.nbstripout.extrakeys']).strip().decode().split())
     except (CalledProcessError, FileNotFoundError):
-        extra_keys = args.extra_keys
+        pass
+    extra_keys.extend(args.extra_keys.split())
 
     input_stream = None
     if sys.version_info < (3, 0):
