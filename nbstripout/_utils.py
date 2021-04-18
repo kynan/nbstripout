@@ -62,8 +62,7 @@ def determine_keep_output(cell, default):
     # keep_output between metadata and tags should not contradict each other
     if has_keep_output_metadata and has_keep_output_tag and not keep_output_metadata:
         raise MetadataError(
-            "cell metadata contradicts tags: "
-            "\"keep_output\": false, but keep_output in tags"
+            'cell metadata contradicts tags: `keep_output` is false, but `keep_output` in tags'
         )
 
     if has_keep_output_metadata or has_keep_output_tag:
