@@ -328,20 +328,10 @@ def main():
         pass
     extra_keys.extend(args.extra_keys.split())
 
-    input_stream = None
-    if sys.version_info < (3, 0):
-        import codecs
-        # Use UTF8 reader/writer for stdin/stdout
-        # http://stackoverflow.com/a/1169209
-        if sys.stdin:
-            input_stream = codecs.getreader('utf8')(sys.stdin)
-        output_stream = codecs.getwriter('utf8')(sys.stdout)
-    else:
-        # Wrap input/output stream in UTF-8 encoded text wrapper
-        # https://stackoverflow.com/a/16549381
-        if sys.stdin:
-            input_stream = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8')
-        output_stream = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', newline='')
+    # Wrap input/output stream in UTF-8 encoded text wrapper
+    # https://stackoverflow.com/a/16549381
+    input_stream = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8') if sys.stdin else None
+    output_stream = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', newline='')
 
     for filename in args.files:
         if not (args.force or filename.endswith('.ipynb')):
