@@ -85,7 +85,7 @@ def strip_output(nb, keep_output, keep_count, extra_keys=[], strip_empty_cells=F
     keys = defaultdict(list)
     for key in extra_keys:
         if '.' not in key or key.split('.')[0] not in ['cell', 'metadata']:
-            sys.stderr.write('ignoring extra key `%s`' % key)
+            sys.stderr.write('Ignoring invalid extra key `%s`\n' % key)
         else:
             namespace, subkey = key.split('.', maxsplit=1)
             keys[namespace].append(subkey)
