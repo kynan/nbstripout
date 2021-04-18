@@ -16,18 +16,16 @@ def pop_recursive(d, key, default=None):
     >>> d
     {'a': {'b': 1}}
     """
-    if key in d:
-        return d.pop(key)
-    nested = key.split('.')
-    current = d
-    for k in nested[:-1]:
-        if hasattr(current, 'get'):
-            current = current.get(k, {})
-        else:
-            return default
-    if not hasattr(current, 'pop'):
+    if not isinstance(d, dict):
         return default
-    return current.pop(nested[-1], default)
+    if key in d:
+        return d.pop(key, default)
+    if '.' not in key:
+        return default
+    key_head, key_tail = key.split('.', maxsplit=1)
+    if key_head in d:
+        return pop_recursive(d[key_head], key_tail, default)
+    return default
 
 
 def _cells(nb, conditional=None):
