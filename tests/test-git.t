@@ -2,7 +2,7 @@
   Initialized empty Git repository in .* (re)
   $ cd foobar
   $ git config --local filter.nbstripout.extrakeys ' '
-  $ echo -n "*.txt text" >> .git/info/attributes
+  $ echo "*.txt text" >> .git/info/attributes
   $ ${NBSTRIPOUT_EXE:-nbstripout} --is-installed
   [1]
   $ ${NBSTRIPOUT_EXE:-nbstripout} --install
@@ -53,4 +53,4 @@
   [1]
   $ cat .git/info/attributes
   *.txt text
-
+  \s* (re)
