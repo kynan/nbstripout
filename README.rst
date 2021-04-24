@@ -23,6 +23,14 @@ notebook UI.
 
 Based on https://gist.github.com/minrk/6176788.
 
+Python 2 Support
+================
+
+0.3.7 and 0.3.10 are the latest releases supporting Python 2.7. Note that 0.3.8
+will install in Python 2 (as it is missing the ``python_requires`` directive),
+but it will not run. Release 0.3.10 was created to make ``pip install pytest``
+on Python 2 pick up this release rather than the broken 0.3.8.
+
 Screencast
 ==========
 
