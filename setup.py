@@ -8,12 +8,12 @@ install_requires = [
 ]
 
 setup_requires = [
-    'pytest-runner',
+    'pytest-runner < 5',
     'setuptools >= 30'
 ]
 
 tests_require = [
-    'pytest',
+    'pytest < 4.7',
     'pytest-flake8',
     'pytest-cram == 0.2.1',
 ]
