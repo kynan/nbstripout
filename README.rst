@@ -1,13 +1,15 @@
 .. image:: https://travis-ci.org/kynan/nbstripout.svg?branch=master
     :target: https://travis-ci.org/kynan/nbstripout
-.. image:: https://img.shields.io/pypi/dm/nbstripout.svg
+.. image:: https://img.shields.io/pypi/dm/nbstripout
     :target: https://pypi.python.org/pypi/nbstripout
-.. image:: https://img.shields.io/pypi/v/nbstripout.svg
+.. image:: https://img.shields.io/pypi/v/nbstripout
     :target: https://pypi.python.org/pypi/nbstripout
-.. image:: https://img.shields.io/badge/license-MIT-blue.svg
+.. image:: https://img.shields.io/badge/license-MIT-blue
     :target: https://raw.githubusercontent.com/kynan/nbstripout/master/LICENSE.txt
-.. image:: https://img.shields.io/pypi/pyversions/nbstripout.svg
+.. image:: https://img.shields.io/pypi/pyversions/nbstripout
     :target: https://pypi.python.org/pypi/nbstripout
+
+**Note:** nbstripout 0.3.10 is a Python 2.7 only release, see below.
 
 nbstripout: strip output from Jupyter and IPython notebooks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -37,7 +39,7 @@ Screencast
 This screencast demonstrates the use and working principles behind the
 nbstripout utility and how to use it as a Git filter:
 
-.. image:: http://i.imgur.com/7oQHuJ5.png
+.. image:: https://i.imgur.com/7oQHuJ5.png
     :target: https://www.youtube.com/watch?v=BEMP4xacrVc
 
 Installation
