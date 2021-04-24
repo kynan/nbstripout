@@ -40,6 +40,8 @@ setup(name='nbstripout',
       install_requires=install_requires,
       setup_requires=setup_requires,
       tests_require=tests_require,
+      # This is a Python 2.7 only release
+      python_requires='>=2.7,<3',
 
       classifiers=[
           "Development Status :: 4 - Beta",
@@ -49,10 +51,5 @@ setup(name='nbstripout',
           "Programming Language :: Python",
           "Programming Language :: Python :: 2",
           "Programming Language :: Python :: 2.7",
-          "Programming Language :: Python :: 3",
-          "Programming Language :: Python :: 3.5",
-          "Programming Language :: Python :: 3.6",
-          "Programming Language :: Python :: 3.7",
-          "Programming Language :: Python :: 3.8",
           "Topic :: Software Development :: Version Control",
       ])
