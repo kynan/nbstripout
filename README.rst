@@ -36,10 +36,10 @@ Based on https://gist.github.com/minrk/6176788.
 Python 3 only
 =============
 
-As of version 0.3.8, nbstripout supports Python 3 *only*. If you need to use
-Python 2, install nbstripout 0.3.7 ::
+As of version 0.4.0, nbstripout supports Python 3 *only*. If you need to use
+Python 2.7, install nbstripout 0.3.10 ::
 
-    pip install nbstripout==0.3.7
+    pip install nbstripout==0.3.10
 
 Screencast
 ==========
@@ -47,7 +47,7 @@ Screencast
 This screencast demonstrates the use and working principles behind the
 nbstripout utility and how to use it as a Git filter:
 
-.. image:: http://i.imgur.com/7oQHuJ5.png
+.. image:: https://i.imgur.com/7oQHuJ5.png
     :target: https://www.youtube.com/watch?v=BEMP4xacrVc
 
 Installation
