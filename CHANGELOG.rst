@@ -1,9 +1,12 @@
 Change Log
 ==========
 
-0.3.8 - unreleased
-------------------
+0.3.10 - 2021-04-24
+-------------------
 
+* Python 2.7 only release, to make ``pip install nbstripout`` work in Python 2.7
+  (previously, this was picking up 0.3.8 which is *not* Python 2.7 compatible)
+* Drop Python 3.4 support, add support for Python 3.7, 3.8
 * Windows compatibility: "" quote Python interpreter path (#115, @fcollonval)
 * Add ``--dry-run`` flag (#122)
 * Support specifying ``keep_output`` as a cell tag (#117, @scottcode)
