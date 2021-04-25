@@ -23,10 +23,10 @@ init:
 
 install:
   - mkdir -p C:\Temp
-  - "%PYTHON%/Scripts/pip install pytest"
-  - "%PYTHON%/Scripts/pip install 'traitlets<5'"
-  - "%PYTHON%/Scripts/pip install nbformat"
-  - "%PYTHON%/Scripts/pip install --upgrade setuptools"
+  - python -m pip install pytest
+  - python -m pip install 'traitlets<5'
+  - python -m pip install nbformat
+  - python -m pip install --upgrade setuptools
   - python setup.py install
 
 build: false  # Not a C# project, build stuff at the test step instead.
