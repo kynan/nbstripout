@@ -1,6 +1,17 @@
 Change Log
 ==========
 
+0.4.0 - 2021-04-25
+------------------
+
+* Add support for system wide installation, ``--system`` flag (@PLPeeters, #149)
+* Use ``~`` instead of ``$HOME`` for config dir (#136)
+* Document stripping kernelspec (#141)
+* Add support for removing empty cells (#131)
+* Create directory for attributes file if needed (#139)
+* Add support for stripping metadata keys containing periods (@baldwint, #143)
+* Strip collapsible headings by default (@rpytel1, #142)
+
 0.3.9 - 2020-06-28
 ------------------
 
