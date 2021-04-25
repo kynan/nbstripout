@@ -139,7 +139,7 @@ except ImportError:
             return current.write(nb, f, 'json')
 
 __all__ = ["install", "uninstall", "status", "main"]
-__version__ = '0.3.9'
+__version__ = '0.4.0'
 
 
 INSTALL_LOCATION_LOCAL = 'local'
