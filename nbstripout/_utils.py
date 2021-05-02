@@ -1,6 +1,5 @@
 from collections import defaultdict
 import sys
-import functools
 
 __all__ = ["pop_recursive", "strip_output", "MetadataError"]
 
@@ -50,7 +49,7 @@ def get_size(item):
     if isinstance(item, str):
         return len(item)
     elif isinstance(item, list):
-        return functools.reduce(lambda a, b: a + get_size(b), item, 0)
+        return sum(get_size(elem) for elem in item)
     elif isinstance(item, dict):
         return get_size(list(item.values()))
     else:
@@ -119,23 +118,13 @@ def strip_output(nb, keep_output, keep_count, extra_keys=[], strip_empty_cells=F
         # Remove the outputs, unless directed otherwise
         if 'outputs' in cell:
 
+            # Default behavior (max_size == 0) strips all outputs.
             if not keep_output_this_cell:
-                if not max_size:
-                    # Default behavior strips outputs. With all outputs stripped,
-                    # there are no counts to keep and keep_count is ignored.
-                    cell['outputs'] = []
-                else:
-                    # otherwise remove outputs larger than max_size
-                    for idx, output in enumerate(cell['outputs']):
-                        if get_size(output) > max_size:
-                            cell['outputs'][idx] = None
-                        elif 'execution_count' in output and not keep_count:
-                            output['execution_count'] = None
-                    cell['outputs'] = [out for out in cell['outputs'] if out is not None]
+                cell['outputs'] = [output for output in cell['outputs']
+                                   if get_size(output) <= max_size]
 
-            # If keep_output_this_cell, but not keep_count, strip the counts
-            # from the output.
-            if keep_output_this_cell and not keep_count:
+            # Strip the counts from the outputs that were kept if not keep_count.
+            if not keep_count:
                 for output in cell['outputs']:
                     if 'execution_count' in output:
                         output['execution_count'] = None
