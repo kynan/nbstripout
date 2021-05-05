@@ -44,6 +44,18 @@ def _cells(nb, conditional=None):
             yield cell
 
 
+def get_size(item):
+    """ Recursively sums length of all strings in `item` """
+    if isinstance(item, str):
+        return len(item)
+    elif isinstance(item, list):
+        return sum(get_size(elem) for elem in item)
+    elif isinstance(item, dict):
+        return get_size(list(item.values()))
+    else:
+        return len(str(item))
+
+
 def determine_keep_output(cell, default):
     """Given a cell, determine whether output should be kept
 
@@ -70,7 +82,7 @@ def determine_keep_output(cell, default):
     return default
 
 
-def strip_output(nb, keep_output, keep_count, extra_keys=[], strip_empty_cells=False):
+def strip_output(nb, keep_output, keep_count, extra_keys=[], strip_empty_cells=False, max_size=0):
     """
     Strip the outputs, execution count/prompt number and miscellaneous
     metadata from a notebook object, unless specified to keep either the outputs
@@ -106,14 +118,13 @@ def strip_output(nb, keep_output, keep_count, extra_keys=[], strip_empty_cells=F
         # Remove the outputs, unless directed otherwise
         if 'outputs' in cell:
 
-            # Default behavior strips outputs. With all outputs stripped,
-            # there are no counts to keep and keep_count is ignored.
+            # Default behavior (max_size == 0) strips all outputs.
             if not keep_output_this_cell:
-                cell['outputs'] = []
+                cell['outputs'] = [output for output in cell['outputs']
+                                   if get_size(output) <= max_size]
 
-            # If keep_output_this_cell, but not keep_count, strip the counts
-            # from the output.
-            if keep_output_this_cell and not keep_count:
+            # Strip the counts from the outputs that were kept if not keep_count.
+            if not keep_count:
                 for output in cell['outputs']:
                     if 'execution_count' in output:
                         output['execution_count'] = None

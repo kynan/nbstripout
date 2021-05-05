@@ -193,6 +193,20 @@ def _get_attrfile(git_config, install_location=INSTALL_LOCATION_LOCAL, attrfile=
     return attrfile
 
 
+def _parse_size(num_str):
+    num_str = num_str.upper()
+    if num_str[-1].isdigit():
+        return int(num_str)
+    elif num_str[-1] == 'K':
+        return int(num_str[:-1]) * (10**3)
+    elif num_str[-1] == 'M':
+        return int(num_str[:-1]) * (10**6)
+    elif num_str[-1] == 'G':
+        return int(num_str[:-1]) * (10**9)
+    else:
+        raise ValueError("Unknown size identifier %s" % num_str[-1])
+
+
 def install(git_config, install_location=INSTALL_LOCATION_LOCAL, attrfile=None):
     """Install the git filter and set the git attributes."""
     try:
@@ -363,6 +377,8 @@ def main():
                           help='Use system git config (default is local config)')
     parser.add_argument('--force', '-f', action='store_true',
                         help='Strip output also from files with non ipynb extension')
+    parser.add_argument('--max-size', metavar='SIZE',
+                        help='Keep outputs smaller than SIZE', default='0')
 
     parser.add_argument('--textconv', '-t', action='store_true',
                         help='Prints stripped files to STDOUT')
@@ -427,7 +443,7 @@ def main():
                     warnings.simplefilter("ignore", category=UserWarning)
                     nb = read(f, as_version=NO_CONVERT)
 
-            nb = strip_output(nb, args.keep_output, args.keep_count, extra_keys, args.strip_empty_cells)
+            nb = strip_output(nb, args.keep_output, args.keep_count, extra_keys, args.strip_empty_cells, _parse_size(args.max_size))
 
             if args.dry_run:
                 output_stream.write('Dry run: would have stripped {}\n'.format(filename))
@@ -462,7 +478,7 @@ def main():
                 warnings.simplefilter("ignore", category=UserWarning)
                 nb = read(input_stream, as_version=NO_CONVERT)
 
-            nb = strip_output(nb, args.keep_output, args.keep_count, extra_keys, args.strip_empty_cells)
+            nb = strip_output(nb, args.keep_output, args.keep_count, extra_keys, args.strip_empty_cells, _parse_size(args.max_size))
 
             if args.dry_run:
                 output_stream.write('Dry run: would have stripped input from '

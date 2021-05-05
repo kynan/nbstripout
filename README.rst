@@ -230,6 +230,10 @@ Do not strip the execution count/prompt number ::
 
     nbstripout --keep-count
 
+Do not strip outputs that are smaller that a given max size (useful for removing large outputs like images) ::
+
+    nbstripout --max-size 1k
+
 Do not strip the output ::
 
     nbstripout --keep-output
