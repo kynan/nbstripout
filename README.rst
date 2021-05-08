@@ -1,7 +1,5 @@
-.. image:: https://img.shields.io/travis/kynan/nbstripout
-    :target: https://travis-ci.org/kynan/nbstripout
-.. image:: https://img.shields.io/appveyor/build/kynan/nbstripout
-    :target: https://ci.appveyor.com/project/kynan/nbstripout
+.. image:: https://github.com/kynan/nbstripout/actions/workflows/tests.yml/badge.svg
+    :target: https://github.com/kynan/nbstripout/actions/workflows/tests.yml
 .. image:: https://img.shields.io/pypi/dm/nbstripout
     :target: https://pypi.org/project/nbstripout
 .. image:: https://img.shields.io/pypi/v/nbstripout
