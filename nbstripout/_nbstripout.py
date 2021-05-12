@@ -111,6 +111,7 @@ In file ``.gitattributes`` or ``.git/info/attributes`` add: ::
 
 from __future__ import print_function
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
+import collections
 import io
 from os import devnull, environ, makedirs, path
 from subprocess import call, check_call, check_output, CalledProcessError, STDOUT
@@ -457,7 +458,7 @@ def main():
                         output_stream.write('Dry run: would have stripped {}\n'.format(
                             filename))
                         continue
-                    nb = json.load(f)
+                    nb = json.load(f, object_pairs_hook=collections.OrderedDict)
                     nb_stripped = strip_zeppelin_output(nb)
 
                     with open(filename, 'w') as f:
@@ -502,7 +503,7 @@ def main():
                 if args.dry_run:
                     output_stream.write('Dry run: would have stripped input from stdin\n')
                     sys.exit(0)
-                nb = json.load(input_stream)
+                nb = json.load(input_stream, object_pairs_hook=collections.OrderedDict)
                 nb_stripped = strip_zeppelin_output(nb)
                 json.dump(nb_stripped, output_stream, indent=2)
                 output_stream.write('\n')
