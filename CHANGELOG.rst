@@ -1,6 +1,14 @@
 Change Log
 ==========
 
+0.5.0 - 2021-06-28
+------------------
+
+* Support only stripping outputs larger than a given size (cjblocker@, #135)
+* Support stripping output from Zeppelin Notebooks (ankitrokdeonsns@, #130)
+* Switch CI to GitHub actions (#151)
+* Support attributes file without leading path component (#155)
+
 0.4.0 - 2021-04-25
 ------------------
 
