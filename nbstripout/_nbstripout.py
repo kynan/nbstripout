@@ -195,7 +195,8 @@ def _get_attrfile(git_config, install_location=INSTALL_LOCATION_LOCAL, attrfile=
             attrfile = path.join(git_dir, 'info', 'attributes')
 
     attrfile = path.expanduser(attrfile)
-    makedirs(path.dirname(attrfile), exist_ok=True)
+    if path.dirname(attrfile):
+        makedirs(path.dirname(attrfile), exist_ok=True)
 
     return attrfile
 
