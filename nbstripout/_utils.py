@@ -56,14 +56,14 @@ def get_size(item):
         return len(str(item))
 
 
-def determine_keep_output(cell, default):
+def determine_keep_output(cell, default, strip_init_cells=False):
     """Given a cell, determine whether output should be kept
 
     Based on whether the metadata has "init_cell": true,
     "keep_output": true, or the tags contain "keep_output" """
     if 'metadata' not in cell:
         return default
-    if 'init_cell' in cell.metadata:
+    if 'init_cell' in cell.metadata and strip_init_cells:
         return bool(cell.metadata.init_cell)
 
     has_keep_output_metadata = 'keep_output' in cell.metadata
@@ -94,7 +94,7 @@ def strip_zeppelin_output(nb):
     return nb
 
 
-def strip_output(nb, keep_output, keep_count, extra_keys=[], strip_empty_cells=False, max_size=0):
+def strip_output(nb, keep_output, keep_count, extra_keys=[], strip_empty_cells=False, strip_init_cells=False, max_size=0):
     """
     Strip the outputs, execution count/prompt number and miscellaneous
     metadata from a notebook object, unless specified to keep either the outputs
@@ -125,7 +125,7 @@ def strip_output(nb, keep_output, keep_count, extra_keys=[], strip_empty_cells=F
         conditional = None
 
     for cell in _cells(nb, conditional):
-        keep_output_this_cell = determine_keep_output(cell, keep_output)
+        keep_output_this_cell = determine_keep_output(cell, keep_output, strip_init_cells)
 
         # Remove the outputs, unless directed otherwise
         if 'outputs' in cell:
