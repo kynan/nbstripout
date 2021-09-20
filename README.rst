@@ -227,6 +227,14 @@ whitespace ::
 
     nbstripout --strip-empty-cells
 
+Removing `init` cells
+++++++++++++++++++++
+
+By default ``nbstripout`` will keep cells with `init_cell: true` metadata. To disable
+this behavior use ::
+
+    nbstripout --strip-init-cells
+
 Keeping some output
 +++++++++++++++++++
 
