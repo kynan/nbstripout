@@ -63,8 +63,8 @@ def determine_keep_output(cell, default, strip_init_cells=False):
     "keep_output": true, or the tags contain "keep_output" """
     if 'metadata' not in cell:
         return default
-    if 'init_cell' in cell.metadata and strip_init_cells:
-        return bool(cell.metadata.init_cell)
+    if 'init_cell' in cell.metadata:
+        return bool(cell.metadata.init_cell) and not strip_init_cells
 
     has_keep_output_metadata = 'keep_output' in cell.metadata
     keep_output_metadata = bool(cell.metadata.get('keep_output', False))

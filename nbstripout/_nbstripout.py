@@ -516,7 +516,7 @@ def main():
                 warnings.simplefilter("ignore", category=UserWarning)
                 nb = read(input_stream, as_version=NO_CONVERT)
 
-            nb = strip_output(nb, args.keep_output, args.keep_count, extra_keys, 
+            nb = strip_output(nb, args.keep_output, args.keep_count, extra_keys,
                               args.strip_empty_cells, args.strip_init_cells, _parse_size(args.max_size))
 
             if args.dry_run:
