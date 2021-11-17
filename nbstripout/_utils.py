@@ -29,17 +29,19 @@ def pop_recursive(d, key, default=None):
     return default
 
 
-def _cells(nb, conditional=None):
-    """Remove cells not satisfying conditional and yield all other cells."""
+def _cells(nb, conditionals=None):
+    """Remove cells not satisfying any conditional in conditionals and yield all other cells."""
     if nb.nbformat < 4:
         for ws in nb.worksheets:
-            if conditional:
-                ws.cells = list(filter(conditional, ws.cells))
+            if conditionals:
+                for conditional in conditionals:
+                    ws.cells = list(filter(conditional, ws.cells))
             for cell in ws.cells:
                 yield cell
     else:
-        if conditional:
-            nb.cells = list(filter(conditional, nb.cells))
+        if conditionals:
+            for conditional in conditionals:
+                nb.cells = list(filter(conditional, nb.cells))
         for cell in nb.cells:
             yield cell
 
@@ -116,15 +118,12 @@ def strip_output(nb, keep_output, keep_count, extra_keys=[], drop_empty_cells=Fa
     for field in keys['metadata']:
         pop_recursive(nb.metadata, field)
 
+    conditionals = []
     # Keep cells if they have any `source` line that contains non-whitespace
     if drop_empty_cells:
-        def conditional(cell):
-            return any(line.strip() for line in cell.get('source', []))
-    # Keep all cells
-    else:
-        conditional = None
+        conditionals.append(lambda cell: any(line.strip() for line in cell.get('source', [])))
 
-    for cell in _cells(nb, conditional):
+    for cell in _cells(nb, conditionals):
         keep_output_this_cell = determine_keep_output(cell, keep_output, strip_init_cells)
 
         # Remove the outputs, unless directed otherwise
