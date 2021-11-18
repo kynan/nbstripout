@@ -235,6 +235,17 @@ this behavior use ::
 
     nbstripout --strip-init-cells
 
+Removing entire cells
+++++++++++++++++++++
+
+In certain conditions it might be handy to remove not only the output, but the entire cell, e.g. when developing exercises.
+
+To drop all cells tagged with "solution" run:
+
+    nbstripout --drop-tagged-cells="solution"
+
+The option accepts a list of tags separated by whitespace.
+
 Keeping some output
 +++++++++++++++++++
 

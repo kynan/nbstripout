@@ -29,19 +29,17 @@ def pop_recursive(d, key, default=None):
     return default
 
 
-def _cells(nb, conditionals=None):
+def _cells(nb, conditionals):
     """Remove cells not satisfying any conditional in conditionals and yield all other cells."""
     if nb.nbformat < 4:
         for ws in nb.worksheets:
-            if conditionals:
-                for conditional in conditionals:
-                    ws.cells = list(filter(conditional, ws.cells))
+            for conditional in conditionals:
+                ws.cells = list(filter(conditional, ws.cells))
             for cell in ws.cells:
                 yield cell
     else:
-        if conditionals:
-            for conditional in conditionals:
-                nb.cells = list(filter(conditional, nb.cells))
+        for conditional in conditionals:
+            nb.cells = list(filter(conditional, nb.cells))
         for cell in nb.cells:
             yield cell
 
@@ -96,7 +94,8 @@ def strip_zeppelin_output(nb):
     return nb
 
 
-def strip_output(nb, keep_output, keep_count, extra_keys=[], drop_empty_cells=False, strip_init_cells=False, max_size=0):
+def strip_output(nb, keep_output, keep_count, extra_keys=[], drop_empty_cells=False, drop_tagged_cells=[],
+                 strip_init_cells=False, max_size=0):
     """
     Strip the outputs, execution count/prompt number and miscellaneous
     metadata from a notebook object, unless specified to keep either the outputs
@@ -121,7 +120,9 @@ def strip_output(nb, keep_output, keep_count, extra_keys=[], drop_empty_cells=Fa
     conditionals = []
     # Keep cells if they have any `source` line that contains non-whitespace
     if drop_empty_cells:
-        conditionals.append(lambda cell: any(line.strip() for line in cell.get('source', [])))
+        conditionals.append(lambda c: any(line.strip() for line in c.get('source', [])))
+    for tag_to_drop in drop_tagged_cells:
+        conditionals.append(lambda c: tag_to_drop not in c.get("metadata", {}).get("tags", []))
 
     for cell in _cells(nb, conditionals):
         keep_output_this_cell = determine_keep_output(cell, keep_output, strip_init_cells)
