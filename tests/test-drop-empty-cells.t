@@ -1,4 +1,4 @@
-  $ cat ${TESTDIR}/test_strip_empty_cells.ipynb | ${NBSTRIPOUT_EXE:-nbstripout}
+  $ cat ${TESTDIR}/test_drop_empty_cells.ipynb | ${NBSTRIPOUT_EXE:-nbstripout}
   {
    "cells": [
     {
@@ -63,7 +63,7 @@
    "nbformat": 4,
    "nbformat_minor": 4
   }
-  $ cat ${TESTDIR}/test_strip_empty_cells.ipynb | ${NBSTRIPOUT_EXE:-nbstripout} --strip-empty-cells
+  $ cat ${TESTDIR}/test_drop_empty_cells.ipynb | ${NBSTRIPOUT_EXE:-nbstripout} --drop-empty-cells
   {
    "cells": [
     {

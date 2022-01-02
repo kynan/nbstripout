@@ -94,7 +94,7 @@ def strip_zeppelin_output(nb):
     return nb
 
 
-def strip_output(nb, keep_output, keep_count, extra_keys=[], strip_empty_cells=False, strip_init_cells=False, max_size=0):
+def strip_output(nb, keep_output, keep_count, extra_keys=[], drop_empty_cells=False, strip_init_cells=False, max_size=0):
     """
     Strip the outputs, execution count/prompt number and miscellaneous
     metadata from a notebook object, unless specified to keep either the outputs
@@ -117,7 +117,7 @@ def strip_output(nb, keep_output, keep_count, extra_keys=[], strip_empty_cells=F
         pop_recursive(nb.metadata, field)
 
     # Keep cells if they have any `source` line that contains non-whitespace
-    if strip_empty_cells:
+    if drop_empty_cells:
         def conditional(cell):
             return any(line.strip() for line in cell.get('source', []))
     # Keep all cells

@@ -377,7 +377,7 @@ def main():
     parser.add_argument('--extra-keys', default='',
                         help='Space separated list of extra keys to strip '
                         'from metadata, e.g. metadata.foo cell.metadata.bar')
-    parser.add_argument('--strip-empty-cells', action='store_true',
+    parser.add_argument('--drop-empty-cells', action='store_true',
                         help='Remove cells where `source` is empty or contains only whitepace')
     parser.add_argument('--strip-init-cells', action='store_true',
                         help='Remove cells with `init_cell: true` metadata (default: False)')
@@ -472,7 +472,7 @@ def main():
                     nb = read(f, as_version=NO_CONVERT)
 
             nb = strip_output(nb, args.keep_output, args.keep_count, extra_keys,
-                              args.strip_empty_cells, args.strip_init_cells, _parse_size(args.max_size))
+                              args.drop_empty_cells, args.strip_init_cells, _parse_size(args.max_size))
 
             if args.dry_run:
                 output_stream.write('Dry run: would have stripped {}\n'.format(filename))
@@ -518,7 +518,7 @@ def main():
                 nb = read(input_stream, as_version=NO_CONVERT)
 
             nb = strip_output(nb, args.keep_output, args.keep_count, extra_keys,
-                              args.strip_empty_cells, args.strip_init_cells, _parse_size(args.max_size))
+                              args.drop_empty_cells, args.strip_init_cells, _parse_size(args.max_size))
 
             if args.dry_run:
                 output_stream.write('Dry run: would have stripped input from '
