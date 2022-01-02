@@ -109,17 +109,16 @@ In file ``.gitattributes`` or ``.git/info/attributes`` add: ::
     *.ipynb diff=ipynb
 """
 
-from __future__ import print_function
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import collections
 import io
+import json
 from os import devnull, environ, makedirs, path
-from subprocess import call, check_call, check_output, CalledProcessError, STDOUT
+from pathlib import PureWindowsPath
 import re
+from subprocess import call, check_call, check_output, CalledProcessError, STDOUT
 import sys
 import warnings
-# warnings.simplefilter("ignore")
-import json
 
 from nbstripout._utils import strip_output, strip_zeppelin_output
 try:
@@ -212,13 +211,13 @@ def _parse_size(num_str):
     elif num_str[-1] == 'G':
         return int(num_str[:-1]) * (10**9)
     else:
-        raise ValueError("Unknown size identifier %s" % num_str[-1])
+        raise ValueError(f"Unknown size identifier {num_str[-1]}")
 
 
 def install(git_config, install_location=INSTALL_LOCATION_LOCAL, attrfile=None):
     """Install the git filter and set the git attributes."""
     try:
-        filepath = '"{}" -m nbstripout'.format(sys.executable.replace('\\', '/'))
+        filepath = f'"{PureWindowsPath(sys.executable).as_posix()}" -m nbstripout'
         check_call(git_config + ['filter.nbstripout.clean', filepath])
         check_call(git_config + ['filter.nbstripout.smudge', 'cat'])
         check_call(git_config + ['diff.ipynb.textconv', filepath + ' -t'])
@@ -258,7 +257,7 @@ def install(git_config, install_location=INSTALL_LOCATION_LOCAL, attrfile=None):
             if not diff_exists:
                 print('*.ipynb diff=ipynb', file=f)
     except PermissionError:
-        print('Installation failed: could not write to {}'.format(attrfile), file=sys.stderr)
+        print(f'Installation failed: could not write to {attrfile}', file=sys.stderr)
 
         if install_location == INSTALL_LOCATION_GLOBAL:
             print('Did you forget to sudo?', file=sys.stderr)
@@ -299,7 +298,7 @@ def status(git_config, install_location=INSTALL_LOCATION_LOCAL, verbose=False):
             location = 'globally'
         else:
             git_dir = path.dirname(path.abspath(check_output(['git', 'rev-parse', '--git-dir'], universal_newlines=True).strip()))
-            location = "in repository '{}'".format(git_dir)
+            location = f"in repository '{git_dir}'"
 
         clean = check_output(git_config + ['filter.nbstripout.clean'], universal_newlines=True).strip()
         smudge = check_output(git_config + ['filter.nbstripout.smudge'], universal_newlines=True).strip()
@@ -458,8 +457,7 @@ def main():
             with io.open(filename, 'r', encoding='utf8') as f:
                 if args.mode == 'zeppelin' or filename.endswith('.zpln'):
                     if args.dry_run:
-                        output_stream.write('Dry run: would have stripped {}\n'.format(
-                            filename))
+                        output_stream.write(f'Dry run: would have stripped {filename}\n')
                         continue
                     nb = json.load(f, object_pairs_hook=collections.OrderedDict)
                     nb_stripped = strip_zeppelin_output(nb)
@@ -475,7 +473,7 @@ def main():
                               args.drop_empty_cells, args.strip_init_cells, _parse_size(args.max_size))
 
             if args.dry_run:
-                output_stream.write('Dry run: would have stripped {}\n'.format(filename))
+                output_stream.write(f'Dry run: would have stripped {filename}\n')
 
                 continue
 
@@ -491,14 +489,14 @@ def main():
                         warnings.simplefilter("ignore", category=UserWarning)
                         write(nb, f)
         except NotJSONError:
-            print("'{}' is not a valid notebook".format(filename), file=sys.stderr)
+            print(f"'{filename}' is not a valid notebook", file=sys.stderr)
             sys.exit(1)
         except FileNotFoundError:
-            print("Could not strip '{}': file not found".format(filename), file=sys.stderr)
+            print(f"Could not strip '{filename}': file not found", file=sys.stderr)
             sys.exit(1)
         except Exception:
             # Ignore exceptions for non-notebook files.
-            print("Could not strip '{}'".format(filename), file=sys.stderr)
+            print(f"Could not strip '{filename}'", file=sys.stderr)
             raise
 
     if not args.files and input_stream:
