@@ -418,6 +418,20 @@ Then run ``pre-commit install`` to activate the hook.
 Troubleshooting
 ===============
 
+Known issues
+++++++++++++
+
+Certain Git workflows are not well supported by `nbstripout`:
+
+* Local changes to notebook files that are made invisible to Git due to the
+  `nbstripout` filter do still cause conflicts when attempting to sync upstream
+  changes (`git pull`, `git merge` etc.). This is because Git has no way of
+  resolving a conflict caused by a non-stripped local file being merged with a
+  stripped upstream file. Adressing this issue is out of scope for `nbstripout`.
+  Read more and find workarounds in `#108`_.
+
+.. _#108: https://github.com/kynan/nbstripout/issues/108
+
 Show files processed by nbstripout filter
 +++++++++++++++++++++++++++++++++++++++++
 
