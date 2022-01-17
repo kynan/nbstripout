@@ -378,6 +378,8 @@ def main():
                         'from metadata, e.g. metadata.foo cell.metadata.bar')
     parser.add_argument('--drop-empty-cells', action='store_true',
                         help='Remove cells where `source` is empty or contains only whitepace')
+    parser.add_argument('--drop-tagged-cells', default='',
+                        help='Space separated list of cell-tags that remove an entire cell')
     parser.add_argument('--strip-init-cells', action='store_true',
                         help='Remove cells with `init_cell: true` metadata (default: False)')
     parser.add_argument('--attributes', metavar='FILEPATH',
@@ -469,8 +471,8 @@ def main():
                     warnings.simplefilter("ignore", category=UserWarning)
                     nb = read(f, as_version=NO_CONVERT)
 
-            nb = strip_output(nb, args.keep_output, args.keep_count, extra_keys,
-                              args.drop_empty_cells, args.strip_init_cells, _parse_size(args.max_size))
+            nb = strip_output(nb, args.keep_output, args.keep_count, extra_keys, args.drop_empty_cells,
+                              args.drop_tagged_cells.split(), args.strip_init_cells, _parse_size(args.max_size))
 
             if args.dry_run:
                 output_stream.write(f'Dry run: would have stripped {filename}\n')
@@ -515,8 +517,8 @@ def main():
                 warnings.simplefilter("ignore", category=UserWarning)
                 nb = read(input_stream, as_version=NO_CONVERT)
 
-            nb = strip_output(nb, args.keep_output, args.keep_count, extra_keys,
-                              args.drop_empty_cells, args.strip_init_cells, _parse_size(args.max_size))
+            nb = strip_output(nb, args.keep_output, args.keep_count, extra_keys, args.drop_empty_cells,
+                              args.drop_tagged_cells.split(), args.strip_init_cells, _parse_size(args.max_size))
 
             if args.dry_run:
                 output_stream.write('Dry run: would have stripped input from '
