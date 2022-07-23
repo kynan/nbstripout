@@ -222,10 +222,10 @@ This is a potentially slower but simpler invocation using ``--tree-filter``: ::
 Removing empty cells
 ++++++++++++++++++++
 
-Strip empty cells i.e. cells where ``source`` is either empty or only contains
+Drop empty cells i.e. cells where ``source`` is either empty or only contains
 whitespace ::
 
-    nbstripout --strip-empty-cells
+    nbstripout --drop-empty-cells
 
 Removing `init` cells
 ++++++++++++++++++++
