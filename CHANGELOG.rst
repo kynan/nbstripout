@@ -1,6 +1,14 @@
 Change Log
 ==========
 
+0.6.0 - 2022-07-24
+------------------
+
+* Support for stripping init cells (@Pugio, #157)
+* Added ``--drop-tagged-cells="some tags"`` option (@boun, #161)
+* Renamed ``--strip-empty-cells`` to ``--drop-empty-cells``
+* Dropped support for Python 3.5, added support for Python 3.10
+
 0.5.0 - 2021-06-28
 ------------------
 
