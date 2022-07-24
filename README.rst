@@ -228,7 +228,7 @@ whitespace ::
     nbstripout --drop-empty-cells
 
 Removing `init` cells
-++++++++++++++++++++
++++++++++++++++++++++
 
 By default ``nbstripout`` will keep cells with `init_cell: true` metadata. To disable
 this behavior use ::
@@ -236,7 +236,7 @@ this behavior use ::
     nbstripout --strip-init-cells
 
 Removing entire cells
-++++++++++++++++++++
++++++++++++++++++++++
 
 In certain conditions it might be handy to remove not only the output, but the entire cell, e.g. when developing exercises.
 
