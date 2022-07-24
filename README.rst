@@ -34,7 +34,7 @@ Based on https://gist.github.com/minrk/6176788.
 Python 3 only
 =============
 
-As of version 0.5.0, nbstripout supports Python 3 *only*. If you need to use
+As of version 0.6.0, nbstripout supports Python 3 *only*. If you need to use
 Python 2.7, install nbstripout 0.3.10 ::
 
     pip install nbstripout==0.3.10
@@ -410,7 +410,7 @@ Once you have `pre-commit`_ installed, add the follwong to the
 
     repos:
     - repo: https://github.com/kynan/nbstripout
-      rev: 0.5.0
+      rev: 0.6.0
       hooks:
         - id: nbstripout
 
