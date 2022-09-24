@@ -7,18 +7,6 @@ install_requires = [
     'nbformat'
 ]
 
-setup_requires = [
-    'pytest-runner',
-    'setuptools >= 30'
-]
-
-tests_require = [
-    'pytest',
-    'flake8 < 5.0.0',
-    'pytest-flake8',
-    'pytest-cram == 0.2.2',
-]
-
 setup(name='nbstripout',
       version='0.6.0',
 
@@ -40,8 +28,6 @@ setup(name='nbstripout',
       },
 
       install_requires=install_requires,
-      setup_requires=setup_requires,
-      tests_require=tests_require,
       python_requires='>=3.6',
 
       classifiers=[
