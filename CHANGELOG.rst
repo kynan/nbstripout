@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+0.6.1 - 2022-09-24
+------------------
+
+* Removed ``setup_requires`` and ``tests_require`` and no longer rely on
+  ``pytest-runner`` for test execution but invoke ``pytest`` directly (#168)
+
 0.6.0 - 2022-07-24
 ------------------
 
