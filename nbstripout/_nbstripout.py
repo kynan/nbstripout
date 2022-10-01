@@ -120,7 +120,7 @@ from subprocess import call, check_call, check_output, CalledProcessError, STDOU
 import sys
 import warnings
 
-from nbstripout._utils import strip_output, strip_zeppelin_output
+from nbstripout._utils import strip_output, strip_zeppelin_output, merge_configuration_file
 try:
     # Jupyter >= 4
     from nbformat import read, write, NO_CONVERT
@@ -377,7 +377,7 @@ def main():
                         help='Space separated list of extra keys to strip '
                         'from metadata, e.g. metadata.foo cell.metadata.bar')
     parser.add_argument('--drop-empty-cells', action='store_true',
-                        help='Remove cells where `source` is empty or contains only whitepace')
+                        help='Remove cells where `source` is empty or contains only whitespace')
     parser.add_argument('--drop-tagged-cells', default='',
                         help='Space separated list of cell-tags that remove an entire cell')
     parser.add_argument('--strip-init-cells', action='store_true',
@@ -402,7 +402,8 @@ def main():
                         help='Prints stripped files to STDOUT')
 
     parser.add_argument('files', nargs='*', help='Files to strip output from')
-    args = parser.parse_args()
+
+    args = merge_configuration_file(parser.parse_args())
 
     git_config = ['git', 'config']
 
