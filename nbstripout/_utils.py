@@ -1,5 +1,8 @@
-from collections import defaultdict
+from argparse import Namespace
+import os
 import sys
+from collections import defaultdict
+from typing import Any, Dict, Optional
 
 __all__ = ["pop_recursive", "strip_output", "strip_zeppelin_output", "MetadataError"]
 
@@ -153,3 +156,97 @@ def strip_output(nb, keep_output, keep_count, extra_keys=[], drop_empty_cells=Fa
         for field in keys['cell']:
             pop_recursive(cell, field)
     return nb
+
+
+def process_pyproject_toml(toml_file_path: str) -> Optional[Dict[str, Any]]:
+    """Extract config mapping from pyproject.toml file."""
+    try:
+        import tomllib  # python 3.11+
+    except ModuleNotFoundError:
+        import tomli as tomllib
+
+    with open(toml_file_path, 'rb') as f:
+        return tomllib.load(f).get('tool', {}).get('nbstripout', None)
+
+
+def process_setup_cfg(cfg_file_path) -> Optional[Dict[str, Any]]:
+    """Extract config mapping from setup.cfg file."""
+    import configparser
+
+    reader = configparser.ConfigParser()
+    reader.read(cfg_file_path)
+    if not reader.has_section('nbstripout'):
+        return None
+
+    return reader['nbstripout']
+
+
+def merge_configuration_file(args: Namespace) -> Namespace:
+    """Merge flags from config files into args."""
+    CONFIG_FILES = {
+        'pyproject.toml': process_pyproject_toml,
+        'setup.cfg': process_setup_cfg,
+    }
+    BOOL_TYPES = {
+        'yes': True,
+        'true': True,
+        'on': True,
+        'no': False,
+        'false': False,
+        'off': False
+    }
+
+    # Traverse the file tree common to all files given as argument looking for
+    # a configuration file
+    config_path = os.path.commonpath([os.path.abspath(file) for file in args.files]) if args.files else os.getcwd()
+    config = None
+    while True:
+        for config_file, processor in CONFIG_FILES.items():
+            config_file_path = os.path.join(config_path, config_file)
+            if os.path.isfile(config_file_path):
+                config = processor(config_file_path)
+                if config is not None:
+                    break
+        if config is not None:
+            break
+        config_path, tail = os.path.split(config_path)
+        if not tail:
+            break
+
+    if config:
+        # merge config
+        for name, value in config.items():
+            if value is None:
+                continue
+            # additive string flags
+            if name in {'extra_keys'}:
+                args.extra_keys = f"{getattr(args, 'extra_keys', '')} {value}".strip()
+            # singular string flags
+            elif name in {'mode'}:
+                args.mode = value
+            # integer flags
+            elif name in {'max_size'}:
+                args.max_size = int(value)
+            # boolean flags
+            elif name in {
+                'dry_run',
+                'keep_count',
+                'keep_output',
+                'drop_empty_cells',
+                'drop_tagged_cells',
+                'strip_init_cells',
+                '_global',
+                '_system',
+                'force',
+                'textconv',
+            }:
+                if isinstance(value, str):
+                    value = BOOL_TYPES.get(value, value)
+                if not isinstance(value, bool):
+                    raise ValueError(f"Invalid value for {name}: {value}, expected bool")
+                if value:
+                    setattr(args, name.replace('-', '_'), value)
+            else:
+                raise ValueError(f'{name} in the config file is not a valid option')
+
+    return args
