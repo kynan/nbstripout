@@ -1,12 +1,12 @@
-from typing import Any
+from argparse import Namespace
+from typing import Any, Dict
+from pathlib import Path
 
 import pytest
 from nbstripout._utils import merge_configuration_file
-from argparse import Namespace
-from pathlib import Path
 
 
-def assert_namespace(namespace: Namespace, expected_props: dict[str, Any]):
+def assert_namespace(namespace: Namespace, expected_props: Dict[str, Any]):
     keys = (prop for prop in dir(namespace) if not prop.startswith("_"))
     actual_props = {key: getattr(namespace, key) for key in keys}
     assert actual_props == expected_props
@@ -27,7 +27,7 @@ def nested_test_nb(tmp_path: Path) -> Path:
     return test_nb
 
 
-def test_no_config_file(tmp_path: Path, test_nb: Path) -> None:
+def test_no_config_file(test_nb: Path) -> None:
 
     original_args = {"files": [test_nb]}
     args = Namespace(**original_args)
