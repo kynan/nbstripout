@@ -405,7 +405,7 @@ Using ``nbstripout`` as a pre-commit hook
 
 `pre-commit`_ is a framework for managing git `pre-commit hooks`_.
 
-Once you have `pre-commit`_ installed, add the follwong to the
+Once you have `pre-commit`_ installed, add the following to the
 ``.pre-commit-config.yaml`` in your repository: ::
 
     repos:
