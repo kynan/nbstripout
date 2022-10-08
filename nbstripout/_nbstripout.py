@@ -224,10 +224,10 @@ def install(git_config, install_location=INSTALL_LOCATION_LOCAL, attrfile=None):
         attrfile = _get_attrfile(git_config, install_location, attrfile)
     except FileNotFoundError:
         print('Installation failed: git is not on path!', file=sys.stderr)
-        raise SystemExit(1)
+        return 1
     except CalledProcessError:
         print('Installation failed: not a git repository!', file=sys.stderr)
-        raise SystemExit(1)
+        return 1
 
     # Check if there is already a filter for ipynb files
     filt_exists = False
@@ -262,7 +262,7 @@ def install(git_config, install_location=INSTALL_LOCATION_LOCAL, attrfile=None):
         if install_location == INSTALL_LOCATION_GLOBAL:
             print('Did you forget to sudo?', file=sys.stderr)
 
-        raise SystemExit(1)
+        return 1
 
 
 def uninstall(git_config, install_location=INSTALL_LOCATION_LOCAL, attrfile=None):
@@ -274,10 +274,10 @@ def uninstall(git_config, install_location=INSTALL_LOCATION_LOCAL, attrfile=None
         attrfile = _get_attrfile(git_config, install_location, attrfile)
     except FileNotFoundError:
         print('Uninstall failed: git is not on path!', file=sys.stderr)
-        raise SystemExit(1)
+        return 1
     except CalledProcessError:
         print('Uninstall failed: not a git repository!', file=sys.stderr)
-        raise SystemExit(1)
+        return 1
 
     # Check if there is a filter for ipynb files
     if path.exists(attrfile):
