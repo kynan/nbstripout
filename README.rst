@@ -405,7 +405,7 @@ Using ``nbstripout`` as a pre-commit hook
 
 `pre-commit`_ is a framework for managing git `pre-commit hooks`_.
 
-Once you have `pre-commit`_ installed, add the follwong to the
+Once you have `pre-commit`_ installed, add the following to the
 ``.pre-commit-config.yaml`` in your repository: ::
 
     repos:
@@ -438,7 +438,7 @@ Certain Git workflows are not well supported by `nbstripout`:
   `nbstripout` filter do still cause conflicts when attempting to sync upstream
   changes (`git pull`, `git merge` etc.). This is because Git has no way of
   resolving a conflict caused by a non-stripped local file being merged with a
-  stripped upstream file. Adressing this issue is out of scope for `nbstripout`.
+  stripped upstream file. Addressing this issue is out of scope for `nbstripout`.
   Read more and find workarounds in `#108`_.
 
 .. _#108: https://github.com/kynan/nbstripout/issues/108
