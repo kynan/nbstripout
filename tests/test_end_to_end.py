@@ -59,7 +59,7 @@ def test_dry_run_stdin(input_file: str, extra_args: List[str]):
 def test_dry_run_args(input_file: str, extra_args: List[str]):
     expected_regex = re.compile(f"Dry run: would have stripped .*[/\\\\]{input_file}\n")
 
-    pc = run([get_nbstripout_exe(), NOTEBOOKS_FOLDER / input_file, "--dry-run", ] + extra_args, capture_output=True, text=True)
+    pc = run([get_nbstripout_exe(), str(NOTEBOOKS_FOLDER / input_file), "--dry-run", ] + extra_args, capture_output=True, text=True)
     output = pc.stdout
 
     assert expected_regex.match(output)
