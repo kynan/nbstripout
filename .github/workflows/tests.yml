@@ -28,10 +28,12 @@ jobs:
       run: git config --global init.defaultBranch main
     - name: Run tests (Linux)
       if: matrix.os == 'ubuntu-latest'
+      shell: bash
       run: |
         pytest
     - name: Run tests (MacOS)
       if: matrix.os == 'macos-latest'
+      shell: bash
       run: |
         pytest
     - name: Run tests (Windows)
