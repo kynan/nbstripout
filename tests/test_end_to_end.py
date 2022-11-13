@@ -53,7 +53,7 @@ def test_end_to_end_nbstripout(input_file: str, expected_file: str, args: List[s
         expected = f.read()
 
     with open(NOTEBOOKS_FOLDER / input_file, mode="r") as f:
-        pc = run([get_nbstripout_exe()] + args, stdin=f, stdout=PIPE, text=True)
+        pc = run([get_nbstripout_exe()] + args, stdin=f, stdout=PIPE, universal_newlines=True)
         output = pc.stdout
 
     assert output == expected
@@ -64,7 +64,7 @@ def test_dry_run_stdin(input_file: str, extra_args: List[str]):
     expected = "Dry run: would have stripped input from stdin\n"
 
     with open(NOTEBOOKS_FOLDER / input_file, mode="r") as f:
-        pc = run([get_nbstripout_exe(), "--dry-run"] + extra_args, stdin=f, stdout=PIPE, text=True)
+        pc = run([get_nbstripout_exe(), "--dry-run"] + extra_args, stdin=f, stdout=PIPE, universal_newlines=True)
         output = pc.stdout
 
     assert output == expected
@@ -74,7 +74,7 @@ def test_dry_run_stdin(input_file: str, extra_args: List[str]):
 def test_dry_run_args(input_file: str, extra_args: List[str]):
     expected_regex = re.compile(f"Dry run: would have stripped .*[/\\\\]{input_file}\n")
 
-    pc = run([get_nbstripout_exe(), str(NOTEBOOKS_FOLDER / input_file), "--dry-run", ] + extra_args, stdout=PIPE, text=True)
+    pc = run([get_nbstripout_exe(), str(NOTEBOOKS_FOLDER / input_file), "--dry-run", ] + extra_args, stdout=PIPE, universal_newlines=True)
     output = pc.stdout
 
     assert expected_regex.match(output)
@@ -83,7 +83,7 @@ def test_dry_run_args(input_file: str, extra_args: List[str]):
 @pytest.mark.parametrize("input_file, expected_errs, extra_args", ERR_OUTPUT_CASES)
 def test_make_errors(input_file: str, expected_errs: List[Union[str, Pattern]], extra_args: List[str]):
     with open(NOTEBOOKS_FOLDER / input_file, mode="r") as f:
-        pc = run([get_nbstripout_exe(), "--dry-run"] + extra_args, stdin=f, stderr=PIPE, text=True)
+        pc = run([get_nbstripout_exe(), "--dry-run"] + extra_args, stdin=f, stderr=PIPE, universal_newlines=True)
         err_output = pc.stderr
 
     for e in expected_errs:
