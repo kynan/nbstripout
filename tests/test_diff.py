@@ -22,7 +22,7 @@ def test_diff_no_difference():
 
     assert 'BASH_EXE' in os.environ
 
-    pc = run([get_bash_exe(), "-c", f"diff <( {get_nbstripout_exe()} -t tests/test_diff.ipynb ) <( {get_nbstripout_exe()} -t tests/test_diff_output.ipynb )"], stdout=PIPE, universal_newlines=True)
+    pc = run([get_bash_exe(), "-c", f"diff <( {get_nbstripout_exe()} -t \"{NOTEBOOKS_FOLDER}/test_diff.ipynb\" ) <( {get_nbstripout_exe()} -t \"{NOTEBOOKS_FOLDER}/test_diff_output.ipynb\" )"], stdout=PIPE, universal_newlines=True)
     output = pc.stdout
 
     assert output == expected
@@ -35,7 +35,7 @@ def test_diff_diff():
 >     "print(\\"aou now it is different\\")"
 """
 
-    pc = run([get_bash_exe(), "-c", f"diff <( {get_nbstripout_exe()} -t tests/test_diff.ipynb ) <( {get_nbstripout_exe()} -t tests/test_diff_different.ipynb )"], stdout=PIPE, universal_newlines=True)
+    pc = run([get_bash_exe(), "-c", f"diff <( {get_nbstripout_exe()} -t \"{NOTEBOOKS_FOLDER}/test_diff.ipynb\" ) <( {get_nbstripout_exe()} -t \"{NOTEBOOKS_FOLDER}/test_diff_different.ipynb\" )"], stdout=PIPE, universal_newlines=True)
     output = pc.stdout
 
     assert output == expected
