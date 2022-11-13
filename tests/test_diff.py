@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from subprocess import run, PIPE
 
-NOTEBOOKS_FOLDER = Path("tests")
+NOTEBOOKS_FOLDER = Path("tests/diff_notebooks")
 
 
 def get_bash_exe():
