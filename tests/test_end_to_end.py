@@ -2,7 +2,8 @@ import os
 from pathlib import Path
 import re
 from subprocess import run, PIPE
-from typing import List, Union
+# Note: typing.Pattern is deprecated, for removal in 3.13 in favour of re.Pattern introduced in 3.8
+from typing import List, Union, Pattern
 
 import pytest
 
@@ -80,13 +81,13 @@ def test_dry_run_args(input_file: str, extra_args: List[str]):
 
 
 @pytest.mark.parametrize("input_file, expected_errs, extra_args", ERR_OUTPUT_CASES)
-def test_make_errors(input_file: str, expected_errs: List[Union[str, re.Pattern]], extra_args: List[str]):
+def test_make_errors(input_file: str, expected_errs: List[Union[str, Pattern]], extra_args: List[str]):
     with open(NOTEBOOKS_FOLDER / input_file, mode="r") as f:
         pc = run([get_nbstripout_exe(), "--dry-run"] + extra_args, stdin=f, stderr=PIPE, text=True)
         err_output = pc.stderr
 
     for e in expected_errs:
-        if isinstance(e, re.Pattern):
+        if isinstance(e, Pattern):
             assert e.search(err_output)
         else:
             assert e in err_output
