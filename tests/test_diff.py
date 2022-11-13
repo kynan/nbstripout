@@ -20,8 +20,6 @@ def get_nbstripout_exe():
 def test_diff_no_difference():
     expected = ""
 
-    assert 'BASH_EXE' in os.environ
-
     pc = run([get_bash_exe(), "-c", f"diff <( {get_nbstripout_exe()} -t \"{NOTEBOOKS_FOLDER}/test_diff.ipynb\" ) <( {get_nbstripout_exe()} -t \"{NOTEBOOKS_FOLDER}/test_diff_output.ipynb\" )"], stdout=PIPE, universal_newlines=True)
     output = pc.stdout
 
