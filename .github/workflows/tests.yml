@@ -45,7 +45,5 @@ jobs:
         NBSTRIPOUT_EXE: ${{ env.pythonLocation }}\Scripts\nbstripout.exe
       run: |
         git config --global core.autocrlf true
-        echo NBSTRIPOUT_EXE=${NBSTRIPOUT_EXE}
-        ${NBSTRIPOUT_EXE} --help
         # cram is broken on Windows (#38)
         pytest --nocram
