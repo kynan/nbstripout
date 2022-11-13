@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from subprocess import run, PIPE
+import sys
 
 import pytest
 
@@ -14,8 +15,8 @@ def get_nbstripout_exe():
 
 
 def test_diff_no_difference():
-    if 'bash' not in os.environ['COMSPEC']:
-        pytest.skip(f"This test requires the bash shell, not {os.environ['COMSPEC']}")
+    if sys.platform == 'win32' and 'bash' not in os.environ['COMSPEC']:
+        pytest.skip(f"This test requires the bash shell on windows, not {os.environ['COMSPEC']}")
 
     expected = ""
 
@@ -26,8 +27,8 @@ def test_diff_no_difference():
 
 
 def test_diff_diff():
-    if 'bash' not in os.environ['COMSPEC']:
-        pytest.skip(f"This test requires the bash shell, not {os.environ['COMSPEC']}")
+    if sys.platform == 'win32' and 'bash' not in os.environ['COMSPEC']:
+        pytest.skip(f"This test requires the bash shell on windows, not {os.environ['COMSPEC']}")
 
     expected = """9c9
 <     "print(\\"aou\\")"
