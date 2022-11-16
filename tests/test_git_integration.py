@@ -1,10 +1,6 @@
 from configparser import ConfigParser
-# import os
 from pathlib import Path
 import re
-# from subprocess import check_call, run, CalledProcessError, PIPE
-# Note: typing.Pattern is deprecated, for removal in 3.13 in favour of re.Pattern introduced in 3.8
-# from typing import List, Union, Pattern
 
 import pytest
 
