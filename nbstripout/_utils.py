@@ -149,7 +149,6 @@ def strip_output(nb, keep_output, keep_count, extra_keys=[], drop_empty_cells=Fa
         if 'execution_count' in cell and not keep_count:
             cell['execution_count'] = None
 
-        # Always remove some metadata
         for field in keys['cell']:
             pop_recursive(cell, field)
     return nb

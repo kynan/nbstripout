@@ -22,6 +22,7 @@ TEST_CASES = [
     ("test_metadata.ipynb", "test_metadata_keep_output.ipynb.expected", ["--keep-output"]),
     ("test_metadata.ipynb", "test_metadata_keep_output_keep_count.ipynb.expected", ["--keep-output", "--keep-count"]),
     ("test_metadata_notebook.ipynb", "test_metadata_notebook.ipynb", []),
+    ("test_keep_metadata_keys.ipynb", "test_keep_metadata_keys.ipynb.expected", ["--keep-metadata-keys", "cell.metadata.scrolled cell.metadata.collapsed metadata.a"]),
     ("test_metadata_period.ipynb", "test_metadata_period.ipynb.expected", ["--extra-keys", "cell.metadata.application/vnd.databricks.v1+cell metadata.application/vnd.databricks.v1+notebook"]),
     ("test_strip_init_cells.ipynb", "test_strip_init_cells.ipynb.expected", ["--strip-init-cells"]),
     ("test_nbformat2.ipynb", "test_nbformat2.ipynb.expected", []),
