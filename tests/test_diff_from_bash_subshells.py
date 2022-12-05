@@ -12,9 +12,9 @@ def test_diff_with_process_substitution_nodiff(pytester: pytest.Pytester):
         pytest.skip("test requires proper bash shell", allow_module_level=True)
 
     r = pytester.run(
-        'bash',
-        '-c',
-        f'diff <( nbstripout -t {NOTEBOOKS_FOLDER / "test_diff.ipynb"} ) <( nbstripout -t {NOTEBOOKS_FOLDER / "test_diff_output.ipynb"} )',
+        'diff',
+        '<(', 'nbstripout', '-t', NOTEBOOKS_FOLDER / "test_diff.ipynb", ')',
+        '<(', 'nbstripout', '-t', NOTEBOOKS_FOLDER / "test_diff_output.ipynb", ')',
     )
     assert not r.outlines
     assert r.ret == 0
@@ -25,9 +25,9 @@ def test_diff_with_process_substitution_diff(pytester: pytest.Pytester):
         pytest.skip("test requires proper bash shell", allow_module_level=True)
 
     r = pytester.run(
-        'bash',
-        '-c',
-        f'diff <( nbstripout -t {NOTEBOOKS_FOLDER / "test_diff.ipynb"} ) <( nbstripout -t {NOTEBOOKS_FOLDER / "test_diff_different.ipynb"} )',
+        'diff',
+        '<(', 'nbstripout', '-t', NOTEBOOKS_FOLDER / "test_diff.ipynb", ')',
+        '<(', 'nbstripout', '-t', NOTEBOOKS_FOLDER / "test_diff_different.ipynb", ')',
     )
     r.stdout.re_match_lines(r"""(.*)
 <     "print(\"aou\")"
