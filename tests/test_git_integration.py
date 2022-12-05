@@ -51,6 +51,62 @@ def test_uninstall(pytester: pytest.Pytester):
     assert 'diff "ipynb"'not in config
 
 
+def test_uninstall_leave_extrakeys(pytester: pytest.Pytester):
+    pytester.run('git', 'init')
+
+    # add extrakeys so we can check that we don't remove them
+    pytester.run('git', 'config', 'filter.nbstripout.extrakeys', 'spam eggs')
+
+    # check not installed
+    assert pytester.run('nbstripout', '--is-installed').ret == 1
+
+    # do the install and verify
+    pytester.run('nbstripout', '--install')
+    assert pytester.run('nbstripout', '--is-installed').ret == 0
+
+    # uninstall and verify
+    pytester.run('nbstripout', '--uninstall')
+    assert pytester.run('nbstripout', '--is-installed').ret == 1
+
+    # check extrakeys still exist
+    r = pytester.run('git', 'config', 'filter.nbstripout.extrakeys')
+    assert r.stdout.str() == 'spam eggs'
+
+
+def test_status(pytester: pytest.Pytester):
+    pytester.run('git', 'init')
+
+    # status when not installed
+    r = pytester.run('nbstripout', '--status')
+    r.stdout.fnmatch_lines(['nbstripout is not installed in repository *'])
+    assert r.ret == 1
+
+    # do the install and verify
+    pytester.run('nbstripout', '--install')
+    r = pytester.run('nbstripout', '--status')
+    assert r.ret == 0
+    r.stdout.re_match_lines(r"""nbstripout is installed in repository .*
+\s*
+Filter:
+  clean = .* -m nbstripout
+  smudge = cat
+  diff= .* -m nbstripout -t
+  extrakeys=\s*
+\s*
+Attributes:
+  \*.ipynb: filter: nbstripout
+\s*
+Diff Attributes:
+  \*.ipynb: diff: ipynb
+""".splitlines())
+
+    # uninstall and verify
+    pytester.run('nbstripout', '--uninstall')
+    r = pytester.run('nbstripout', '--status')
+    r.stdout.fnmatch_lines(['nbstripout is not installed in repository *'])
+    assert r.ret == 1
+
+
 def test_git_diff_nodiff(pytester: pytest.Pytester):
     pytester.run('git', 'init')
     pytester.run('git', 'config', '--local', 'filter.nbstripout.extrakeys', ' ')
