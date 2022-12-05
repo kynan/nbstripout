@@ -29,7 +29,7 @@ def test_diff_with_process_substitution_diff(pytester: pytest.Pytester):
         '-c',
         f'diff <( nbstripout -t {NOTEBOOKS_FOLDER / "test_diff.ipynb"} ) <( nbstripout -t {NOTEBOOKS_FOLDER / "test_diff_different.ipynb"} )',
     )
-    assert r.stdout.re_match_lines(r"""(.*)
+    r.stdout.re_match_lines(r"""(.*)
 <     "print(\"aou\")"
 ---
 (.*\"print\(\\\"aou now it is different\\\"\)\")
