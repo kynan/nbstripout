@@ -17,7 +17,7 @@ def test_diff_with_process_substitution_nodiff(pytester: pytest.Pytester):
         f'"diff <( $nbstripout -t ${NOTEBOOKS_FOLDER / "test_diff.ipynb"} ) <( $nbstripout -t ${NOTEBOOKS_FOLDER / "test_diff_output.ipynb"} )"',
     )
     assert not r.outlines
-    assert r.ret == 0
+    assert r.stderr.fnmatch_lines(['asdf'])
 
 
 def test_diff_with_process_substitution_diff(pytester: pytest.Pytester):
