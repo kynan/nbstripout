@@ -69,29 +69,28 @@ def test_git_diff_diff(pytester: pytest.Pytester):
 
     r = pytester.run('git', 'diff', '--no-index', NOTEBOOKS_FOLDER / "test_diff.ipynb", NOTEBOOKS_FOLDER / "test_diff_different_extrakeys.ipynb")
     assert r.ret == 1
-    r.stdout.fnmatch_lines([
-        r'index*',
-        r'--- *test_diff.ipynb*',
-        r'+++ *test_diff_different_extrakeys.ipynb*',
-        r'@@ -6,15 +6,14 @@',
-        r'    "metadata": {},',
-        r'    "outputs": [],',
-        r'    "source": [',
-        r'-    "print(\"aou\")"',
-        r'+    "print(\"aou now it is different\")"',
-        r'    ]',
-        r'   }',
-        r'  ],',
-        r'  "metadata": {',
-        r'   "kernelspec": {',
-        r'    "display_name": "Python 2",',
-        r'-   "language": "python",',
-        r'-   "name": "python2"',
-        r'+   "language": "python"',
-        r'   },',
-        r'   "language_info": {',
-        r'    "codemirror_mode": {',
-    ])
+    r.stdout.fnmatch_lines(r"""index*
+--- *test_diff.ipynb*
++++ *test_diff_different_extrakeys.ipynb*
+@@ -6,15 +6,14 @@
+    "metadata": {},
+    "outputs": [],
+    "source": [
+-    "print(\"aou\")"
++    "print(\"aou now it is different\")"
+    ]
+   }
+  ],
+  "metadata": {
+   "kernelspec": {
+    "display_name": "Python 2",
+-   "language": "python",
+-   "name": "python2"
++   "language": "python"
+   },
+   "language_info": {
+    "codemirror_mode": {
+""".splitlines())
     assert len(r.outlines) == 22  # 21 lines + new line at end
 
 
@@ -102,18 +101,17 @@ def test_git_diff_extrakeys(pytester: pytest.Pytester):
 
     r = pytester.run('git', 'diff', '--no-index', NOTEBOOKS_FOLDER / "test_diff.ipynb", NOTEBOOKS_FOLDER / "test_diff_different_extrakeys.ipynb")
     assert r.ret == 1
-    r.stdout.fnmatch_lines([
-        r'index*',
-        r'--- *test_diff.ipynb*',
-        r'+++ *test_diff_different_extrakeys.ipynb*',
-        r'@@ -6,7 +6,7 @@',
-        r'    "metadata": {},',
-        r'    "outputs": [],',
-        r'    "source": [',
-        r'-    "print(\"aou\")"',
-        r'+    "print(\"aou now it is different\")"',
-        r'    ]',
-        r'   }',
-        r'  ],',
-    ])
+    r.stdout.fnmatch_lines(r"""index*
+--- *test_diff.ipynb*
++++ *test_diff_different_extrakeys.ipynb*
+@@ -6,7 +6,7 @@
+    "metadata": {},
+    "outputs": [],
+    "source": [
+-    "print(\"aou\")"
++    "print(\"aou now it is different\")"
+    ]
+   }
+  ],
+""".splitlines())
     assert len(r.outlines) == 13  # 12 lines + new line at end
