@@ -14,10 +14,11 @@ def test_diff_with_process_substitution_nodiff(pytester: pytest.Pytester):
     r = pytester.run(
         'bash',
         '-c',
-        f'diff <( nbstripout -t ${NOTEBOOKS_FOLDER / "test_diff.ipynb"} ) <( nbstripout -t ${NOTEBOOKS_FOLDER / "test_diff_output.ipynb"} )',
+        f'diff <( nbstripout -t {NOTEBOOKS_FOLDER / "test_diff.ipynb"} ) <( nbstripout -t {NOTEBOOKS_FOLDER / "test_diff_output.ipynb"} )',
     )
     assert not r.outlines
     assert r.stderr.fnmatch_lines(['asdf'])
+    assert r.ret == 0
 
 
 def test_diff_with_process_substitution_diff(pytester: pytest.Pytester):
@@ -27,7 +28,7 @@ def test_diff_with_process_substitution_diff(pytester: pytest.Pytester):
     r = pytester.run(
         'bash',
         '-c',
-        f'diff <( nbstripout -t ${NOTEBOOKS_FOLDER / "test_diff.ipynb"} ) <( nbstripout -t ${NOTEBOOKS_FOLDER / "test_diff_different.ipynb"} )',
+        f'diff <( nbstripout -t {NOTEBOOKS_FOLDER / "test_diff.ipynb"} ) <( nbstripout -t {NOTEBOOKS_FOLDER / "test_diff_different.ipynb"} )',
     )
     assert r.stdout.re_match_lines(r"""(.*)
   <     "print(\"aou\")"
