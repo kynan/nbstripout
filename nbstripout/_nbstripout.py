@@ -224,10 +224,10 @@ def install(git_config, install_location=INSTALL_LOCATION_LOCAL, attrfile=None):
         attrfile = _get_attrfile(git_config, install_location, attrfile)
     except FileNotFoundError:
         print('Installation failed: git is not on path!', file=sys.stderr)
-        sys.exit(1)
+        return 1
     except CalledProcessError:
         print('Installation failed: not a git repository!', file=sys.stderr)
-        sys.exit(1)
+        return 1
 
     # Check if there is already a filter for ipynb files
     filt_exists = False
@@ -262,7 +262,7 @@ def install(git_config, install_location=INSTALL_LOCATION_LOCAL, attrfile=None):
         if install_location == INSTALL_LOCATION_GLOBAL:
             print('Did you forget to sudo?', file=sys.stderr)
 
-        sys.exit(1)
+        return 1
 
 
 def uninstall(git_config, install_location=INSTALL_LOCATION_LOCAL, attrfile=None):
@@ -274,10 +274,10 @@ def uninstall(git_config, install_location=INSTALL_LOCATION_LOCAL, attrfile=None
         attrfile = _get_attrfile(git_config, install_location, attrfile)
     except FileNotFoundError:
         print('Uninstall failed: git is not on path!', file=sys.stderr)
-        sys.exit(1)
+        return 1
     except CalledProcessError:
         print('Uninstall failed: not a git repository!', file=sys.stderr)
-        sys.exit(1)
+        return 1
 
     # Check if there is a filter for ipynb files
     if path.exists(attrfile):
@@ -418,16 +418,16 @@ def main():
         install_location = INSTALL_LOCATION_LOCAL
 
     if args.install:
-        sys.exit(install(git_config, install_location, attrfile=args.attributes))
+        raise SystemExit(install(git_config, install_location, attrfile=args.attributes))
     if args.uninstall:
-        sys.exit(uninstall(git_config, install_location, attrfile=args.attributes))
+        raise SystemExit(uninstall(git_config, install_location, attrfile=args.attributes))
     if args.is_installed:
-        sys.exit(status(git_config, install_location, verbose=False))
+        raise SystemExit(status(git_config, install_location, verbose=False))
     if args.status:
-        sys.exit(status(git_config, install_location, verbose=True))
+        raise SystemExit(status(git_config, install_location, verbose=True))
     if args.version:
         print(__version__)
-        sys.exit(0)
+        raise SystemExit(0)
 
     extra_keys = [
         'metadata.signature',
@@ -493,10 +493,10 @@ def main():
                         write(nb, f)
         except NotJSONError:
             print(f"'{filename}' is not a valid notebook", file=sys.stderr)
-            sys.exit(1)
+            raise SystemExit(1)
         except FileNotFoundError:
             print(f"Could not strip '{filename}': file not found", file=sys.stderr)
-            sys.exit(1)
+            raise SystemExit(1)
         except Exception:
             # Ignore exceptions for non-notebook files.
             print(f"Could not strip '{filename}'", file=sys.stderr)
@@ -507,13 +507,13 @@ def main():
             if args.mode == 'zeppelin':
                 if args.dry_run:
                     output_stream.write('Dry run: would have stripped input from stdin\n')
-                    sys.exit(0)
+                    raise SystemExit(0)
                 nb = json.load(input_stream, object_pairs_hook=collections.OrderedDict)
                 nb_stripped = strip_zeppelin_output(nb)
                 json.dump(nb_stripped, output_stream, indent=2)
                 output_stream.write('\n')
                 output_stream.flush()
-                sys.exit(0)
+                raise SystemExit(0)
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore", category=UserWarning)
                 nb = read(input_stream, as_version=NO_CONVERT)
@@ -532,4 +532,4 @@ def main():
                 output_stream.flush()
         except NotJSONError:
             print('No valid notebook detected', file=sys.stderr)
-            sys.exit(1)
+            raise SystemExit(1)

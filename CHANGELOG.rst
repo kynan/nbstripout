@@ -98,7 +98,7 @@ Change Log
 0.3.4 - 2019-03-26
 ------------------
 * Fix ``WindowsError`` not defined on POSIX systems (#90)
-* Add support for blacklisting custom metatdata fields (#92, @casperdcl)
+* Add support for blacklisting custom metadata fields (#92, @casperdcl)
 
 0.3.3 - 2018-08-04
 ------------------
@@ -205,7 +205,7 @@ Change Log
 
 0.1.0 - not released
 --------------------
-* Based on Min RK's orginal but supports multiple versions of
+* Based on Min RK's original but supports multiple versions of
   IPython/Jupyter and also strips the execution count.
 * Add install option that fails sensibly if not in a git repository,
   does not clobber an existing attributes file and checks for an
