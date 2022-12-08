@@ -159,7 +159,7 @@ def strip_output(nb, keep_output, keep_count, extra_keys=[], drop_empty_cells=Fa
     return nb
 
 
-def process_pyproject_toml(toml_file_path: str) -> Optional[Dict[str, Any]]:
+def process_pyproject_toml(toml_file_path: str, parser: ArgumentParser) -> Optional[Dict[str, Any]]:
     """Extract config mapping from pyproject.toml file."""
     try:
         import tomllib  # python 3.11+
@@ -167,7 +167,19 @@ def process_pyproject_toml(toml_file_path: str) -> Optional[Dict[str, Any]]:
         import tomli as tomllib
 
     with open(toml_file_path, 'rb') as f:
-        return tomllib.load(f).get('tool', {}).get('nbstripout', None)
+        dict_config = tomllib.load(f).get('tool', {}).get('nbstripout', None)
+
+    if not dict_config:
+        # could be {} if 'tool' not found, or None if 'nbstripout' not found
+        return dict_config
+
+    # special processing of boolean options, make sure we don't have invalid types
+    for a in parser._actions:
+        if a.dest in dict_config and isinstance(a, (_StoreTrueAction, _StoreFalseAction)):
+            if not isinstance(dict_config[a.dest], bool):
+                raise ValueError(f'Argument {a.dest} in pyproject.toml must be a boolean, not {dict_config[a.dest]}')
+
+    return dict_config
 
 
 def process_setup_cfg(cfg_file_path, parser: ArgumentParser) -> Optional[Dict[str, Any]]:
@@ -193,7 +205,7 @@ def process_setup_cfg(cfg_file_path, parser: ArgumentParser) -> Optional[Dict[st
 def merge_configuration_file(parser: ArgumentParser, args_str=None) -> Namespace:
     """Merge flags from config files into args."""
     CONFIG_FILES = {
-        'pyproject.toml': process_pyproject_toml,
+        'pyproject.toml': partial(process_pyproject_toml, parser=parser),
         'setup.cfg': partial(process_setup_cfg, parser=parser),
     }
 
