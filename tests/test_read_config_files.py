@@ -261,3 +261,31 @@ def test_merge_with_cli_additive_str_property(tmp_path: Path, test_nb: Path, par
     expected_args.extra_keys = "bar foo"
     args = merge_configuration_file(parser, args_str)
     assert_namespace(args, expected_args)
+
+
+def test_override_bool_true(pytester: pytest.Pytester, parser: ArgumentParser):
+    pytester.makepyprojecttoml("[tool.nbstripout]\ndrop_empty_cells = false\n")
+    args_str = ["--drop-empty-cells"]
+    expected_args = parser.parse_args(args_str)
+    args = merge_configuration_file(parser, args_str)
+    assert_namespace(args, expected_args)
+
+
+def test_override_size(pytester: pytest.Pytester, parser: ArgumentParser):
+    pytester.makepyprojecttoml("[tool.nbstripout]\nmax_size = 30\n")
+    args_str = ["--max-size=40"]
+    expected_args = parser.parse_args(args_str)
+    args = merge_configuration_file(parser, args_str)
+    assert_namespace(args, expected_args)
+
+
+def test_toml_override_settings(pytester: pytest.Pytester, parser: ArgumentParser):
+    pytester.makepyprojecttoml("[tool.nbstripout]\nmax_size = 30\n")
+    Path("setup.cfg").write_text(
+        "[nbstripout]\nmax_size = 50\n",
+    )
+    args_str = []
+    expected_args = parser.parse_args(args_str)
+    expected_args.max_size = 30
+    args = merge_configuration_file(parser, args_str)
+    assert_namespace(args, expected_args)
