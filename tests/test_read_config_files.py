@@ -81,11 +81,8 @@ def test_non_nested_setup_cfg_non_empty(tmp_path: Path, test_nb: Path, parser: A
     assert_namespace(args, expected_args)
 
 
-def test_nofiles_pyproject_toml_non_empty(tmp_path: Path, parser: ArgumentParser) -> None:
-    pytest.skip("TODO")
-    (tmp_path / "pyproject.toml").write_text(
-        "[tool.nbstripout]\ndrop_empty_cells=true\n",
-    )
+def test_nofiles_pyproject_toml_non_empty(pytester: pytest.Pytester, parser: ArgumentParser) -> None:
+    pytester.makepyprojecttoml("[tool.nbstripout]\ndrop_empty_cells=true\n")
     args_str = []
     expected_args = parser.parse_args(args_str)
     expected_args.drop_empty_cells = True
@@ -93,9 +90,8 @@ def test_nofiles_pyproject_toml_non_empty(tmp_path: Path, parser: ArgumentParser
     assert_namespace(args, expected_args)
 
 
-def test_nofiles_setup_cfg_empty(tmp_path: Path, test_nb: Path, parser: ArgumentParser) -> None:
-    pytest.skip("TODO")
-    (tmp_path / "setup.cfg").write_text(
+def test_nofiles_setup_cfg_empty(pytester: pytest.Pytester, parser: ArgumentParser) -> None:
+    Path("setup.cfg").write_text(
         "[nbstripout]\ndrop_empty_cells = yes\n",
     )
     args_str = []

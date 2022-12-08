@@ -221,7 +221,6 @@ def merge_configuration_file(parser: ArgumentParser, args_str=None) -> Namespace
     #       comes first.
     # if no files are given, start from cwd
     config_path = os.path.commonpath([os.path.abspath(file) for file in args.files]) if args.files else os.path.abspath(os.getcwd())
-    print(f"{config_path =}")
     config: Optional[Dict[str, Any]] = None
     while True:
         for config_file, processor in CONFIG_FILES.items():
@@ -239,10 +238,8 @@ def merge_configuration_file(parser: ArgumentParser, args_str=None) -> Namespace
     # black starts with default arguments (from click), updates that with the config file,
     # then applies command line arguments. this all happens in the click framework, before main() is called
     # we can use parser.set_defaults
-    print(f'getting config {config}')
     if config:
         # check all arguments are valid
-        print(f"have a config: {config.keys()}")
         valid_args = vars(args).keys()
         for name in config.keys():
             if name not in valid_args:
