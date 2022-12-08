@@ -109,7 +109,7 @@ In file ``.gitattributes`` or ``.git/info/attributes`` add: ::
     *.ipynb diff=ipynb
 """
 
-from argparse import ArgumentParser, RawDescriptionHelpFormatter
+from argparse import ArgumentParser, Namespace, RawDescriptionHelpFormatter
 import collections
 import io
 import json
@@ -351,7 +351,7 @@ def status(git_config, install_location=INSTALL_LOCATION_LOCAL, verbose=False):
         return 1
 
 
-def main():
+def setup_commandline() -> Namespace:
     parser = ArgumentParser(epilog=__doc__, formatter_class=RawDescriptionHelpFormatter)
     task = parser.add_mutually_exclusive_group()
     task.add_argument('--dry-run', action='store_true',
@@ -403,7 +403,12 @@ def main():
 
     parser.add_argument('files', nargs='*', help='Files to strip output from')
 
-    args = merge_configuration_file(parser.parse_args())
+    return parser
+
+
+def main():
+    parser = setup_commandline()
+    args = merge_configuration_file(parser)
 
     git_config = ['git', 'config']
 
