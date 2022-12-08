@@ -1,5 +1,4 @@
 from argparse import ArgumentParser, Namespace
-from typing import Any, Dict
 from pathlib import Path
 
 import pytest
