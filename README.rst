@@ -320,9 +320,21 @@ Additional metadata to be stripped can be configured via either
           cell.metadata.tags
           cell.metadata.init_cell'
 
-*   the ``--extra-keys`` flag, which takes a string as an argument, e.g. ::
+*   the ``--extra-keys`` flag, which takes a space-delimited string as an argument, e.g. ::
 
         --extra-keys "metadata.celltoolbar cell.metadata.heading_collapsed"
+
+You can keep certain metadata with either
+
+*   ``git config (--global/--system) filter.nbstripout.keepmetadatakeys``, e.g. ::
+
+        git config --global filter.nbstripout.keepmetadatakeys '
+          cell.metadata.collapsed
+          cell.metadata.scrolled'
+
+*   the ``--keep-metadata-keys`` flag, which takes a space-delimited string as an argument, e.g. ::
+
+        --keep-metadata-keys "cell.metadata.collapsed cell.metadata.scrolled"
 
 Note: Previous versions of Jupyter used ``metadata.kernel_spec`` for kernel
 metadata. Prefer stripping ``kernelspec`` entirely: only stripping some

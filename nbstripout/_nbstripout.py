@@ -376,6 +376,9 @@ def main():
     parser.add_argument('--extra-keys', default='',
                         help='Space separated list of extra keys to strip '
                         'from metadata, e.g. metadata.foo cell.metadata.bar')
+    parser.add_argument('--keep-metadata-keys', default='',
+                        help='Space separated list of metadata keys to keep'
+                        ', e.g. metadata.foo cell.metadata.bar')
     parser.add_argument('--drop-empty-cells', action='store_true',
                         help='Remove cells where `source` is empty or contains only whitepace')
     parser.add_argument('--drop-tagged-cells', default='',
@@ -445,6 +448,16 @@ def main():
         pass
 
     extra_keys.extend(args.extra_keys.split())
+
+    try:
+        keep_metadata_keys = check_output(
+            (git_config if args._system or args._global else ['git', 'config']) + ['filter.nbstripout.keepmetadatakeys'],
+            universal_newlines=True
+        ).strip().split()
+    except (CalledProcessError, FileNotFoundError):
+        keep_metadata_keys = []
+    keep_metadata_keys.extend(args.keep_metadata_keys.split())
+    extra_keys = [i for i in extra_keys if i not in keep_metadata_keys]
 
     # Wrap input/output stream in UTF-8 encoded text wrapper
     # https://stackoverflow.com/a/16549381

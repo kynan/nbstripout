@@ -171,3 +171,32 @@ def test_git_diff_extrakeys(pytester: pytest.Pytester):
   ],
 """.splitlines())
     assert len(r.outlines) == 13  # 12 lines + new line at end
+
+
+def test_git_diff_keepmetadatakeys(pytester: pytest.Pytester):
+    pytester.run('git', 'init')
+    pytester.run('git', 'config', '--local', 'filter.nbstripout.keepmetadatakeys', 'cell.metadata.scrolled metadata.foo.bar')
+    pytester.run('nbstripout', '--install')
+
+    r = pytester.run('git', 'diff', '--no-index', NOTEBOOKS_FOLDER / "test_diff.ipynb", NOTEBOOKS_FOLDER / "test_diff_different_extrakeys.ipynb")
+    assert r.ret == 1
+    r.stdout.fnmatch_lines(r"""index*
+--- *test_diff.ipynb*
++++ *test_diff_different_extrakeys.ipynb*
+@@ -3,20 +3,17 @@
+   {
+    "cell_type": "code",
+    "execution_count": null,
+-   "metadata": {
+-    "scrolled": true
+-   },
++   "metadata": {},
+    "outputs": [],
+    "source": [
+-    "print(\"aou\")"
++    "print(\"aou now it is different\")"
+    ]
+   }
+  ],
+""".splitlines())
+    assert len(r.outlines) == 28  # 12 lines + new line at end
