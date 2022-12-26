@@ -89,7 +89,7 @@ def test_nofiles_pyproject_toml_non_empty(pytester: pytest.Pytester, parser: Arg
     assert_namespace(args, expected_args)
 
 
-def test_nofiles_setup_cfg_empty(pytester: pytest.Pytester, parser: ArgumentParser) -> None:
+def test_nofiles_setup_cfg_non_empty(pytester: pytest.Pytester, parser: ArgumentParser) -> None:
     Path("setup.cfg").write_text(
         "[nbstripout]\ndrop_empty_cells = yes\n",
     )
