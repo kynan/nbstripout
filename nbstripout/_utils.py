@@ -202,7 +202,7 @@ def process_setup_cfg(cfg_file_path, parser: ArgumentParser) -> Optional[Dict[st
     return dict_config
 
 
-def merge_configuration_file(parser: ArgumentParser, args_str=None) -> Namespace:
+def merge_configuration_files(parser: ArgumentParser, args_str=None) -> Namespace:
     """Merge flags from config files into args."""
     CONFIG_FILES = {
         'pyproject.toml': partial(process_pyproject_toml, parser=parser),
