@@ -214,10 +214,10 @@ def _parse_size(num_str):
         raise ValueError(f"Unknown size identifier {num_str[-1]}")
 
 
-def install(git_config, install_location=INSTALL_LOCATION_LOCAL, attrfile=None):
+def install(git_config, install_location=INSTALL_LOCATION_LOCAL, python=None, attrfile=None):
     """Install the git filter and set the git attributes."""
     try:
-        filepath = f'"{PureWindowsPath(sys.executable).as_posix()}" -m nbstripout'
+        filepath = f'"{PureWindowsPath(python or sys.executable).as_posix()}" -m nbstripout'
         check_call(git_config + ['filter.nbstripout.clean', filepath])
         check_call(git_config + ['filter.nbstripout.smudge', 'cat'])
         check_call(git_config + ['diff.ipynb.textconv', filepath + ' -t'])
@@ -394,6 +394,9 @@ def main():
                           help='Use global git config (default is local config)')
     location.add_argument('--system', dest='_system', action='store_true',
                           help='Use system git config (default is local config)')
+    location.add_argument('--python', dest='_python', metavar="PATH",
+                          help='Path to python executable to use when --install\'ing '
+                          '(default is deduced from `sys.executable`)')
     parser.add_argument('--force', '-f', action='store_true',
                         help='Strip output also from files with non ipynb extension')
     parser.add_argument('--max-size', metavar='SIZE',
@@ -420,7 +423,7 @@ def main():
         install_location = INSTALL_LOCATION_LOCAL
 
     if args.install:
-        raise SystemExit(install(git_config, install_location, attrfile=args.attributes))
+        raise SystemExit(install(git_config, install_location, python=args._python, attrfile=args.attributes))
     if args.uninstall:
         raise SystemExit(uninstall(git_config, install_location, attrfile=args.attributes))
     if args.is_installed:
