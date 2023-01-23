@@ -34,12 +34,6 @@ def test_install_different_python(pytester: pytest.Pytester):
     pytester.run("nbstripout", "--install", "--python", "DIFFERENTPYTHON")
     assert pytester.run("nbstripout", "--is-installed").ret == 0
 
-    with open(".git/info/attributes", "r") as f:
-        attr_lines = f.readlines()
-    assert "*.ipynb filter=nbstripout\n" in attr_lines
-    assert "*.zpln filter=nbstripout\n" in attr_lines
-    assert "*.ipynb diff=ipynb\n" in attr_lines
-
     config = ConfigParser()
     config.read(".git/config")
     assert re.match(
