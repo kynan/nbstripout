@@ -27,11 +27,12 @@ def test_install(pytester: pytest.Pytester):
     assert config['filter "nbstripout"']["smudge"] == "cat"
     assert re.match(r".*python.* -m nbstripout -t", config['diff "ipynb"']["textconv"])
 
+
 def test_install_different_python(pytester: pytest.Pytester):
-    pytester.run('git', 'init')
-    assert pytester.run('nbstripout', '--is-installed').ret == 1
-    pytester.run('nbstripout', '--install','--python','DIFFERENTPYTHON')
-    assert pytester.run('nbstripout', '--is-installed').ret == 0
+    pytester.run("git", "init")
+    assert pytester.run("nbstripout", "--is-installed").ret == 1
+    pytester.run("nbstripout", "--install", "--python", "DIFFERENTPYTHON")
+    assert pytester.run("nbstripout", "--is-installed").ret == 0
 
     with open(".git/info/attributes", "r") as f:
         attr_lines = f.readlines()
@@ -41,11 +42,15 @@ def test_install_different_python(pytester: pytest.Pytester):
 
     config = ConfigParser()
     config.read(".git/config")
-    assert re.match(r".*DIFFERENTPYTHON.* -m nbstripout", config['filter "nbstripout"']["clean"])
+    assert re.match(
+        r".*DIFFERENTPYTHON.* -m nbstripout", config['filter "nbstripout"']["clean"]
+    )
     assert sys.executable not in config['filter "nbstripout"']["clean"]
     assert config['filter "nbstripout"']["smudge"] == "cat"
-    assert re.match(r".*DIFFERENTPYTHON.* -m nbstripout -t", config['diff "ipynb"']["textconv"])
-    assert sys.executable not in  config['diff "ipynb"']["textconv"]
+    assert re.match(
+        r".*DIFFERENTPYTHON.* -m nbstripout -t", config['diff "ipynb"']["textconv"]
+    )
+    assert sys.executable not in config['diff "ipynb"']["textconv"]
 
 
 def test_uninstall(pytester: pytest.Pytester):
