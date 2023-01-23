@@ -95,7 +95,11 @@ Set up the git filter using ``.gitattributes`` ::
 
     nbstripout --install --attributes .gitattributes
 
-Specify a different path to Python (default is the path to the Python used during ``nbstripout`` invocation). This is useful if you have Python installed in different or unusual locations across machines (e.g. ``/usr/bin/python3`` on your machine vs ``/usr/local/bin/python3`` in a container or elsewhere):
+Specify a different path to the Python interpreter to be used for the git
+filters (default is the path to the Python interpreter used when ``nbstripout``
+is installed). This is useful if you have Python installed in different or
+unusual locations across machines (e.g. ``/usr/bin/python3`` on your machine vs
+``/usr/local/bin/python3`` in a container or elsewhere):
 
 .. code-block:: sh
 
