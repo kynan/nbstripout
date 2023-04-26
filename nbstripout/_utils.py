@@ -94,7 +94,7 @@ def strip_zeppelin_output(nb):
     return nb
 
 
-def strip_output(nb, keep_output, keep_count, extra_keys=[], drop_empty_cells=False, drop_tagged_cells=[],
+def strip_output(nb, keep_output, keep_count, keep_id, extra_keys=[], drop_empty_cells=False, drop_tagged_cells=[],
                  strip_init_cells=False, max_size=0):
     """
     Strip the outputs, execution count/prompt number and miscellaneous
@@ -124,7 +124,7 @@ def strip_output(nb, keep_output, keep_count, extra_keys=[], drop_empty_cells=Fa
     for tag_to_drop in drop_tagged_cells:
         conditionals.append(lambda c: tag_to_drop not in c.get("metadata", {}).get("tags", []))
 
-    for cell in _cells(nb, conditionals):
+    for i, cell in enumerate(_cells(nb, conditionals)):
         keep_output_this_cell = determine_keep_output(cell, keep_output, strip_init_cells)
 
         # Remove the outputs, unless directed otherwise
@@ -148,7 +148,9 @@ def strip_output(nb, keep_output, keep_count, extra_keys=[], drop_empty_cells=Fa
             cell['prompt_number'] = None
         if 'execution_count' in cell and not keep_count:
             cell['execution_count'] = None
-
+        # Replace the cell id with an incremental value that will be consistent across runs
+        if "id" in cell and not keep_id:
+            cell["id"] = str(i)
         for field in keys['cell']:
             pop_recursive(cell, field)
     return nb

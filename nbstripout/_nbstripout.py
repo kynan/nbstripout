@@ -373,6 +373,7 @@ def main():
                         help='Do not strip the execution count/prompt number')
     parser.add_argument('--keep-output', action='store_true',
                         help='Do not strip output', default=None)
+    parser.add_argument('--keep-id', action='store_true', help="Keep the randomly generated cell ids, which will be different after each execution.")
     parser.add_argument('--extra-keys', default='',
                         help='Space separated list of extra keys to strip '
                         'from metadata, e.g. metadata.foo cell.metadata.bar')
@@ -409,7 +410,6 @@ def main():
 
     parser.add_argument('files', nargs='*', help='Files to strip output from')
     args = parser.parse_args()
-
     git_config = ['git', 'config']
 
     if args._system:
@@ -487,7 +487,7 @@ def main():
                     warnings.simplefilter("ignore", category=UserWarning)
                     nb = read(f, as_version=NO_CONVERT)
 
-            nb = strip_output(nb, args.keep_output, args.keep_count, extra_keys, args.drop_empty_cells,
+            nb = strip_output(nb, args.keep_output, args.keep_count, args.keep_id, extra_keys, args.drop_empty_cells,
                               args.drop_tagged_cells.split(), args.strip_init_cells, _parse_size(args.max_size))
 
             if args.dry_run:
@@ -533,7 +533,7 @@ def main():
                 warnings.simplefilter("ignore", category=UserWarning)
                 nb = read(input_stream, as_version=NO_CONVERT)
 
-            nb = strip_output(nb, args.keep_output, args.keep_count, extra_keys, args.drop_empty_cells,
+            nb = strip_output(nb, args.keep_output, args.keep_count, args.keep_id, extra_keys, args.drop_empty_cells,
                               args.drop_tagged_cells.split(), args.strip_init_cells, _parse_size(args.max_size))
 
             if args.dry_run:
