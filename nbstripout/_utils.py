@@ -149,8 +149,8 @@ def strip_output(nb, keep_output, keep_count, keep_id, extra_keys=[], drop_empty
         if 'execution_count' in cell and not keep_count:
             cell['execution_count'] = None
         # Replace the cell id with an incremental value that will be consistent across runs
-        if "id" in cell and not keep_id:
-            cell["id"] = str(i)
+        if 'id' in cell and not keep_id:
+            cell['id'] = str(i)
         for field in keys['cell']:
             pop_recursive(cell, field)
     return nb

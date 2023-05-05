@@ -373,7 +373,9 @@ def main():
                         help='Do not strip the execution count/prompt number')
     parser.add_argument('--keep-output', action='store_true',
                         help='Do not strip output', default=None)
-    parser.add_argument('--keep-id', action='store_true', help="Keep the randomly generated cell ids, which will be different after each execution.")
+    parser.add_argument('--keep-id', action='store_true',
+                        help='Keep the randomly generated cell ids, '
+                        'which will be different after each execution.')
     parser.add_argument('--extra-keys', default='',
                         help='Space separated list of extra keys to strip '
                         'from metadata, e.g. metadata.foo cell.metadata.bar')
