@@ -274,6 +274,10 @@ Do not strip the output ::
 
     nbstripout --keep-output
 
+Do not reassign the cell ids to be sequential ::
+    
+    nbstripout --keep-id
+
 To mark special cells so that the output is not stripped, you can either:
 
 1.  Set the ``keep_output`` tag on the cell. To do this, enable the tags
