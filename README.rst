@@ -315,8 +315,9 @@ Stripping metadata
 
 The following metadata is stripped by default:
 
-* Notebook metadata: ``signature``, ``widgets``
-* Cell metadata: ``ExecuteTime``, ``collapsed``, ``execution``, ``scrolled``
+*   Notebook metadata: ``signature``, ``widgets``
+*   Cell metadata: ``ExecuteTime``, ``collapsed``, ``execution``,
+    ``heading_collapsed``, ``hidden``, ``scrolled``
 
 Additional metadata to be stripped can be configured via either
 
@@ -340,6 +341,10 @@ Additional metadata to be stripped can be configured via either
 *   the ``--extra-keys`` flag, which takes a space-delimited string as an argument, e.g. ::
 
         --extra-keys "metadata.celltoolbar cell.metadata.heading_collapsed"
+
+Note: Only notebook and cell metadata is currently supported and every key
+specified via ``filter.nbstripout.extrakeys`` or ``--extra-keys`` must start
+with ``metadata.`` for notebook and ``cell.metadata.`` for cell metadata.
 
 You can keep certain metadata with either
 
