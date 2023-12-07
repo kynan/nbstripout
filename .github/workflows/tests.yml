@@ -32,8 +32,6 @@ jobs:
       if: matrix.os == 'macos-latest'
       shell: bash
       run: |
-        # Ignore test-hg.t as Mercurial is not installed
-        echo 'cramignore = test-hg.t' >> pytest.ini
         pytest
     - name: Run tests (Windows)
       if: matrix.os == 'windows-latest'
@@ -42,5 +40,4 @@ jobs:
         NBSTRIPOUT_EXE: ${{ env.pythonLocation }}\Scripts\nbstripout.exe
       run: |
         git config --global core.autocrlf true
-        # cram is broken on Windows (#38)
-        pytest --nocram
+        pytest

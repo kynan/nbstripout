@@ -24,7 +24,7 @@ def nb_with_exception():
 
 def test_cells(orig_nb):
     nb_stripped = deepcopy(orig_nb)
-    nb_stripped = strip_output(nb_stripped, None, None)
+    nb_stripped = strip_output(nb_stripped, keep_output=None, keep_count=None, keep_id=None)
     for i, cell in enumerate(nb_stripped.cells):
         if cell.cell_type == 'code' and cell.source:
             match = re.match(r"\s*#\s*(output|no_output)", cell.source)
@@ -41,4 +41,4 @@ def test_cells(orig_nb):
 
 def test_exception(nb_with_exception):
     with pytest.raises(MetadataError):
-        strip_output(nb_with_exception, None, None)
+        strip_output(nb_with_exception, keep_output=None, keep_count=None, keep_id=None)

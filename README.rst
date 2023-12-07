@@ -95,6 +95,19 @@ Set up the git filter using ``.gitattributes`` ::
 
     nbstripout --install --attributes .gitattributes
 
+Specify a different path to the Python interpreter to be used for the git
+filters (default is the path to the Python interpreter used when ``nbstripout``
+is installed). This is useful if you have Python installed in different or
+unusual locations across machines (e.g. ``/usr/bin/python3`` on your machine vs
+``/usr/local/bin/python3`` in a container or elsewhere):
+
+.. code-block:: sh
+
+    # Using just 'python3' lets each machine find its Python itself. 
+    # However, keep in mind that depending on your setup this might not be 
+    # the Python version you want or even fail because an absolute path is required.
+    nbstripout --install --python python3
+
 Set up the git filter in your global ``~/.gitconfig`` ::
 
     nbstripout --install --global
@@ -261,6 +274,10 @@ Do not strip the output ::
 
     nbstripout --keep-output
 
+Do not reassign the cell ids to be sequential ::
+    
+    nbstripout --keep-id
+
 To mark special cells so that the output is not stripped, you can either:
 
 1.  Set the ``keep_output`` tag on the cell. To do this, enable the tags
@@ -298,8 +315,9 @@ Stripping metadata
 
 The following metadata is stripped by default:
 
-* Notebook metadata: ``signature``, ``widgets``
-* Cell metadata: ``ExecuteTime``, ``collapsed``, ``execution``, ``scrolled``
+*   Notebook metadata: ``signature``, ``widgets``
+*   Cell metadata: ``ExecuteTime``, ``collapsed``, ``execution``,
+    ``heading_collapsed``, ``hidden``, ``scrolled``
 
 Additional metadata to be stripped can be configured via either
 
@@ -320,9 +338,25 @@ Additional metadata to be stripped can be configured via either
           cell.metadata.tags
           cell.metadata.init_cell'
 
-*   the ``--extra-keys`` flag, which takes a string as an argument, e.g. ::
+*   the ``--extra-keys`` flag, which takes a space-delimited string as an argument, e.g. ::
 
         --extra-keys "metadata.celltoolbar cell.metadata.heading_collapsed"
+
+Note: Only notebook and cell metadata is currently supported and every key
+specified via ``filter.nbstripout.extrakeys`` or ``--extra-keys`` must start
+with ``metadata.`` for notebook and ``cell.metadata.`` for cell metadata.
+
+You can keep certain metadata with either
+
+*   ``git config (--global/--system) filter.nbstripout.keepmetadatakeys``, e.g. ::
+
+        git config --global filter.nbstripout.keepmetadatakeys '
+          cell.metadata.collapsed
+          cell.metadata.scrolled'
+
+*   the ``--keep-metadata-keys`` flag, which takes a space-delimited string as an argument, e.g. ::
+
+        --keep-metadata-keys "cell.metadata.collapsed cell.metadata.scrolled"
 
 Note: Previous versions of Jupyter used ``metadata.kernel_spec`` for kernel
 metadata. Prefer stripping ``kernelspec`` entirely: only stripping some

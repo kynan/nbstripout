@@ -214,10 +214,10 @@ def _parse_size(num_str):
         raise ValueError(f"Unknown size identifier {num_str[-1]}")
 
 
-def install(git_config, install_location=INSTALL_LOCATION_LOCAL, attrfile=None):
+def install(git_config, install_location=INSTALL_LOCATION_LOCAL, python=None, attrfile=None):
     """Install the git filter and set the git attributes."""
     try:
-        filepath = f'"{PureWindowsPath(sys.executable).as_posix()}" -m nbstripout'
+        filepath = f'"{PureWindowsPath(python or sys.executable).as_posix()}" -m nbstripout'
         check_call(git_config + ['filter.nbstripout.clean', filepath])
         check_call(git_config + ['filter.nbstripout.smudge', 'cat'])
         check_call(git_config + ['diff.ipynb.textconv', filepath + ' -t'])
@@ -373,9 +373,15 @@ def setup_commandline() -> Namespace:
                         help='Do not strip the execution count/prompt number')
     parser.add_argument('--keep-output', action='store_true',
                         help='Do not strip output', default=None)
+    parser.add_argument('--keep-id', action='store_true',
+                        help='Keep the randomly generated cell ids, '
+                        'which will be different after each execution.')
     parser.add_argument('--extra-keys', default='',
                         help='Space separated list of extra keys to strip '
                         'from metadata, e.g. metadata.foo cell.metadata.bar')
+    parser.add_argument('--keep-metadata-keys', default='',
+                        help='Space separated list of metadata keys to keep'
+                        ', e.g. metadata.foo cell.metadata.bar')
     parser.add_argument('--drop-empty-cells', action='store_true',
                         help='Remove cells where `source` is empty or contains only whitespace')
     parser.add_argument('--drop-tagged-cells', default='',
@@ -391,6 +397,9 @@ def setup_commandline() -> Namespace:
                           help='Use global git config (default is local config)')
     location.add_argument('--system', dest='_system', action='store_true',
                           help='Use system git config (default is local config)')
+    location.add_argument('--python', dest='_python', metavar="PATH",
+                          help='Path to python executable to use when --install\'ing '
+                          '(default is deduced from `sys.executable`)')
     parser.add_argument('--force', '-f', action='store_true',
                         help='Strip output also from files with non ipynb extension')
     parser.add_argument('--max-size', metavar='SIZE',
@@ -423,7 +432,7 @@ def main():
         install_location = INSTALL_LOCATION_LOCAL
 
     if args.install:
-        raise SystemExit(install(git_config, install_location, attrfile=args.attributes))
+        raise SystemExit(install(git_config, install_location, python=args._python, attrfile=args.attributes))
     if args.uninstall:
         raise SystemExit(uninstall(git_config, install_location, attrfile=args.attributes))
     if args.is_installed:
@@ -452,6 +461,16 @@ def main():
 
     extra_keys.extend(args.extra_keys.split())
 
+    try:
+        keep_metadata_keys = check_output(
+            (git_config if args._system or args._global else ['git', 'config']) + ['filter.nbstripout.keepmetadatakeys'],
+            universal_newlines=True
+        ).strip().split()
+    except (CalledProcessError, FileNotFoundError):
+        keep_metadata_keys = []
+    keep_metadata_keys.extend(args.keep_metadata_keys.split())
+    extra_keys = [i for i in extra_keys if i not in keep_metadata_keys]
+
     # Wrap input/output stream in UTF-8 encoded text wrapper
     # https://stackoverflow.com/a/16549381
     input_stream = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8') if sys.stdin else None
@@ -477,7 +496,7 @@ def main():
                     warnings.simplefilter("ignore", category=UserWarning)
                     nb = read(f, as_version=NO_CONVERT)
 
-            nb = strip_output(nb, args.keep_output, args.keep_count, extra_keys, args.drop_empty_cells,
+            nb = strip_output(nb, args.keep_output, args.keep_count, args.keep_id, extra_keys, args.drop_empty_cells,
                               args.drop_tagged_cells.split(), args.strip_init_cells, _parse_size(args.max_size))
 
             if args.dry_run:
@@ -523,7 +542,7 @@ def main():
                 warnings.simplefilter("ignore", category=UserWarning)
                 nb = read(input_stream, as_version=NO_CONVERT)
 
-            nb = strip_output(nb, args.keep_output, args.keep_count, extra_keys, args.drop_empty_cells,
+            nb = strip_output(nb, args.keep_output, args.keep_count, args.keep_id, extra_keys, args.drop_empty_cells,
                               args.drop_tagged_cells.split(), args.strip_init_cells, _parse_size(args.max_size))
 
             if args.dry_run:
