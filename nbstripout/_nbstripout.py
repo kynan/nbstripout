@@ -214,10 +214,12 @@ def _parse_size(num_str):
         raise ValueError(f"Unknown size identifier {num_str[-1]}")
 
 
-def install(git_config, install_location=INSTALL_LOCATION_LOCAL, python=None, attrfile=None):
+def install(git_config, install_location=INSTALL_LOCATION_LOCAL, python=None, attrfile=None, keep_args=None):
     """Install the git filter and set the git attributes."""
     try:
         filepath = f'"{PureWindowsPath(python or sys.executable).as_posix()}" -m nbstripout'
+        if keep_args:
+            filepath = filepath + ' '.join(keep_args)
         check_call(git_config + ['filter.nbstripout.clean', filepath])
         check_call(git_config + ['filter.nbstripout.smudge', 'cat'])
         check_call(git_config + ['diff.ipynb.textconv', filepath + ' -t'])
@@ -414,6 +416,12 @@ def main():
     args = parser.parse_args()
     git_config = ['git', 'config']
 
+    keep_args = [
+        f'--keep-{arg}'
+        for arg in ['output', 'count', 'id']
+        if getattr(args, f'keep_{arg}', False)
+    ]
+
     if args._system:
         git_config.append('--system')
         install_location = INSTALL_LOCATION_SYSTEM
@@ -425,7 +433,7 @@ def main():
         install_location = INSTALL_LOCATION_LOCAL
 
     if args.install:
-        raise SystemExit(install(git_config, install_location, python=args._python, attrfile=args.attributes))
+        raise SystemExit(install(git_config, install_location, python=args._python, attrfile=args.attributes, keep_args=keep_args))
     if args.uninstall:
         raise SystemExit(uninstall(git_config, install_location, attrfile=args.attributes))
     if args.is_installed:
