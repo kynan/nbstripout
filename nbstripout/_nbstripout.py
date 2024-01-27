@@ -158,15 +158,12 @@ def _get_system_gitconfig_folder():
 def _get_attrfile(git_config, install_location=INSTALL_LOCATION_LOCAL, attrfile=None):
     if not attrfile:
         if install_location == INSTALL_LOCATION_SYSTEM:
-            try:
-                attrfile = check_output(git_config + ['core.attributesFile'], universal_newlines=True).strip()
-            except CalledProcessError:
-                config_dir = _get_system_gitconfig_folder()
-                attrfile = path.join(config_dir, 'gitattributes')
+            attrfile = _git_config_string(git_config, key='core.attributesFile')
+            if not attrfile:
+                attrfile = path.join(_get_system_gitconfig_folder(), 'gitattributes')
         elif install_location == INSTALL_LOCATION_GLOBAL:
-            try:
-                attrfile = check_output(git_config + ['core.attributesFile'], universal_newlines=True).strip()
-            except CalledProcessError:
+            attrfile = _git_config_string(git_config, key='core.attributesFile')
+            if not attrfile:
                 config_dir = environ.get('XDG_CONFIG_DIR', path.expanduser('~/.config'))
                 attrfile = path.join(config_dir, 'git', 'attributes')
         else:
@@ -280,10 +277,6 @@ def status(git_config, install_location=INSTALL_LOCATION_LOCAL, verbose=False):
             git_dir = path.dirname(path.abspath(check_output(['git', 'rev-parse', '--git-dir'], universal_newlines=True).strip()))
             location = f"in repository '{git_dir}'"
 
-        clean = check_output(git_config + ['filter.nbstripout.clean'], universal_newlines=True).strip()
-        smudge = check_output(git_config + ['filter.nbstripout.smudge'], universal_newlines=True).strip()
-        diff = check_output(git_config + ['diff.ipynb.textconv'], universal_newlines=True).strip()
-
         if install_location in {INSTALL_LOCATION_SYSTEM, INSTALL_LOCATION_GLOBAL}:
             attrfile = _get_attrfile(git_config, install_location)
             attributes = ''
@@ -298,11 +291,6 @@ def status(git_config, install_location=INSTALL_LOCATION_LOCAL, verbose=False):
             attributes = check_output(['git', 'check-attr', 'filter', '--', '*.ipynb'], universal_newlines=True).strip()
             diff_attributes = check_output(['git', 'check-attr', 'diff', '--', '*.ipynb'], universal_newlines=True).strip()
 
-        try:
-            extra_keys = check_output(git_config + ['filter.nbstripout.extrakeys'], universal_newlines=True).strip()
-        except CalledProcessError:
-            extra_keys = ''
-
         if attributes.endswith('unspecified'):
             if verbose:
                 print('nbstripout is not installed', location)
@@ -312,10 +300,10 @@ def status(git_config, install_location=INSTALL_LOCATION_LOCAL, verbose=False):
         if verbose:
             print('nbstripout is installed', location)
             print('\nFilter:')
-            print('  clean =', clean)
-            print('  smudge =', smudge)
-            print('  diff=', diff)
-            print('  extrakeys=', extra_keys)
+            print('  clean =', _git_config_string(git_config, key='clean'))
+            print('  smudge =', _git_config_string(git_config, key='smudge'))
+            print('  diff=', _git_config_string(git_config, key='diff.ipynb.textconv'))
+            print('  extrakeys=', _git_config_string(git_config, key='extrakeys'))
             print('\nAttributes:\n ', attributes)
             print('\nDiff Attributes:\n ', diff_attributes)
 
@@ -363,6 +351,14 @@ def process_notebook(input_stream, output_stream, args, extra_keys, filename='in
             warnings.simplefilter("ignore", category=UserWarning)
             nbformat.write(nb, output_stream)
         output_stream.flush()
+
+
+def _git_config_string(git_config, key):
+    key = key if '.' in key else f'filter.nbstripout.{key}'
+    try:
+        return check_output(git_config + [key], universal_newlines=True).strip()
+    except (CalledProcessError, FileNotFoundError):
+        return ''
 
 
 def main():
@@ -461,20 +457,10 @@ def main():
         'cell.metadata.scrolled',
     ]
 
-    try:
-        extra_keys.extend(check_output((git_config if args._system or args._global else ['git', 'config']) + ['filter.nbstripout.extrakeys'], universal_newlines=True).strip().split())
-    except (CalledProcessError, FileNotFoundError):
-        pass
-
+    extra_keys.extend(_git_config_string(git_config, key='extrakeys').split())
     extra_keys.extend(args.extra_keys.split())
 
-    try:
-        keep_metadata_keys = check_output(
-            (git_config if args._system or args._global else ['git', 'config']) + ['filter.nbstripout.keepmetadatakeys'],
-            universal_newlines=True
-        ).strip().split()
-    except (CalledProcessError, FileNotFoundError):
-        keep_metadata_keys = []
+    keep_metadata_keys = _git_config_string(git_config, key='keepmetadatakeys').split()
     keep_metadata_keys.extend(args.keep_metadata_keys.split())
     extra_keys = [i for i in extra_keys if i not in keep_metadata_keys]
 
