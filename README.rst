@@ -34,7 +34,7 @@ Based on https://gist.github.com/minrk/6176788.
 Python 3 only
 =============
 
-As of version 0.6.2, nbstripout supports Python 3 *only*. If you need to use
+As of version 0.6.1, nbstripout supports Python 3 *only*. If you need to use
 Python 2.7, install nbstripout 0.3.10 ::
 
     pip install nbstripout==0.3.10
