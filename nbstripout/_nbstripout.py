@@ -393,7 +393,7 @@ def main():
     parser.add_argument('--keep-count', action='store_true',
                         help='Do not strip the execution count/prompt number')
     parser.add_argument('--keep-output', action='store_true',
-                        help='Do not strip output')
+                        help='Do not strip output', default=None)
     parser.add_argument('--keep-id', action='store_true',
                         help='Keep the randomly generated cell ids, '
                         'which will be different after each execution.')
@@ -448,7 +448,7 @@ def main():
     # Extra (bool) flags
     extra_flags = {}
     for flag_name in ('keep_count', 'keep_id', 'keep_output'):
-        extra_flags[flag_name] = getattr(args, flag_name) or _get_default_extra_flag(git_config, flag_name)
+        extra_flags[flag_name] = getattr(args, flag_name) or _get_default_extra_flag(git_config, flag_name) or False
 
     if args.install:
         raise SystemExit(install(git_config, install_location, python=args._python, attrfile=args.attributes, extra_flags=extra_flags))
