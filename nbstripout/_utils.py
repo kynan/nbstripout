@@ -103,7 +103,7 @@ def strip_output(nb, keep_output, keep_count, keep_id, extra_keys=[], drop_empty
 
     `extra_keys` could be 'metadata.foo cell.metadata.bar metadata.baz'
     """
-    if keep_output is None and 'keep_output' in nb.metadata:
+    if not keep_output and 'keep_output' in nb.metadata:
         keep_output = bool(nb.metadata['keep_output'])
 
     keys = defaultdict(list)
