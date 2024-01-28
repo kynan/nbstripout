@@ -361,10 +361,47 @@ def _git_config_string(git_config, key):
         return ''
 
 
+def _git_config_flag(git_config, key):
+    key = key if '.' in key else f'filter.nbstripout.{key}'
+    try:
+        return check_output(git_config + ['--type', 'bool', key], universal_newlines=True).strip() == 'true'
+    except (CalledProcessError, FileNotFoundError):
+        return None
+
+
 def main():
-    parser = ArgumentParser(epilog=__doc__, formatter_class=RawDescriptionHelpFormatter)
+    # Don't handle -h/--help with this parser as the argument list is incomplete
+    parser = ArgumentParser(add_help=False)
+
+    location = parser.add_mutually_exclusive_group()
+    location.add_argument('--global', dest='_global', action='store_true',
+                          help='Use global git config (default is local config)')
+    location.add_argument('--system', dest='_system', action='store_true',
+                          help='Use system git config (default is local config)')
+    location.add_argument('--python', dest='_python', metavar="PATH",
+                          help='Path to python executable to use when --install\'ing '
+                          '(default is deduced from `sys.executable`)')
+
+    # Initial parsing of arguments to determine git config location to use.
+    args, _ = parser.parse_known_args()
+    git_config = ['git', 'config']
+
+    if args._system:
+        git_config.append('--system')
+        install_location = INSTALL_LOCATION_SYSTEM
+    elif args._global:
+        git_config.append('--global')
+        install_location = INSTALL_LOCATION_GLOBAL
+    else:
+        git_config.append('--local')
+        install_location = INSTALL_LOCATION_LOCAL
+
+    # 2nd pass parser, using defaults from git config and inheriting from 1st pass
+    parser = ArgumentParser(epilog=__doc__, formatter_class=RawDescriptionHelpFormatter, parents=[parser])
+
     task = parser.add_mutually_exclusive_group()
     task.add_argument('--dry-run', action='store_true',
+                      default=_git_config_flag(git_config, key='dryRun'),
                       help='Print which notebooks would have been stripped')
     task.add_argument('--install', action='store_true',
                       help='Install nbstripout in the current repository (set '
@@ -379,42 +416,46 @@ def main():
                       'repository and configuration summary if installed')
     task.add_argument('--version', action='store_true',
                       help='Print version')
+
     parser.add_argument('--keep-count', action='store_true',
+                        default=_git_config_flag(git_config, key='keepCount'),
                         help='Do not strip the execution count/prompt number')
     parser.add_argument('--keep-output', action='store_true',
-                        help='Do not strip output', default=None)
+                        default=_git_config_flag(git_config, key='keepOutput'),
+                        help='Do not strip output')
     parser.add_argument('--keep-id', action='store_true',
+                        default=_git_config_flag(git_config, key='keepId'),
                         help='Keep the randomly generated cell ids, '
                         'which will be different after each execution.')
-    parser.add_argument('--extra-keys', default='',
+    parser.add_argument('--extra-keys',
+                        default=_git_config_string(git_config, key='extraKeys'),
                         help='Space separated list of extra keys to strip '
-                        'from metadata, e.g. metadata.foo cell.metadata.bar')
-    parser.add_argument('--keep-metadata-keys', default='',
+                        'from metadata, e.g. "metadata.foo cell.metadata.bar"')
+    parser.add_argument('--keep-metadata-keys',
+                        default=_git_config_string(git_config, key='keepMetadataKeys'),
                         help='Space separated list of metadata keys to keep'
-                        ', e.g. metadata.foo cell.metadata.bar')
+                        ', e.g. "metadata.foo cell.metadata.bar"')
     parser.add_argument('--drop-empty-cells', action='store_true',
+                        default=_git_config_flag(git_config, key='dropEmptyCells'),
                         help='Remove cells where `source` is empty or contains only whitepace')
-    parser.add_argument('--drop-tagged-cells', default='',
+    parser.add_argument('--drop-tagged-cells',
+                        default=_git_config_string(git_config, key='dropTaggedCells'),
                         help='Space separated list of cell-tags that remove an entire cell')
     parser.add_argument('--strip-init-cells', action='store_true',
+                        default=_git_config_flag(git_config, key='stripInitCells'),
                         help='Remove cells with `init_cell: true` metadata (default: False)')
     parser.add_argument('--attributes', metavar='FILEPATH',
                         help='Attributes file to add the filter to (in '
                         'combination with --install/--uninstall), '
                         'defaults to .git/info/attributes')
-    location = parser.add_mutually_exclusive_group()
-    location.add_argument('--global', dest='_global', action='store_true',
-                          help='Use global git config (default is local config)')
-    location.add_argument('--system', dest='_system', action='store_true',
-                          help='Use system git config (default is local config)')
-    location.add_argument('--python', dest='_python', metavar="PATH",
-                          help='Path to python executable to use when --install\'ing '
-                          '(default is deduced from `sys.executable`)')
     parser.add_argument('--force', '-f', action='store_true',
+                        default=_git_config_flag(git_config, key='force'),
                         help='Strip output also from files with non ipynb extension')
     parser.add_argument('--max-size', metavar='SIZE',
-                        help='Keep outputs smaller than SIZE', default='0')
-    parser.add_argument('--mode', '-m', default='jupyter', choices=['jupyter', 'zeppelin'],
+                        default=_git_config_string(git_config, key='maxSize') or '0',
+                        help='Keep outputs smaller than SIZE')
+    parser.add_argument('--mode', '-m', choices=['jupyter', 'zeppelin'],
+                        default=_git_config_string(git_config, key='mode') or 'jupyter',
                         help='Specify mode between [jupyter (default) | zeppelin] (to be used in combination with -f)')
 
     parser.add_argument('--textconv', '-t', action='store_true',
@@ -422,17 +463,6 @@ def main():
 
     parser.add_argument('files', nargs='*', help='Files to strip output from')
     args = parser.parse_args()
-    git_config = ['git', 'config']
-
-    if args._system:
-        git_config.append('--system')
-        install_location = INSTALL_LOCATION_SYSTEM
-    elif args._global:
-        git_config.append('--global')
-        install_location = INSTALL_LOCATION_GLOBAL
-    else:
-        git_config.append('--local')
-        install_location = INSTALL_LOCATION_LOCAL
 
     if args.install:
         raise SystemExit(install(git_config, install_location, python=args._python, attrfile=args.attributes))
@@ -446,6 +476,7 @@ def main():
         print(__version__)
         raise SystemExit(0)
 
+    # Determine additional metadata keys to strip
     extra_keys = [
         'metadata.signature',
         'metadata.widgets',
@@ -456,12 +487,10 @@ def main():
         'cell.metadata.hidden',
         'cell.metadata.scrolled',
     ]
-
-    extra_keys.extend(_git_config_string(git_config, key='extrakeys').split())
     extra_keys.extend(args.extra_keys.split())
 
-    keep_metadata_keys = _git_config_string(git_config, key='keepmetadatakeys').split()
-    keep_metadata_keys.extend(args.keep_metadata_keys.split())
+    keep_metadata_keys = args.keep_metadata_keys.split()
+
     extra_keys = [i for i in extra_keys if i not in keep_metadata_keys]
 
     # Wrap input/output stream in UTF-8 encoded text wrapper
