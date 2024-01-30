@@ -109,7 +109,7 @@ In file ``.gitattributes`` or ``.git/info/attributes`` add: ::
     *.ipynb diff=ipynb
 """
 
-from argparse import ArgumentParser, RawDescriptionHelpFormatter
+from argparse import ArgumentParser, Namespace, RawDescriptionHelpFormatter
 import collections
 import io
 import json
@@ -120,7 +120,7 @@ from subprocess import call, check_call, check_output, CalledProcessError, STDOU
 import sys
 import warnings
 
-from nbstripout._utils import strip_output, strip_zeppelin_output
+from nbstripout._utils import strip_output, strip_zeppelin_output, merge_configuration_file
 try:
     # Jupyter >= 4
     from nbformat import read, write, NO_CONVERT
@@ -351,7 +351,7 @@ def status(git_config, install_location=INSTALL_LOCATION_LOCAL, verbose=False):
         return 1
 
 
-def main():
+def setup_commandline() -> Namespace:
     parser = ArgumentParser(epilog=__doc__, formatter_class=RawDescriptionHelpFormatter)
     task = parser.add_mutually_exclusive_group()
     task.add_argument('--dry-run', action='store_true',
@@ -383,7 +383,7 @@ def main():
                         help='Space separated list of metadata keys to keep'
                         ', e.g. metadata.foo cell.metadata.bar')
     parser.add_argument('--drop-empty-cells', action='store_true',
-                        help='Remove cells where `source` is empty or contains only whitepace')
+                        help='Remove cells where `source` is empty or contains only whitespace')
     parser.add_argument('--drop-tagged-cells', default='',
                         help='Space separated list of cell-tags that remove an entire cell')
     parser.add_argument('--strip-init-cells', action='store_true',
@@ -411,7 +411,14 @@ def main():
                         help='Prints stripped files to STDOUT')
 
     parser.add_argument('files', nargs='*', help='Files to strip output from')
-    args = parser.parse_args()
+
+    return parser
+
+
+def main():
+    parser = setup_commandline()
+    args = merge_configuration_file(parser)
+
     git_config = ['git', 'config']
 
     if args._system:
