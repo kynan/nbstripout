@@ -444,7 +444,7 @@ Once you have `pre-commit`_ installed, add the following to the
 
     repos:
     - repo: https://github.com/kynan/nbstripout
-      rev: 0.6.1
+      rev: 0.6.2
       hooks:
         - id: nbstripout
 

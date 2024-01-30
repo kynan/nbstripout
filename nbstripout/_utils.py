@@ -103,7 +103,7 @@ def strip_output(nb, keep_output, keep_count, keep_id, extra_keys=[], drop_empty
 
     `extra_keys` could be 'metadata.foo cell.metadata.bar metadata.baz'
     """
-    if keep_output is None and 'keep_output' in nb.metadata:
+    if not keep_output and 'keep_output' in nb.metadata:
         keep_output = bool(nb.metadata['keep_output'])
 
     keys = defaultdict(list)
@@ -154,3 +154,12 @@ def strip_output(nb, keep_output, keep_count, keep_id, extra_keys=[], drop_empty
         for field in keys['cell']:
             pop_recursive(cell, field)
     return nb
+
+
+def snake_to_camel_case(string):
+    """Converts snake_case string to camelCase."""
+    if '_' not in string:
+        return string
+    string_parts = string.split('_')
+    camel_parts = [part[0].upper() + part[1:] for part in string_parts[1:] if part != '']
+    return string_parts[0] + ''.join(camel_parts)

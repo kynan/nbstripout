@@ -120,7 +120,7 @@ from subprocess import call, check_call, check_output, CalledProcessError, STDOU
 import sys
 import warnings
 
-from nbstripout._utils import strip_output, strip_zeppelin_output
+from nbstripout._utils import strip_output, strip_zeppelin_output, snake_to_camel_case
 try:
     # Jupyter >= 4
     from nbformat import read, write, NO_CONVERT
@@ -145,7 +145,7 @@ except ImportError:
             return current.write(nb, f, 'json')
 
 __all__ = ["install", "uninstall", "status", "main"]
-__version__ = '0.6.1'
+__version__ = '0.6.2'
 
 
 INSTALL_LOCATION_LOCAL = 'local'
@@ -200,6 +200,21 @@ def _get_attrfile(git_config, install_location=INSTALL_LOCATION_LOCAL, attrfile=
     return attrfile
 
 
+def _get_default_extra_flag(git_config, flag_name):
+    camel_flag_name = snake_to_camel_case(flag_name)
+    try:
+        gitconfig_flag_value = check_output(
+            git_config + [f'filter.nbstripout.{camel_flag_name}'],
+            universal_newlines=True,
+        ).strip()
+    except CalledProcessError:
+        return None
+    if gitconfig_flag_value == 'true':
+        return True
+    elif gitconfig_flag_value == 'false':
+        return False
+
+
 def _parse_size(num_str):
     num_str = num_str.upper()
     if num_str[-1].isdigit():
@@ -214,13 +229,16 @@ def _parse_size(num_str):
         raise ValueError(f"Unknown size identifier {num_str[-1]}")
 
 
-def install(git_config, install_location=INSTALL_LOCATION_LOCAL, python=None, attrfile=None):
+def install(git_config, install_location=INSTALL_LOCATION_LOCAL, python=None, attrfile=None, extra_flags=None):
     """Install the git filter and set the git attributes."""
     try:
         filepath = f'"{PureWindowsPath(python or sys.executable).as_posix()}" -m nbstripout'
         check_call(git_config + ['filter.nbstripout.clean', filepath])
         check_call(git_config + ['filter.nbstripout.smudge', 'cat'])
         check_call(git_config + ['diff.ipynb.textconv', filepath + ' -t'])
+        for flag_name, flag_value in extra_flags.items():
+            camel_flag_name = snake_to_camel_case(flag_name)
+            check_call(git_config + ['--type', 'bool', f'filter.nbstripout.{camel_flag_name}', str(flag_value)])
         attrfile = _get_attrfile(git_config, install_location, attrfile)
     except FileNotFoundError:
         print('Installation failed: git is not on path!', file=sys.stderr)
@@ -265,11 +283,14 @@ def install(git_config, install_location=INSTALL_LOCATION_LOCAL, python=None, at
         return 1
 
 
-def uninstall(git_config, install_location=INSTALL_LOCATION_LOCAL, attrfile=None):
+def uninstall(git_config, install_location=INSTALL_LOCATION_LOCAL, attrfile=None, extra_flags=None):
     """Uninstall the git filter and unset the git attributes."""
     try:
         call(git_config + ['--unset', 'filter.nbstripout.clean'], stdout=open(devnull, 'w'), stderr=STDOUT)
         call(git_config + ['--unset', 'filter.nbstripout.smudge'], stdout=open(devnull, 'w'), stderr=STDOUT)
+        for flag in extra_flags.keys():
+            camel_flag = snake_to_camel_case(flag)
+            call(git_config + ['--unset', f'filter.nbstripout.{camel_flag}'], stdout=open(devnull, 'w'), stderr=STDOUT)
         call(git_config + ['--remove-section', 'diff.ipynb'], stdout=open(devnull, 'w'), stderr=STDOUT)
         attrfile = _get_attrfile(git_config, install_location, attrfile)
     except FileNotFoundError:
@@ -424,10 +445,15 @@ def main():
         git_config.append('--local')
         install_location = INSTALL_LOCATION_LOCAL
 
+    # Extra (bool) flags
+    extra_flags = {}
+    for flag_name in ('keep_count', 'keep_id', 'keep_output'):
+        extra_flags[flag_name] = getattr(args, flag_name) or _get_default_extra_flag(git_config, flag_name) or False
+
     if args.install:
-        raise SystemExit(install(git_config, install_location, python=args._python, attrfile=args.attributes))
+        raise SystemExit(install(git_config, install_location, python=args._python, attrfile=args.attributes, extra_flags=extra_flags))
     if args.uninstall:
-        raise SystemExit(uninstall(git_config, install_location, attrfile=args.attributes))
+        raise SystemExit(uninstall(git_config, install_location, attrfile=args.attributes, extra_flags=extra_flags))
     if args.is_installed:
         raise SystemExit(status(git_config, install_location, verbose=False))
     if args.status:
@@ -489,7 +515,7 @@ def main():
                     warnings.simplefilter("ignore", category=UserWarning)
                     nb = read(f, as_version=NO_CONVERT)
 
-            nb = strip_output(nb, args.keep_output, args.keep_count, args.keep_id, extra_keys, args.drop_empty_cells,
+            nb = strip_output(nb, extra_flags['keep_output'], extra_flags['keep_count'], extra_flags['keep_id'], extra_keys, args.drop_empty_cells,
                               args.drop_tagged_cells.split(), args.strip_init_cells, _parse_size(args.max_size))
 
             if args.dry_run:
@@ -535,7 +561,7 @@ def main():
                 warnings.simplefilter("ignore", category=UserWarning)
                 nb = read(input_stream, as_version=NO_CONVERT)
 
-            nb = strip_output(nb, args.keep_output, args.keep_count, args.keep_id, extra_keys, args.drop_empty_cells,
+            nb = strip_output(nb, extra_flags['keep_output'], extra_flags['keep_count'], extra_flags['keep_id'], extra_keys, args.drop_empty_cells,
                               args.drop_tagged_cells.split(), args.strip_init_cells, _parse_size(args.max_size))
 
             if args.dry_run:
