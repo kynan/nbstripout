@@ -1,6 +1,19 @@
 Change Log
 ==========
 
+0.6.2 - 2024-02-03
+------------------
+
+* Add ``--python`` option for ``nbstripout --install`` to allow overriding the
+  Python interpreter specified in `.git/config` (nobodyinperson@, #181, #182)
+* Add option ``--keep-metadata-keys`` to keep specific metadata keys that are
+  stripped by default (davidxia@, #177, #78)
+* Replace `Cram <https://bitheap.org/cram/>`_ as test runner for integration
+  tests with a custom framework which also supports testing on Windows
+  (arobrien@, #176, #178)
+* Use ``SystemExit`` instead of ``sys.exit`` and do not exit from functions
+  (janosh@, #173)
+
 0.6.1 - 2022-09-24
 ------------------
 
