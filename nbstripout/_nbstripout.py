@@ -145,7 +145,7 @@ except ImportError:
             return current.write(nb, f, 'json')
 
 __all__ = ["install", "uninstall", "status", "main"]
-__version__ = '0.6.1'
+__version__ = '0.6.2'
 
 
 INSTALL_LOCATION_LOCAL = 'local'
