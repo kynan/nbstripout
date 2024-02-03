@@ -350,6 +350,38 @@ def status(git_config, install_location=INSTALL_LOCATION_LOCAL, verbose=False):
 
         return 1
 
+def process_notebook(input_stream, output_stream, args, extra_keys, filename='input from stdin'):
+    try:
+        if args.mode == 'zeppelin':
+            nb = json.load(input_stream, object_pairs_hook=collections.OrderedDict)
+            nb_stripped = strip_zeppelin_output(nb)
+            if args.dry_run:
+                output_stream.write(f'Dry run: would have stripped {filename}\n')
+                return
+            json.dump(nb_stripped, output_stream, indent=2)
+            output_stream.write('\n')
+            output_stream.flush()
+            return
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=UserWarning)
+            nb = read(input_stream, as_version=NO_CONVERT)
+
+        nb = strip_output(nb, args.keep_output, args.keep_count, args.keep_id,
+                          extra_keys, args.drop_empty_cells,
+                          args.drop_tagged_cells.split(), args.strip_init_cells,
+                          _parse_size(args.max_size))
+
+        if args.dry_run:
+            output_stream.write(f'Dry run: would have stripped {filename}\n')
+        else:
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", category=UserWarning)
+                write(nb, output_stream)
+            output_stream.flush()
+    except NotJSONError:
+        print('No valid notebook detected', file=sys.stderr)
+        raise SystemExit(1)
+
 
 def main():
     parser = ArgumentParser(epilog=__doc__, formatter_class=RawDescriptionHelpFormatter)
@@ -474,43 +506,12 @@ def main():
             continue
 
         try:
-            with io.open(filename, 'r', encoding='utf8') as f:
-                if args.mode == 'zeppelin' or filename.endswith('.zpln'):
-                    if args.dry_run:
-                        output_stream.write(f'Dry run: would have stripped {filename}\n')
-                        continue
-                    nb = json.load(f, object_pairs_hook=collections.OrderedDict)
-                    nb_stripped = strip_zeppelin_output(nb)
-
-                    with open(filename, 'w') as f:
-                        json.dump(nb_stripped, f, indent=2)
-                    continue
-                with warnings.catch_warnings():
-                    warnings.simplefilter("ignore", category=UserWarning)
-                    nb = read(f, as_version=NO_CONVERT)
-
-            nb = strip_output(nb, args.keep_output, args.keep_count, args.keep_id, extra_keys, args.drop_empty_cells,
-                              args.drop_tagged_cells.split(), args.strip_init_cells, _parse_size(args.max_size))
-
-            if args.dry_run:
-                output_stream.write(f'Dry run: would have stripped {filename}\n')
-
-                continue
-
-            if args.textconv:
-                with warnings.catch_warnings():
-                    warnings.simplefilter("ignore", category=UserWarning)
-                    write(nb, output_stream)
-
-                output_stream.flush()
-            else:
-                with io.open(filename, 'w', encoding='utf8', newline='') as f:
-                    with warnings.catch_warnings():
-                        warnings.simplefilter("ignore", category=UserWarning)
-                        write(nb, f)
-        except NotJSONError:
-            print(f"'{filename}' is not a valid notebook", file=sys.stderr)
-            raise SystemExit(1)
+            with io.open(filename, 'r', encoding='utf8') as fin:
+                if args.textconv or args.dry_run:
+                    process_notebook(fin, output_stream, args, extra_keys, filename)
+                else:
+                    with io.open(filename, 'w', encoding='utf8', newline='') as fout:
+                        process_notebook(fin, fout, args, extra_keys, filename)
         except FileNotFoundError:
             print(f"Could not strip '{filename}': file not found", file=sys.stderr)
             raise SystemExit(1)
@@ -520,33 +521,4 @@ def main():
             raise
 
     if not args.files and input_stream:
-        try:
-            if args.mode == 'zeppelin':
-                if args.dry_run:
-                    output_stream.write('Dry run: would have stripped input from stdin\n')
-                    raise SystemExit(0)
-                nb = json.load(input_stream, object_pairs_hook=collections.OrderedDict)
-                nb_stripped = strip_zeppelin_output(nb)
-                json.dump(nb_stripped, output_stream, indent=2)
-                output_stream.write('\n')
-                output_stream.flush()
-                raise SystemExit(0)
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore", category=UserWarning)
-                nb = read(input_stream, as_version=NO_CONVERT)
-
-            nb = strip_output(nb, args.keep_output, args.keep_count, args.keep_id, extra_keys, args.drop_empty_cells,
-                              args.drop_tagged_cells.split(), args.strip_init_cells, _parse_size(args.max_size))
-
-            if args.dry_run:
-                output_stream.write('Dry run: would have stripped input from '
-                                    'stdin\n')
-            else:
-                with warnings.catch_warnings():
-                    warnings.simplefilter("ignore", category=UserWarning)
-                    write(nb, output_stream)
-
-                output_stream.flush()
-        except NotJSONError:
-            print('No valid notebook detected', file=sys.stderr)
-            raise SystemExit(1)
+        process_notebook(input_stream, output_stream, args, extra_keys)
