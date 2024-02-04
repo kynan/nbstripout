@@ -8,7 +8,7 @@ install_requires = [
 ]
 
 setup(name='nbstripout',
-      version='0.7.0',
+      version='0.7.1',
 
       author='Florian Rathgeber',
       author_email='florian.rathgeber@gmail.com',
