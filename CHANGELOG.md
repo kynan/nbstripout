@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.7.0 - 2024-02-04
+
+-   Drop support for Python 3.7 (end of life 2023-06-27), require Python 3.8.
+-   Add support for Python 3.12.
+-   Drop backwards compability with IPython.nbformat for IPython <4.
+-   Rename cell ids to be sequential by default. Disable by passing `--keep-id`
+    (@JasonJooste, #184).
+-   Improve documentation for notebook and cell metadata stripping (#187).
+-   Switch from pytest-flake8 to pytest-ruff.
+-   Convert all text assets from rST to Markdown format.
+
 ## 0.6.2 - 2024-02-03
 
 -   Add `--python` option for `nbstripout --install` to allow overriding the
