@@ -423,7 +423,7 @@ to the `.pre-commit-config.yaml` in your repository:
 
     repos:
     - repo: https://github.com/kynan/nbstripout
-      rev: 0.6.2
+      rev: 0.7.0
       hooks:
         - id: nbstripout
 
