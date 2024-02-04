@@ -120,29 +120,9 @@ from subprocess import call, check_call, check_output, CalledProcessError, STDOU
 import sys
 import warnings
 
+import nbformat
+
 from nbstripout._utils import strip_output, strip_zeppelin_output
-try:
-    # Jupyter >= 4
-    from nbformat import read, write, NO_CONVERT
-    from nbformat.reader import NotJSONError
-except ImportError:
-    # IPython 3
-    try:
-        from IPython.nbformat import read, write, NO_CONVERT
-        from IPython.nbformat.reader import NotJSONError
-    except ImportError:
-        # IPython < 3
-        from IPython.nbformat import current
-        from IPython.nbformat.reader import NotJSONError
-
-        # Dummy value, ignored anyway
-        NO_CONVERT = None
-
-        def read(f, as_version):
-            return current.read(f, 'json')
-
-        def write(nb, f):
-            return current.write(nb, f, 'json')
 
 __all__ = ["install", "uninstall", "status", "main"]
 __version__ = '0.6.2'
@@ -364,7 +344,7 @@ def process_notebook(input_stream, output_stream, args, extra_keys, filename='in
             return
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=UserWarning)
-            nb = read(input_stream, as_version=NO_CONVERT)
+            nb = nbformat.read(input_stream, as_version=nbformat.NO_CONVERT)
 
         nb = strip_output(nb, args.keep_output, args.keep_count, args.keep_id,
                           extra_keys, args.drop_empty_cells,
@@ -376,9 +356,9 @@ def process_notebook(input_stream, output_stream, args, extra_keys, filename='in
         else:
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore", category=UserWarning)
-                write(nb, output_stream)
+                nbformat.write(nb, output_stream)
             output_stream.flush()
-    except NotJSONError:
+    except nbformat.reader.NotJSONError:
         print('No valid notebook detected', file=sys.stderr)
         raise SystemExit(1)
 
