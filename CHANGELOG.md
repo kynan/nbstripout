@@ -1,7 +1,12 @@
 # Changelog
 
+## 0.7.1 - 2024-02-04
+
+-   Fix regression where input file was truncated before reading (#190).
+
 ## 0.7.0 - 2024-02-04
 
+-   **This release has been yanked from PyPI due to a major regression (#190).**
 -   Drop support for Python 3.7 (end of life 2023-06-27), require Python 3.8.
 -   Add support for Python 3.12.
 -   Drop backwards compability with IPython.nbformat for IPython <4.
