@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-with open('README.rst') as f:
+with open('README.md') as f:
     long_description = f.read()
 
 install_requires = [
@@ -18,7 +18,7 @@ setup(name='nbstripout',
 
       description='Strips outputs from Jupyter and IPython notebooks',
       long_description=long_description,
-      long_description_content_type='text/x-rst',
+      long_description_content_type='text/markdown',
       packages=find_packages(),
       provides=['nbstripout'],
       entry_points={
