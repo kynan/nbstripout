@@ -31,7 +31,7 @@ def pop_recursive(d, key, default=None):
 
 def _cells(nb, conditionals):
     """Remove cells not satisfying any conditional in conditionals and yield all other cells."""
-    if nb.nbformat < 4:
+    if hasattr(nb, 'nbformat') and nb.nbformat < 4:
         for ws in nb.worksheets:
             for conditional in conditionals:
                 ws.cells = list(filter(conditional, ws.cells))
