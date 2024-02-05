@@ -53,7 +53,7 @@ def nbstripout_exe():
 
 
 @pytest.mark.parametrize("input_file, expected_file, args", TEST_CASES)
-def test_end_to_end_nbstripout(input_file: str, expected_file: str, args: List[str]):
+def test_end_to_end_stdin(input_file: str, expected_file: str, args: List[str]):
     with open(NOTEBOOKS_FOLDER / expected_file, mode="r") as f:
         expected = f.read()
 
@@ -62,6 +62,19 @@ def test_end_to_end_nbstripout(input_file: str, expected_file: str, args: List[s
         output = pc.stdout
 
     assert output == expected
+
+
+@pytest.mark.parametrize("input_file, expected_file, args", TEST_CASES)
+def test_end_to_end_file(input_file: str, expected_file: str, args: List[str], tmp_path):
+    with open(NOTEBOOKS_FOLDER / expected_file, mode="r") as f:
+        expected = f.read()
+
+    p = tmp_path / input_file
+    with open(NOTEBOOKS_FOLDER / input_file, mode="r") as f:
+        p.write_text(f.read())
+    pc = run([nbstripout_exe(), p] + args, stdout=PIPE, universal_newlines=True)
+
+    assert not pc.stdout and p.read_text() == expected
 
 
 @pytest.mark.parametrize("input_file, extra_args", DRY_RUN_CASES)
