@@ -17,6 +17,7 @@ TEST_CASES = [
     ("test_execution_timing.ipynb", "test_execution_timing.ipynb.expected", []),
     ("test_max_size.ipynb", "test_max_size.ipynb.expected", ["--max-size", "50", "--keep-id"]),
     ("test_max_size.ipynb", "test_max_size.ipynb.expected_sequential_id", ["--max-size", "50"]),
+    ("test_empty_metadata.ipynb", "test_empty_metadata.ipynb.expected", []),
     ("test_metadata.ipynb", "test_metadata.ipynb.expected", []),
     ("test_metadata.ipynb", "test_metadata_extra_keys.ipynb.expected", ["--extra-keys", "metadata.kernelspec metadata.language_info"]),
     ("test_metadata.ipynb", "test_metadata_keep_count.ipynb.expected", ["--keep-count"]),
