@@ -43,7 +43,8 @@ DRY_RUN_CASES = [
 
 ERR_OUTPUT_CASES = [
     ("test_metadata.ipynb", ["Ignoring invalid extra key `invalid`", "Ignoring invalid extra key `foo.invalid`"], ["--extra-keys", "invalid foo.invalid"]),
-    ("test_metadata_exception.ipynb", [re.compile(".*MetadataError: cell metadata contradicts tags: `keep_output` is false, but `keep_output` in tags")], [])
+    ("test_metadata_exception.ipynb", [re.compile(".*MetadataError: cell metadata contradicts tags: `keep_output` is false, but `keep_output` in tags")], []),
+    ("test_invalid_json.ipynb", ["No valid notebook detected on stdin"], []),
 ]
 
 
