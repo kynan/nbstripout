@@ -354,6 +354,9 @@ def status(git_config, install_location=INSTALL_LOCATION_LOCAL, verbose=False):
 def main():
     parser = ArgumentParser(epilog=__doc__, formatter_class=RawDescriptionHelpFormatter)
     task = parser.add_mutually_exclusive_group()
+    task.add_argument('--verify', action='store_true',
+                      help='Print which notebooks would have been stripped, '
+                      'Like dry-run but returns an error if a file would have been changed')
     task.add_argument('--dry-run', action='store_true',
                       help='Print which notebooks would have been stripped')
     task.add_argument('--install', action='store_true',
@@ -469,6 +472,7 @@ def main():
     input_stream = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8') if sys.stdin else None
     output_stream = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', newline='')
 
+    to_change_files = []
     for filename in args.files:
         if not (args.force or filename.endswith('.ipynb') or filename.endswith('.zpln')):
             continue
@@ -480,10 +484,17 @@ def main():
                         output_stream.write(f'Dry run: would have stripped {filename}\n')
                         continue
                     nb = json.load(f, object_pairs_hook=collections.OrderedDict)
+                    pre_hash = hash(json.dumps(nb))
                     nb_stripped = strip_zeppelin_output(nb)
 
-                    with open(filename, 'w') as f:
-                        json.dump(nb_stripped, f, indent=2)
+                    if not args.verify:
+                        with open(filename, 'w') as f:
+                            json.dump(nb_stripped, f, indent=2)
+                    else:
+                        post_hash = hash(json.dumps(nb_stripped))
+
+                        if pre_hash != post_hash:
+                            to_change_files.append(filename)
                     continue
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore", category=UserWarning)
@@ -491,10 +502,10 @@ def main():
 
             nb = strip_output(nb, args.keep_output, args.keep_count, args.keep_id, extra_keys, args.drop_empty_cells,
                               args.drop_tagged_cells.split(), args.strip_init_cells, _parse_size(args.max_size))
+            post_hash = hash(json.dumps(nb))
 
             if args.dry_run:
                 output_stream.write(f'Dry run: would have stripped {filename}\n')
-
                 continue
 
             if args.textconv:
@@ -504,10 +515,15 @@ def main():
 
                 output_stream.flush()
             else:
-                with io.open(filename, 'w', encoding='utf8', newline='') as f:
-                    with warnings.catch_warnings():
-                        warnings.simplefilter("ignore", category=UserWarning)
-                        write(nb, f)
+                if args.verify:
+                    if pre_hash != post_hash:
+                        output_stream.write(f'Verify: would have stripped {filename}\n')
+                        to_change_files.append(filename)
+                else:
+                    with io.open(filename, 'w', encoding='utf8', newline='') as f:
+                        with warnings.catch_warnings():
+                            warnings.simplefilter("ignore", category=UserWarning)
+                            write(nb, f)
         except NotJSONError:
             print(f"'{filename}' is not a valid notebook", file=sys.stderr)
             raise SystemExit(1)
@@ -519,28 +535,53 @@ def main():
             print(f"Could not strip '{filename}'", file=sys.stderr)
             raise
 
+    if to_change_files:
+        raise SystemExit(1)
+
     if not args.files and input_stream:
         try:
             if args.mode == 'zeppelin':
                 if args.dry_run:
                     output_stream.write('Dry run: would have stripped input from stdin\n')
                     raise SystemExit(0)
+
                 nb = json.load(input_stream, object_pairs_hook=collections.OrderedDict)
                 nb_stripped = strip_zeppelin_output(nb)
+
+                if args.verify:
+                    pre_hash = hash(json.dumps(nb))
+                    post_hash = hash(json.dumps(nb_stripped))
+                    if pre_hash != post_hash:
+                        output_stream.write('Verify: would have stripped input from stdin\n')
+                        raise SystemExit(1)
+                    else:
+                        raise SystemExit(0)
+                    
                 json.dump(nb_stripped, output_stream, indent=2)
                 output_stream.write('\n')
                 output_stream.flush()
                 raise SystemExit(0)
+
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore", category=UserWarning)
                 nb = read(input_stream, as_version=NO_CONVERT)
+                pre_hash = hash(json.dumps(nb))
 
             nb = strip_output(nb, args.keep_output, args.keep_count, args.keep_id, extra_keys, args.drop_empty_cells,
                               args.drop_tagged_cells.split(), args.strip_init_cells, _parse_size(args.max_size))
+            post_hash = hash(json.dumps(nb))
 
             if args.dry_run:
                 output_stream.write('Dry run: would have stripped input from '
                                     'stdin\n')
+            elif args.verify:
+                if pre_hash != post_hash:
+                    output_stream.write(
+                        'Verify: would have stripped input from stdin\n'
+                    )
+                    raise SystemExit(1)
+
+                output_stream.flush()
             else:
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore", category=UserWarning)
