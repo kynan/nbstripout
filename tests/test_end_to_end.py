@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 import re
+import json
 from subprocess import run, PIPE
 # Note: typing.Pattern is deprecated, for removal in 3.13 in favour of re.Pattern introduced in 3.8
 from typing import List, Union, Pattern
@@ -53,49 +54,100 @@ def nbstripout_exe():
 
 
 @pytest.mark.parametrize("input_file, expected_file, args", TEST_CASES)
-def test_end_to_end_stdin(input_file: str, expected_file: str, args: List[str]):
+@pytest.mark.parametrize("verify", (True, False))
+def test_end_to_end_stdin(input_file: str, expected_file: str, args: List[str], verify: bool):
     with open(NOTEBOOKS_FOLDER / expected_file, mode="r") as f:
         expected = f.read()
+        expected_str = json.dumps(json.loads(expected), indent=2)
 
     with open(NOTEBOOKS_FOLDER / input_file, mode="r") as f:
-        pc = run([nbstripout_exe()] + args, stdin=f, stdout=PIPE, universal_newlines=True)
+        input_str = json.dumps(json.loads(f.read()), indent=2)
+
+    with open(NOTEBOOKS_FOLDER / input_file, mode="r") as f:
+        args = [nbstripout_exe()] + args
+        if verify:
+            args.append("--verify")
+        pc = run(args, stdin=f, stdout=PIPE, universal_newlines=True)
         output = pc.stdout
 
-    assert output == expected
+    if verify:
+        # When using stin, the dry flag is disregarded.
+        if input_str != expected_str:
+            assert pc.returncode == 1
+        else:
+            assert pc.returncode == 0
+    else:
+        assert output == expected
+        assert pc.returncode == 0
 
 
 @pytest.mark.parametrize("input_file, expected_file, args", TEST_CASES)
-def test_end_to_end_file(input_file: str, expected_file: str, args: List[str], tmp_path):
+@pytest.mark.parametrize("verify", (True, False))
+def test_end_to_end_file(input_file: str, expected_file: str, args: List[str], tmp_path, verify: bool):
     with open(NOTEBOOKS_FOLDER / expected_file, mode="r") as f:
         expected = f.read()
+        expected_str = json.dumps(json.loads(expected), indent=2)
 
     p = tmp_path / input_file
     with open(NOTEBOOKS_FOLDER / input_file, mode="r") as f:
         p.write_text(f.read())
-    pc = run([nbstripout_exe(), p] + args, stdout=PIPE, universal_newlines=True)
 
-    assert not pc.stdout and p.read_text() == expected
+    with open(NOTEBOOKS_FOLDER / input_file, mode="r") as f:
+        input_str = json.dumps(json.loads(f.read()), indent=2)
+
+    args = [nbstripout_exe(), p] + args
+    if verify:
+        args.append("--verify")
+    pc = run(args, stdout=PIPE, universal_newlines=True)
+
+    output = pc.stdout.strip()
+    if verify:
+        if expected_str != input_str.strip():
+            assert pc.returncode == 1
+
+        # Since verify implies --dry-run, we make sure the file is not modified
+        # In other words, that the output == input, INSTEAD of output == expected
+        output.strip() == input_str.strip()
+    else:
+        output_file_str = json.dumps(json.loads(p.read_text()), indent=2)
+        assert pc.returncode == 0
+        assert output_file_str == expected_str
 
 
 @pytest.mark.parametrize("input_file, extra_args", DRY_RUN_CASES)
-def test_dry_run_stdin(input_file: str, extra_args: List[str]):
+@pytest.mark.parametrize("verify", (True, False))
+def test_dry_run_stdin(input_file: str, extra_args: List[str], verify: bool):
     expected = "Dry run: would have stripped input from stdin\n"
 
     with open(NOTEBOOKS_FOLDER / input_file, mode="r") as f:
-        pc = run([nbstripout_exe(), "--dry-run"] + extra_args, stdin=f, stdout=PIPE, universal_newlines=True)
+        args = [nbstripout_exe(), "--dry-run"] + extra_args
+        if verify:
+            args.append("--verify")
+        pc = run(args, stdin=f, stdout=PIPE, universal_newlines=True)
         output = pc.stdout
+        exit_code = pc.returncode
 
     assert output == expected
+    if verify:
+        assert exit_code == 1
+    else:
+        assert exit_code == 0
 
 
 @pytest.mark.parametrize("input_file, extra_args", DRY_RUN_CASES)
-def test_dry_run_args(input_file: str, extra_args: List[str]):
+@pytest.mark.parametrize("verify", (True, False))
+def test_dry_run_args(input_file: str, extra_args: List[str], verify: bool):
     expected_regex = re.compile(f"Dry run: would have stripped .*[/\\\\]{input_file}\n")
-
-    pc = run([nbstripout_exe(), str(NOTEBOOKS_FOLDER / input_file), "--dry-run", ] + extra_args, stdout=PIPE, universal_newlines=True)
+    args = [nbstripout_exe(), str(NOTEBOOKS_FOLDER / input_file), "--dry-run", ] + extra_args
+    if verify:
+        args.append("--verify")
+    pc = run(args, stdout=PIPE, universal_newlines=True)
     output = pc.stdout
+    exit_code = pc.returncode
 
     assert expected_regex.match(output)
+    if verify:
+        assert exit_code == 1
 
 
 @pytest.mark.parametrize("input_file, expected_errs, extra_args", ERR_OUTPUT_CASES)
