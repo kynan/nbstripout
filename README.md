@@ -204,7 +204,7 @@ from existing notebooks. This invocation operates on all ipynb files in the repo
     #!/usr/bin/env bash
     # get lint-history with callback from https://github.com/newren/git-filter-repo/pull/542
     ./lint-history.py --relevant 'return filename.endswith(b".ipynb")' --callback '
-    import json,warnings,nbformat
+    import json, warnings, nbformat
     from nbstripout import strip_output
     from nbformat.reader import NotJSONError
     try:
