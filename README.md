@@ -213,7 +213,7 @@ from existing notebooks. This invocation operates on all ipynb files in the repo
             notebook = nbformat.reads(blob.data, as_version=nbformat.NO_CONVERT)
         # customize to your needs
         strip_output(notebook, keep_output=False, keep_count=False, keep_id=False, extra_keys=["metadata.widgets","metadata.execution","cell.attachments"], drop_empty_cells=True,  drop_tagged_cells=[],strip_init_cells=False, max_size=0)
-        old_len=len(blob.data)
+        old_len = len(blob.data)
         blob.data = (nbformat.writes(notebook) + "\n").encode("utf-8")
         if old_len!=len(blob.data):
             print(change.blob_id,change.filename,old_len,len(blob.data))
