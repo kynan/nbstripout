@@ -197,8 +197,8 @@ Note that you need to uninstall with the same flags:
 ### Apply retroactively
 
 `nbstripout` can be used to rewrite an existing Git repository using
-`git filter-repo` to strip output from existing notebooks. This invocation
-operates on all ipynb-files in the repo: :
+[`git filter-repo`](https://github.com/newren/git-filter-repo) to strip output
+from existing notebooks. This invocation operates on all ipynb files in the repo:
 
 ```sh
     #!/usr/bin/env bash
