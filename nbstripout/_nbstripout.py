@@ -508,8 +508,8 @@ def main():
         try:
             with io.open(filename, 'r+', encoding='utf8', newline='') as f:
                 out = output_stream if args.textconv or args.dry_run else f
-                any_local_change = process_notebook(f, out, args, extra_keys, filename)
-                any_change = any_change or any_local_change
+                if process_notebook(f, out, args, extra_keys, filename):
+                    any_change = True
 
         except nbformat.reader.NotJSONError:
             print(f"No valid notebook detected in '{filename}'", file=sys.stderr)
