@@ -396,7 +396,7 @@ def main():
     task.add_argument('--version', action='store_true',
                       help='Print version')
     parser.add_argument("--verify", action="store_true",
-                      help="Return a non-zero exit code if any files were changed, Implies --dry-run")
+                        help="Return a non-zero exit code if any files were changed, Implies --dry-run")
     parser.add_argument('--keep-count', action='store_true',
                         help='Do not strip the execution count/prompt number')
     parser.add_argument('--keep-output', action='store_true',
