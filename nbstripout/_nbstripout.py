@@ -442,10 +442,8 @@ def main():
     args = parser.parse_args()
     git_config = ['git', 'config']
 
-    if args.verify:
-        if not args.dry_run:
-            print("Running in verify mode, setting --dry-run")
-            args.dry_run = True
+    if args.verify and not args.dry_run:
+        args.dry_run = True
 
     if args._system:
         git_config.append('--system')
