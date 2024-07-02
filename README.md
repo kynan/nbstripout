@@ -74,6 +74,25 @@ or
 
     nbstripout -t FILE.ipynb | other-command
 
+Do a dry run and only list which files would have been stripped:
+
+    nbstripout --dry-run FILE.ipynb [FILE2.ipynb ...]
+
+Operate on all `.ipynb` files in the current directory and subdirectories
+recursively:
+
+    find . -name '*.ipynb' -exec nbstripout {} +
+
+Print the version:
+
+    nbstripout --version
+
+Show help and usage instructions:
+
+    nbstripout --help
+
+### Using as a Git filter
+
 Set up the git filter and attributes as described in the manual installation
 instructions below:
 
@@ -131,18 +150,6 @@ configuration summary of filter and attributes if installed (exits with code 0
 if installed, 1 otherwise):
 
     nbstripout --status
-
-Do a dry run and only list which files would have been stripped:
-
-    nbstripout --dry-run FILE.ipynb [FILE2.ipynb ...]
-
-Print the version:
-
-    nbstripout --version
-
-Show help and usage instructions:
-
-    nbstripout --help
 
 ### Configuration files
 
