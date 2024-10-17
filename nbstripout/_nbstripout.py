@@ -111,6 +111,7 @@ In file ``.gitattributes`` or ``.git/info/attributes`` add: ::
 
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import collections
+import copy
 import io
 import json
 from os import devnull, environ, makedirs, path
@@ -334,11 +335,9 @@ def process_notebook(input_stream, output_stream, args, extra_keys, filename='in
     any_change = False
     if args.mode == 'zeppelin':
         nb = json.load(input_stream, object_pairs_hook=collections.OrderedDict)
-        nb_str_orig = json.dumps(nb, indent=2)
+        nb_orig = copy.deepcopy(nb)
         nb_stripped = strip_zeppelin_output(nb)
-
-        nb_str_stripped = json.dumps(nb_stripped, indent=2)
-        if nb_str_orig != nb_str_stripped:
+        if nb_orig != nb_stripped:
             any_change = True
 
         if args.dry_run:
@@ -356,13 +355,13 @@ def process_notebook(input_stream, output_stream, args, extra_keys, filename='in
         warnings.simplefilter("ignore", category=UserWarning)
         nb = nbformat.read(input_stream, as_version=nbformat.NO_CONVERT)
 
-    nb_start_str = json.dumps(nb, indent=2)
+    nb_start = copy.deepcopy(nb)
     nb = strip_output(nb, args.keep_output, args.keep_count, args.keep_id,
                         extra_keys, args.drop_empty_cells,
                         args.drop_tagged_cells.split(), args.strip_init_cells,
                         _parse_size(args.max_size))
-    nb_end_str = json.dumps(nb, indent=2)
-    if nb_start_str != nb_end_str:
+    nb_end = copy.deepcopy(nb)
+    if nb_start != nb_end:
         any_change = True
 
     if args.dry_run:
@@ -524,8 +523,8 @@ def main():
 
     if not args.files and input_stream:
         try:
-            any_local_change = process_notebook(input_stream, output_stream, args, extra_keys)
-            any_change = any_change or any_local_change
+            if process_notebook(input_stream, output_stream, args, extra_keys):
+                any_change = True
         except nbformat.reader.NotJSONError:
             print('No valid notebook detected on stdin', file=sys.stderr)
             raise SystemExit(1)
