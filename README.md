@@ -74,6 +74,25 @@ or
 
     nbstripout -t FILE.ipynb | other-command
 
+Do a dry run and only list which files would have been stripped:
+
+    nbstripout --dry-run FILE.ipynb [FILE2.ipynb ...]
+
+Operate on all `.ipynb` files in the current directory and subdirectories
+recursively:
+
+    find . -name '*.ipynb' -exec nbstripout {} +
+
+Print the version:
+
+    nbstripout --version
+
+Show help and usage instructions:
+
+    nbstripout --help
+
+### Using as a Git filter
+
 Set up the git filter and attributes as described in the manual installation
 instructions below:
 
@@ -132,18 +151,6 @@ if installed, 1 otherwise):
 
     nbstripout --status
 
-Do a dry run and only list which files would have been stripped:
-
-    nbstripout --dry-run FILE.ipynb [FILE2.ipynb ...]
-
-Print the version:
-
-    nbstripout --version
-
-Show help and usage instructions:
-
-    nbstripout --help
-
 ### Configuration files
 
 The following table shows in which files the `nbstripout` filter and attribute
@@ -197,23 +204,30 @@ Note that you need to uninstall with the same flags:
 ### Apply retroactively
 
 `nbstripout` can be used to rewrite an existing Git repository using
-`git filter-branch` to strip output from existing notebooks. This invocation
-uses `--index-filter` and operates on all ipynb-files in the repo: :
+[`git filter-repo`](https://github.com/newren/git-filter-repo) to strip output
+from existing notebooks. This invocation operates on all ipynb files in the repo:
 
-    git filter-branch -f --index-filter '
-        git checkout -- :*.ipynb
-        find . -name "*.ipynb" -exec nbstripout "{}" +
-        git add . --ignore-removal
+```sh
+    #!/usr/bin/env bash
+    # get lint-history with callback from https://github.com/newren/git-filter-repo/pull/542
+    ./lint-history.py --relevant 'return filename.endswith(b".ipynb")' --callback '
+    import json, warnings, nbformat
+    from nbstripout import strip_output
+    from nbformat.reader import NotJSONError
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=UserWarning)
+            notebook = nbformat.reads(blob.data, as_version=nbformat.NO_CONVERT)
+        # customize to your needs
+        strip_output(notebook, keep_output=False, keep_count=False, keep_id=False, extra_keys=["metadata.widgets","metadata.execution","cell.attachments"], drop_empty_cells=True,  drop_tagged_cells=[],strip_init_cells=False, max_size=0)
+        old_len = len(blob.data)
+        blob.data = (nbformat.writes(notebook) + "\n").encode("utf-8")
+        if old_len != len(blob.data):
+            print(change.blob_id, change.filename, old_len, len(blob.data))
+    except NotJSONError as e:
+         print("ERROR", type(e), change.blob_id, change.filename)
     '
-
-If the repository is large and the notebooks are in a subdirectory it will run
-faster with `git checkout -- :<subdir>/*.ipynb`. You will get a warning for
-commits that do not contain any notebooks, which can be suppressed by piping
-stderr to `/dev/null`.
-
-This is a potentially slower but simpler invocation using `--tree-filter`:
-
-    git filter-branch -f --tree-filter 'find . -name "*.ipynb" -exec nbstripout "{}" +'
+```
 
 ### Removing empty cells
 
