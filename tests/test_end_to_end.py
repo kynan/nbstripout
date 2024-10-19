@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 import re
-import json
 from subprocess import run, PIPE
 # Note: typing.Pattern is deprecated, for removal in 3.13 in favour of re.Pattern introduced in 3.8
 from typing import List, Union, Pattern
@@ -58,10 +57,9 @@ def nbstripout_exe():
 def test_end_to_end_stdin(input_file: str, expected_file: str, args: List[str], verify: bool):
     with open(NOTEBOOKS_FOLDER / expected_file, mode="r") as f:
         expected = f.read()
-        expected_str = json.dumps(json.loads(expected), indent=2)
 
     with open(NOTEBOOKS_FOLDER / input_file, mode="r") as f:
-        input_str = json.dumps(json.loads(f.read()), indent=2)
+        input_ = f.read()
 
     with open(NOTEBOOKS_FOLDER / input_file, mode="r") as f:
         args = [nbstripout_exe()] + args
@@ -71,8 +69,8 @@ def test_end_to_end_stdin(input_file: str, expected_file: str, args: List[str], 
         output = pc.stdout
 
     if verify:
-        # When using stin, the dry flag is disregarded.
-        if input_str != expected_str:
+        # When using stin, the dry run flag is disregarded.
+        if input_ != expected:
             assert pc.returncode == 1
         else:
             assert pc.returncode == 0
@@ -86,14 +84,13 @@ def test_end_to_end_stdin(input_file: str, expected_file: str, args: List[str], 
 def test_end_to_end_file(input_file: str, expected_file: str, args: List[str], tmp_path, verify: bool):
     with open(NOTEBOOKS_FOLDER / expected_file, mode="r") as f:
         expected = f.read()
-        expected_str = json.dumps(json.loads(expected), indent=2)
 
     p = tmp_path / input_file
     with open(NOTEBOOKS_FOLDER / input_file, mode="r") as f:
         p.write_text(f.read())
 
     with open(NOTEBOOKS_FOLDER / input_file, mode="r") as f:
-        input_str = json.dumps(json.loads(f.read()), indent=2)
+        input_ = f.read()
 
     args = [nbstripout_exe(), p] + args
     if verify:
@@ -102,16 +99,16 @@ def test_end_to_end_file(input_file: str, expected_file: str, args: List[str], t
 
     output = pc.stdout.strip()
     if verify:
-        if expected_str != input_str.strip():
+        if expected != input_:
             assert pc.returncode == 1
 
         # Since verify implies --dry-run, we make sure the file is not modified
         # In other words, that the output == input, INSTEAD of output == expected
-        output.strip() == input_str.strip()
+        output == input_
     else:
-        output_file_str = json.dumps(json.loads(p.read_text()), indent=2)
+        output = p.read_text()
         assert pc.returncode == 0
-        assert output_file_str == expected_str
+        assert output == expected
 
 
 @pytest.mark.parametrize("input_file, extra_args", DRY_RUN_CASES)

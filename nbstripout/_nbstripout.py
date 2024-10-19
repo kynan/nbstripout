@@ -355,13 +355,13 @@ def process_notebook(input_stream, output_stream, args, extra_keys, filename='in
         warnings.simplefilter("ignore", category=UserWarning)
         nb = nbformat.read(input_stream, as_version=nbformat.NO_CONVERT)
 
-    nb_start = copy.deepcopy(nb)
+    nb_orig = copy.deepcopy(nb)
     nb = strip_output(nb, args.keep_output, args.keep_count, args.keep_id,
                         extra_keys, args.drop_empty_cells,
                         args.drop_tagged_cells.split(), args.strip_init_cells,
                         _parse_size(args.max_size))
-    nb_end = copy.deepcopy(nb)
-    if nb_start != nb_end:
+
+    if nb_orig != nb:
         any_change = True
 
     if args.dry_run:
