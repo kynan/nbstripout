@@ -138,11 +138,10 @@ def test_dry_run_args(input_file: str, extra_args: List[str], verify: bool):
         args.append("--verify")
     pc = run(args, stdout=PIPE, universal_newlines=True)
     output = pc.stdout
-    exit_code = pc.returncode
 
     assert expected_regex.match(output)
     if verify:
-        assert exit_code == 1
+        assert pc.returncode == 1
 
 
 @pytest.mark.parametrize("input_file, expected_errs, extra_args", ERR_OUTPUT_CASES)
