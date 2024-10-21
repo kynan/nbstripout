@@ -122,13 +122,12 @@ def test_dry_run_stdin(input_file: str, extra_args: List[str], verify: bool):
             args.append("--verify")
         pc = run(args, stdin=f, stdout=PIPE, universal_newlines=True)
         output = pc.stdout
-        exit_code = pc.returncode
 
     assert output == expected
     if verify:
-        assert exit_code == 1
+        assert pc.returncode == 1
     else:
-        assert exit_code == 0
+        assert pc.returncode == 0
 
 
 @pytest.mark.parametrize("input_file, extra_args", DRY_RUN_CASES)
