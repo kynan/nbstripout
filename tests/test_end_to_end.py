@@ -106,9 +106,8 @@ def test_end_to_end_file(input_file: str, expected_file: str, args: List[str], t
         # In other words, that the output == input, INSTEAD of output == expected
         output == input_
     else:
-        output = p.read_text()
         assert pc.returncode == 0
-        assert output == expected
+        assert not pc.stdout and p.read_text() == expected
 
 
 @pytest.mark.parametrize("input_file, extra_args", DRY_RUN_CASES)
