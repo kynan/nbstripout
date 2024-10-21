@@ -104,7 +104,7 @@ def test_end_to_end_file(input_file: str, expected_file: str, args: List[str], t
 
         # Since verify implies --dry-run, we make sure the file is not modified
         # In other words, that the output == input, INSTEAD of output == expected
-        output == input_
+        assert output == input_
     else:
         assert pc.returncode == 0
         assert not pc.stdout and p.read_text() == expected
