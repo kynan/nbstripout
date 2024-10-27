@@ -70,10 +70,7 @@ def test_end_to_end_stdin(input_file: str, expected_file: str, args: List[str], 
 
     if verify:
         # When using stin, the dry run flag is disregarded.
-        if input_ != expected:
-            assert pc.returncode == 1
-        else:
-            assert pc.returncode == 0
+        assert pc.returncode == 1 if input_ != expected else 0
     else:
         assert output == expected
         assert pc.returncode == 0
