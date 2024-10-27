@@ -120,10 +120,7 @@ def test_dry_run_stdin(input_file: str, extra_args: List[str], verify: bool):
         output = pc.stdout
 
     assert output == expected
-    if verify:
-        assert pc.returncode == 1
-    else:
-        assert pc.returncode == 0
+    assert pc.returncode == 1 if verify else 0
 
 
 @pytest.mark.parametrize("input_file, extra_args", DRY_RUN_CASES)
