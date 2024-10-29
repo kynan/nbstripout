@@ -70,7 +70,7 @@ def test_end_to_end_stdin(input_file: str, expected_file: str, args: List[str], 
 
     if verify:
         # When using stin, the dry run flag is disregarded.
-        assert pc.returncode == 1 if input_ != expected else 0
+        assert pc.returncode == (1 if input_ != expected else 0)
     else:
         assert output == expected
         assert pc.returncode == 0
@@ -97,11 +97,14 @@ def test_end_to_end_file(input_file: str, expected_file: str, args: List[str], t
     output = pc.stdout.strip()
     if verify:
         if expected != input_:
+            assert "Dry run: would have stripped" in output
             assert pc.returncode == 1
 
         # Since verify implies --dry-run, we make sure the file is not modified
-        # In other words, that the output == input, INSTEAD of output == expected
-        assert output == input_
+        with open(NOTEBOOKS_FOLDER / input_file, mode="r") as f:
+            output_ = f.read()
+
+        assert output_ == input_
     else:
         assert pc.returncode == 0
         assert not pc.stdout and p.read_text() == expected
@@ -120,7 +123,7 @@ def test_dry_run_stdin(input_file: str, extra_args: List[str], verify: bool):
         output = pc.stdout
 
     assert output == expected
-    assert pc.returncode == 1 if verify else 0
+    assert pc.returncode == (1 if verify else 0)
 
 
 @pytest.mark.parametrize("input_file, extra_args", DRY_RUN_CASES)
