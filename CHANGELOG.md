@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.8.0 - 2024-11-03
+
+-   Adds `--verify` flag, similar to `--dry-run` but returning 1 if any
+    affected files would have changed (@jspaezp, #153, #195).
+-   Adds script to apply `nbstripout` retroactively using `git-filter-repo` to
+    README (@LunarLanding @tokleine, #194 #197).
+-   Documents nbstripout on all files in the current directory and
+    subdirectories recursively (#127).
+-   Accepts notebooks without `nbformat` version specified.
+-   Improves test coverage.
+
 ## 0.7.1 - 2024-02-04
 
 -   Fix regression where input file was truncated before reading (#190).
