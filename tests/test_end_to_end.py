@@ -53,49 +53,92 @@ def nbstripout_exe():
 
 
 @pytest.mark.parametrize("input_file, expected_file, args", TEST_CASES)
-def test_end_to_end_stdin(input_file: str, expected_file: str, args: List[str]):
+@pytest.mark.parametrize("verify", (True, False))
+def test_end_to_end_stdin(input_file: str, expected_file: str, args: List[str], verify: bool):
     with open(NOTEBOOKS_FOLDER / expected_file, mode="r") as f:
         expected = f.read()
 
     with open(NOTEBOOKS_FOLDER / input_file, mode="r") as f:
-        pc = run([nbstripout_exe()] + args, stdin=f, stdout=PIPE, universal_newlines=True)
+        input_ = f.read()
+
+    with open(NOTEBOOKS_FOLDER / input_file, mode="r") as f:
+        args = [nbstripout_exe()] + args
+        if verify:
+            args.append("--verify")
+        pc = run(args, stdin=f, stdout=PIPE, universal_newlines=True)
         output = pc.stdout
 
-    assert output == expected
+    if verify:
+        # When using stin, the dry run flag is disregarded.
+        assert pc.returncode == (1 if input_ != expected else 0)
+    else:
+        assert output == expected
+        assert pc.returncode == 0
 
 
 @pytest.mark.parametrize("input_file, expected_file, args", TEST_CASES)
-def test_end_to_end_file(input_file: str, expected_file: str, args: List[str], tmp_path):
+@pytest.mark.parametrize("verify", (True, False))
+def test_end_to_end_file(input_file: str, expected_file: str, args: List[str], tmp_path, verify: bool):
     with open(NOTEBOOKS_FOLDER / expected_file, mode="r") as f:
         expected = f.read()
 
     p = tmp_path / input_file
     with open(NOTEBOOKS_FOLDER / input_file, mode="r") as f:
         p.write_text(f.read())
-    pc = run([nbstripout_exe(), p] + args, stdout=PIPE, universal_newlines=True)
 
-    assert not pc.stdout and p.read_text() == expected
+    with open(NOTEBOOKS_FOLDER / input_file, mode="r") as f:
+        input_ = f.read()
+
+    args = [nbstripout_exe(), p] + args
+    if verify:
+        args.append("--verify")
+    pc = run(args, stdout=PIPE, universal_newlines=True)
+
+    output = pc.stdout.strip()
+    if verify:
+        if expected != input_:
+            assert "Dry run: would have stripped" in output
+            assert pc.returncode == 1
+
+        # Since verify implies --dry-run, we make sure the file is not modified
+        with open(NOTEBOOKS_FOLDER / input_file, mode="r") as f:
+            output_ = f.read()
+
+        assert output_ == input_
+    else:
+        assert pc.returncode == 0
+        assert not pc.stdout and p.read_text() == expected
 
 
 @pytest.mark.parametrize("input_file, extra_args", DRY_RUN_CASES)
-def test_dry_run_stdin(input_file: str, extra_args: List[str]):
+@pytest.mark.parametrize("verify", (True, False))
+def test_dry_run_stdin(input_file: str, extra_args: List[str], verify: bool):
     expected = "Dry run: would have stripped input from stdin\n"
 
     with open(NOTEBOOKS_FOLDER / input_file, mode="r") as f:
-        pc = run([nbstripout_exe(), "--dry-run"] + extra_args, stdin=f, stdout=PIPE, universal_newlines=True)
+        args = [nbstripout_exe(), "--dry-run"] + extra_args
+        if verify:
+            args.append("--verify")
+        pc = run(args, stdin=f, stdout=PIPE, universal_newlines=True)
         output = pc.stdout
 
     assert output == expected
+    assert pc.returncode == (1 if verify else 0)
 
 
 @pytest.mark.parametrize("input_file, extra_args", DRY_RUN_CASES)
-def test_dry_run_args(input_file: str, extra_args: List[str]):
+@pytest.mark.parametrize("verify", (True, False))
+def test_dry_run_args(input_file: str, extra_args: List[str], verify: bool):
     expected_regex = re.compile(f"Dry run: would have stripped .*[/\\\\]{input_file}\n")
-
-    pc = run([nbstripout_exe(), str(NOTEBOOKS_FOLDER / input_file), "--dry-run", ] + extra_args, stdout=PIPE, universal_newlines=True)
+    args = [nbstripout_exe(), str(NOTEBOOKS_FOLDER / input_file), "--dry-run", ] + extra_args
+    if verify:
+        args.append("--verify")
+    pc = run(args, stdout=PIPE, universal_newlines=True)
     output = pc.stdout
 
     assert expected_regex.match(output)
+    if verify:
+        assert pc.returncode == 1
 
 
 @pytest.mark.parametrize("input_file, expected_errs, extra_args", ERR_OUTPUT_CASES)

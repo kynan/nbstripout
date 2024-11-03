@@ -78,6 +78,13 @@ Do a dry run and only list which files would have been stripped:
 
     nbstripout --dry-run FILE.ipynb [FILE2.ipynb ...]
 
+or
+
+Do a verification run, which works like dry run but will fail
+if any files would have been stripped:
+
+    nbstripout --verify FILE.ipynb [FILE2.ipynb ...]
+
 Operate on all `.ipynb` files in the current directory and subdirectories
 recursively:
 

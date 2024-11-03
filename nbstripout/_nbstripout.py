@@ -111,6 +111,7 @@ In file ``.gitattributes`` or ``.git/info/attributes`` add: ::
 
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import collections
+import copy
 import io
 import json
 from os import devnull, environ, makedirs, path
@@ -331,27 +332,37 @@ def status(git_config, install_location=INSTALL_LOCATION_LOCAL, verbose=False):
         return 1
 
 def process_notebook(input_stream, output_stream, args, extra_keys, filename='input from stdin'):
+    any_change = False
     if args.mode == 'zeppelin':
         nb = json.load(input_stream, object_pairs_hook=collections.OrderedDict)
+        nb_orig = copy.deepcopy(nb)
         nb_stripped = strip_zeppelin_output(nb)
+        if nb_orig != nb_stripped:
+            any_change = True
+
         if args.dry_run:
             output_stream.write(f'Dry run: would have stripped {filename}\n')
-            return
+            return any_change
         if output_stream.seekable():
             output_stream.seek(0)
             output_stream.truncate()
         json.dump(nb_stripped, output_stream, indent=2)
         output_stream.write('\n')
         output_stream.flush()
-        return
+        return any_change
+
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", category=UserWarning)
         nb = nbformat.read(input_stream, as_version=nbformat.NO_CONVERT)
 
+    nb_orig = copy.deepcopy(nb)
     nb = strip_output(nb, args.keep_output, args.keep_count, args.keep_id,
                         extra_keys, args.drop_empty_cells,
                         args.drop_tagged_cells.split(), args.strip_init_cells,
                         _parse_size(args.max_size))
+
+    if nb_orig != nb:
+        any_change = True
 
     if args.dry_run:
         output_stream.write(f'Dry run: would have stripped {filename}\n')
@@ -363,7 +374,7 @@ def process_notebook(input_stream, output_stream, args, extra_keys, filename='in
             warnings.simplefilter("ignore", category=UserWarning)
             nbformat.write(nb, output_stream)
         output_stream.flush()
-
+    return any_change
 
 def main():
     parser = ArgumentParser(epilog=__doc__, formatter_class=RawDescriptionHelpFormatter)
@@ -383,6 +394,8 @@ def main():
                       'repository and configuration summary if installed')
     task.add_argument('--version', action='store_true',
                       help='Print version')
+    parser.add_argument("--verify", action="store_true",
+                        help="Return a non-zero exit code if any files were changed, Implies --dry-run")
     parser.add_argument('--keep-count', action='store_true',
                         help='Do not strip the execution count/prompt number')
     parser.add_argument('--keep-output', action='store_true',
@@ -427,6 +440,9 @@ def main():
     parser.add_argument('files', nargs='*', help='Files to strip output from')
     args = parser.parse_args()
     git_config = ['git', 'config']
+
+    if args.verify and not args.dry_run:
+        args.dry_run = True
 
     if args._system:
         git_config.append('--system')
@@ -483,6 +499,7 @@ def main():
     input_stream = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8') if sys.stdin else None
     output_stream = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', newline='')
 
+    any_change = False
     for filename in args.files:
         if not (args.force or filename.endswith('.ipynb') or filename.endswith('.zpln')):
             continue
@@ -490,7 +507,9 @@ def main():
         try:
             with io.open(filename, 'r+', encoding='utf8', newline='') as f:
                 out = output_stream if args.textconv or args.dry_run else f
-                process_notebook(f, out, args, extra_keys, filename)
+                if process_notebook(f, out, args, extra_keys, filename):
+                    any_change = True
+
         except nbformat.reader.NotJSONError:
             print(f"No valid notebook detected in '{filename}'", file=sys.stderr)
             raise SystemExit(1)
@@ -504,7 +523,11 @@ def main():
 
     if not args.files and input_stream:
         try:
-            process_notebook(input_stream, output_stream, args, extra_keys)
+            if process_notebook(input_stream, output_stream, args, extra_keys):
+                any_change = True
         except nbformat.reader.NotJSONError:
             print('No valid notebook detected on stdin', file=sys.stderr)
             raise SystemExit(1)
+        
+    if args.verify and any_change:
+        raise SystemExit(1)
