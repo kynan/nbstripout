@@ -331,25 +331,8 @@ def status(git_config, install_location=INSTALL_LOCATION_LOCAL, verbose=False):
 
         return 1
 
-def process_notebook(input_stream, output_stream, args, extra_keys, filename='input from stdin'):
+def process_jupyter_notebook(input_stream, output_stream, args, extra_keys, filename='input from stdin'):
     any_change = False
-    if args.mode == 'zeppelin':
-        nb = json.load(input_stream, object_pairs_hook=collections.OrderedDict)
-        nb_orig = copy.deepcopy(nb)
-        nb_stripped = strip_zeppelin_output(nb)
-        if nb_orig != nb_stripped:
-            any_change = True
-
-        if args.dry_run:
-            output_stream.write(f'Dry run: would have stripped {filename}\n')
-            return any_change
-        if output_stream.seekable():
-            output_stream.seek(0)
-            output_stream.truncate()
-        json.dump(nb_stripped, output_stream, indent=2)
-        output_stream.write('\n')
-        output_stream.flush()
-        return any_change
 
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", category=UserWarning)
@@ -374,6 +357,26 @@ def process_notebook(input_stream, output_stream, args, extra_keys, filename='in
             warnings.simplefilter("ignore", category=UserWarning)
             nbformat.write(nb, output_stream)
         output_stream.flush()
+    return any_change
+
+def process_zeppelin_notebook(input_stream, output_stream, args, extra_keys, filename='input from stdin'):
+    any_change = False
+
+    nb = json.load(input_stream, object_pairs_hook=collections.OrderedDict)
+    nb_orig = copy.deepcopy(nb)
+    nb_stripped = strip_zeppelin_output(nb)
+    if nb_orig != nb_stripped:
+        any_change = True
+
+    if args.dry_run:
+        output_stream.write(f'Dry run: would have stripped {filename}\n')
+        return any_change
+    if output_stream.seekable():
+        output_stream.seek(0)
+        output_stream.truncate()
+    json.dump(nb_stripped, output_stream, indent=2)
+    output_stream.write('\n')
+    output_stream.flush()
     return any_change
 
 def main():
@@ -499,6 +502,7 @@ def main():
     input_stream = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8') if sys.stdin else None
     output_stream = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', newline='')
 
+    process_notebook = {'jupyter': process_jupyter_notebook, 'zeppelin': process_zeppelin_notebook}[args.mode]
     any_change = False
     for filename in args.files:
         if not (args.force or filename.endswith('.ipynb') or filename.endswith('.zpln')):
