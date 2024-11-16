@@ -332,45 +332,44 @@ def status(git_config, install_location=INSTALL_LOCATION_LOCAL, verbose=False):
         return 1
 
 def process_jupyter_notebook(input_stream, output_stream, args, extra_keys, filename='input from stdin'):
-    any_change = False
-
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", category=UserWarning)
         nb = nbformat.read(input_stream, as_version=nbformat.NO_CONVERT)
 
     nb_orig = copy.deepcopy(nb)
-    nb = strip_output(nb, args.keep_output, args.keep_count, args.keep_id,
-                        extra_keys, args.drop_empty_cells,
-                        args.drop_tagged_cells.split(), args.strip_init_cells,
-                        _parse_size(args.max_size))
+    nb_stripped = strip_output(nb, args.keep_output, args.keep_count,
+                               args.keep_id, extra_keys, args.drop_empty_cells,
+                               args.drop_tagged_cells.split(),
+                               args.strip_init_cells, _parse_size(args.max_size))
 
-    if nb_orig != nb:
-        any_change = True
+    any_change = nb_orig != nb_stripped
 
     if args.dry_run:
-        output_stream.write(f'Dry run: would have stripped {filename}\n')
-    else:
-        if output_stream.seekable():
-            output_stream.seek(0)
-            output_stream.truncate()
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", category=UserWarning)
-            nbformat.write(nb, output_stream)
-        output_stream.flush()
+        if any_change:
+            output_stream.write(f'Dry run: would have stripped {filename}\n')
+        return any_change
+
+    if output_stream.seekable():
+        output_stream.seek(0)
+        output_stream.truncate()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=UserWarning)
+        nbformat.write(nb_stripped, output_stream)
+    output_stream.flush()
     return any_change
 
 def process_zeppelin_notebook(input_stream, output_stream, args, extra_keys, filename='input from stdin'):
-    any_change = False
-
     nb = json.load(input_stream, object_pairs_hook=collections.OrderedDict)
     nb_orig = copy.deepcopy(nb)
     nb_stripped = strip_zeppelin_output(nb)
-    if nb_orig != nb_stripped:
-        any_change = True
+
+    any_change = nb_orig != nb_stripped
 
     if args.dry_run:
-        output_stream.write(f'Dry run: would have stripped {filename}\n')
+        if any_change:
+            output_stream.write(f'Dry run: would have stripped {filename}\n')
         return any_change
+
     if output_stream.seekable():
         output_stream.seek(0)
         output_stream.truncate()

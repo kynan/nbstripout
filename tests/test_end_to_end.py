@@ -37,8 +37,9 @@ TEST_CASES = [
 ]
 
 DRY_RUN_CASES = [
-    ("test_metadata.ipynb", []),
-    ("test_zeppelin.zpln", ["--mode", "zeppelin"]),
+    ("test_metadata.ipynb", [], True),
+    ("test_zeppelin.zpln", ["--mode", "zeppelin"], True),
+    ("test_nochange.ipynb", [], False),
 ]
 
 ERR_OUTPUT_CASES = [
@@ -110,9 +111,9 @@ def test_end_to_end_file(input_file: str, expected_file: str, args: List[str], t
         assert not pc.stdout and p.read_text() == expected
 
 
-@pytest.mark.parametrize("input_file, extra_args", DRY_RUN_CASES)
+@pytest.mark.parametrize("input_file, extra_args, any_change", DRY_RUN_CASES)
 @pytest.mark.parametrize("verify", (True, False))
-def test_dry_run_stdin(input_file: str, extra_args: List[str], verify: bool):
+def test_dry_run_stdin(input_file: str, extra_args: List[str], any_change:bool, verify: bool):
     expected = "Dry run: would have stripped input from stdin\n"
 
     with open(NOTEBOOKS_FOLDER / input_file, mode="r") as f:
@@ -122,13 +123,13 @@ def test_dry_run_stdin(input_file: str, extra_args: List[str], verify: bool):
         pc = run(args, stdin=f, stdout=PIPE, universal_newlines=True)
         output = pc.stdout
 
-    assert output == expected
-    assert pc.returncode == (1 if verify else 0)
+    assert output == (expected if any_change else '')
+    assert pc.returncode == (1 if verify and any_change else 0)
 
 
-@pytest.mark.parametrize("input_file, extra_args", DRY_RUN_CASES)
+@pytest.mark.parametrize("input_file, extra_args, any_change", DRY_RUN_CASES)
 @pytest.mark.parametrize("verify", (True, False))
-def test_dry_run_args(input_file: str, extra_args: List[str], verify: bool):
+def test_dry_run_args(input_file: str, extra_args: List[str], any_change: bool, verify: bool):
     expected_regex = re.compile(f"Dry run: would have stripped .*[/\\\\]{input_file}\n")
     args = [nbstripout_exe(), str(NOTEBOOKS_FOLDER / input_file), "--dry-run", ] + extra_args
     if verify:
@@ -136,9 +137,8 @@ def test_dry_run_args(input_file: str, extra_args: List[str], verify: bool):
     pc = run(args, stdout=PIPE, universal_newlines=True)
     output = pc.stdout
 
-    assert expected_regex.match(output)
-    if verify:
-        assert pc.returncode == 1
+    assert expected_regex.match(output) if any_change else output == ''
+    assert pc.returncode == (1 if verify and any_change else 0)
 
 
 @pytest.mark.parametrize("input_file, expected_errs, extra_args", ERR_OUTPUT_CASES)
