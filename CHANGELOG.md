@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.1 - 2024-11-17
+
+-   In dry run mode, only print output if there would have been a change (#152).
+-   Declare git filter to be `required` when installing, such that it *must*
+    succeed (#191).
+
 ## 0.8.0 - 2024-11-03
 
 -   Adds `--verify` flag, similar to `--dry-run` but returning 1 if any
