@@ -201,6 +201,7 @@ def install(git_config, install_location=INSTALL_LOCATION_LOCAL, python=None, at
         filepath = f'"{PureWindowsPath(python or sys.executable).as_posix()}" -m nbstripout'
         check_call(git_config + ['filter.nbstripout.clean', filepath])
         check_call(git_config + ['filter.nbstripout.smudge', 'cat'])
+        check_call(git_config + ['filter.nbstripout.required', 'true'])
         check_call(git_config + ['diff.ipynb.textconv', filepath + ' -t'])
         attrfile = _get_attrfile(git_config, install_location, attrfile)
     except FileNotFoundError:
@@ -251,6 +252,7 @@ def uninstall(git_config, install_location=INSTALL_LOCATION_LOCAL, attrfile=None
     try:
         call(git_config + ['--unset', 'filter.nbstripout.clean'], stdout=open(devnull, 'w'), stderr=STDOUT)
         call(git_config + ['--unset', 'filter.nbstripout.smudge'], stdout=open(devnull, 'w'), stderr=STDOUT)
+        call(git_config + ['--unset', 'filter.nbstripout.required'], stdout=open(devnull, 'w'), stderr=STDOUT)
         call(git_config + ['--remove-section', 'diff.ipynb'], stdout=open(devnull, 'w'), stderr=STDOUT)
         attrfile = _get_attrfile(git_config, install_location, attrfile)
     except FileNotFoundError:

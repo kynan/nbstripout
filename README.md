@@ -100,10 +100,13 @@ Show help and usage instructions:
 
 ### Using as a Git filter
 
-Set up the git filter and attributes as described in the manual installation
-instructions below:
+Set up the [git filter](https://git-scm.com/docs/gitattributes#_filter) and
+attributes as described in the manual installation instructions below:
 
     nbstripout --install
+
+Note: The filter is declared as `required`, meaning the filter *must* succeed.
+Failures and misconfigurations will not simply cause the filter to be ignored.
 
 Set up the git filter using `.gitattributes`:
 

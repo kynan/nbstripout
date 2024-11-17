@@ -24,6 +24,7 @@ def test_install(pytester: pytest.Pytester):
     config = ConfigParser()
     config.read(".git/config")
     assert re.match(r".*python.* -m nbstripout", config['filter "nbstripout"']["clean"])
+    assert config['filter "nbstripout"']["required"] == "true"
     assert config['filter "nbstripout"']["smudge"] == "cat"
     assert re.match(r".*python.* -m nbstripout -t", config['diff "ipynb"']["textconv"])
 
@@ -40,6 +41,7 @@ def test_install_different_python(pytester: pytest.Pytester):
         r".*DIFFERENTPYTHON.* -m nbstripout", config['filter "nbstripout"']["clean"]
     )
     assert sys.executable not in config['filter "nbstripout"']["clean"]
+    assert config['filter "nbstripout"']["required"] == "true"
     assert config['filter "nbstripout"']["smudge"] == "cat"
     assert re.match(
         r".*DIFFERENTPYTHON.* -m nbstripout -t", config['diff "ipynb"']["textconv"]
