@@ -453,6 +453,16 @@ to the `.pre-commit-config.yaml` in your repository:
 
 Then run `pre-commit install` to activate the hook.
 
+When passing parameters to the hook, be aware that arguments with spaces such as
+`--extra-keys` need to be quoted as a whole:
+
+    repos:
+    - repo: https://github.com/kynan/nbstripout
+      rev: 0.8.1
+      hooks:
+        - id: nbstripout
+          args: ['--extra-keys="metadata.celltoolbar cell.metadata.heading_collapsed"']
+
 > [!WARNING]
 >
 > In this mode, `nbstripout` is used as a git hook to strip any `.ipynb` files
