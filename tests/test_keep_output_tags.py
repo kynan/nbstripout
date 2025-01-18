@@ -27,7 +27,7 @@ def test_cells(orig_nb):
     nb_stripped = strip_output(nb_stripped, keep_output=None, keep_count=None, keep_id=None)
     for i, cell in enumerate(nb_stripped.cells):
         if cell.cell_type == 'code' and cell.source:
-            match = re.match(r"\s*#\s*(output|no_output)", cell.source)
+            match = re.match(r'\s*#\s*(output|no_output)', cell.source)
             if match:
                 # original cell should have had output.
                 # If not, there's a problem with the test fixture

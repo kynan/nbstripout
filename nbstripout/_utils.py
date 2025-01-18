@@ -1,7 +1,7 @@
 from collections import defaultdict
 import sys
 
-__all__ = ["pop_recursive", "strip_output", "strip_zeppelin_output", "MetadataError"]
+__all__ = ['pop_recursive', 'strip_output', 'strip_zeppelin_output', 'MetadataError']
 
 
 class MetadataError(Exception):
@@ -45,7 +45,7 @@ def _cells(nb, conditionals):
 
 
 def get_size(item):
-    """ Recursively sums length of all strings in `item` """
+    """Recursively sums length of all strings in `item`"""
     if isinstance(item, str):
         return len(item)
     elif isinstance(item, list):
@@ -73,9 +73,7 @@ def determine_keep_output(cell, default, strip_init_cells=False):
 
     # keep_output between metadata and tags should not contradict each other
     if has_keep_output_metadata and has_keep_output_tag and not keep_output_metadata:
-        raise MetadataError(
-            'cell metadata contradicts tags: `keep_output` is false, but `keep_output` in tags'
-        )
+        raise MetadataError('cell metadata contradicts tags: `keep_output` is false, but `keep_output` in tags')
 
     if has_keep_output_metadata or has_keep_output_tag:
         return keep_output_metadata or has_keep_output_tag
@@ -94,8 +92,17 @@ def strip_zeppelin_output(nb):
     return nb
 
 
-def strip_output(nb, keep_output, keep_count, keep_id, extra_keys=[], drop_empty_cells=False, drop_tagged_cells=[],
-                 strip_init_cells=False, max_size=0):
+def strip_output(
+    nb,
+    keep_output,
+    keep_count,
+    keep_id,
+    extra_keys=[],
+    drop_empty_cells=False,
+    drop_tagged_cells=[],
+    strip_init_cells=False,
+    max_size=0,
+):
     """
     Strip the outputs, execution count/prompt number and miscellaneous
     metadata from a notebook object, unless specified to keep either the outputs
@@ -122,18 +129,16 @@ def strip_output(nb, keep_output, keep_count, keep_id, extra_keys=[], drop_empty
     if drop_empty_cells:
         conditionals.append(lambda c: any(line.strip() for line in c.get('source', [])))
     for tag_to_drop in drop_tagged_cells:
-        conditionals.append(lambda c: tag_to_drop not in c.get("metadata", {}).get("tags", []))
+        conditionals.append(lambda c: tag_to_drop not in c.get('metadata', {}).get('tags', []))
 
     for i, cell in enumerate(_cells(nb, conditionals)):
         keep_output_this_cell = determine_keep_output(cell, keep_output, strip_init_cells)
 
         # Remove the outputs, unless directed otherwise
         if 'outputs' in cell:
-
             # Default behavior (max_size == 0) strips all outputs.
             if not keep_output_this_cell:
-                cell['outputs'] = [output for output in cell['outputs']
-                                   if get_size(output) <= max_size]
+                cell['outputs'] = [output for output in cell['outputs'] if get_size(output) <= max_size]
 
             # Strip the counts from the outputs that were kept if not keep_count.
             if not keep_count:
