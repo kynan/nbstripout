@@ -109,7 +109,7 @@ In file ``.gitattributes`` or ``.git/info/attributes`` add: ::
     *.ipynb diff=ipynb
 """
 
-from argparse import ArgumentParser, RawDescriptionHelpFormatter
+from argparse import ArgumentParser, RawDescriptionHelpFormatter, Namespace
 import collections
 import copy
 import io
@@ -118,6 +118,7 @@ from os import devnull, environ, makedirs, path
 from pathlib import PureWindowsPath
 import re
 from subprocess import call, check_call, check_output, CalledProcessError, STDOUT
+from typing import List, Optional
 import sys
 import warnings
 
@@ -134,7 +135,7 @@ INSTALL_LOCATION_GLOBAL = 'global'
 INSTALL_LOCATION_SYSTEM = 'system'
 
 
-def _get_system_gitconfig_folder():
+def _get_system_gitconfig_folder() -> str:
     try:
         git_config_output = check_output(
             ['git', 'config', '--system', '--list', '--show-origin'], universal_newlines=True, stderr=STDOUT
@@ -160,7 +161,9 @@ def _get_system_gitconfig_folder():
     return path.abspath(path.dirname(system_gitconfig_file_path))
 
 
-def _get_attrfile(git_config, install_location=INSTALL_LOCATION_LOCAL, attrfile=None):
+def _get_attrfile(
+    git_config: str, install_location: str = INSTALL_LOCATION_LOCAL, attrfile: Optional[str] = None
+) -> str:
     if not attrfile:
         if install_location == INSTALL_LOCATION_SYSTEM:
             try:
@@ -185,7 +188,7 @@ def _get_attrfile(git_config, install_location=INSTALL_LOCATION_LOCAL, attrfile=
     return attrfile
 
 
-def _parse_size(num_str):
+def _parse_size(num_str: str) -> int:
     num_str = num_str.upper()
     if num_str[-1].isdigit():
         return int(num_str)
@@ -195,11 +198,15 @@ def _parse_size(num_str):
         return int(num_str[:-1]) * (10**6)
     elif num_str[-1] == 'G':
         return int(num_str[:-1]) * (10**9)
-    else:
-        raise ValueError(f'Unknown size identifier {num_str[-1]}')
+    raise ValueError(f'Unknown size identifier {num_str[-1]}')
 
 
-def install(git_config, install_location=INSTALL_LOCATION_LOCAL, python=None, attrfile=None):
+def install(
+    git_config: str,
+    install_location: str = INSTALL_LOCATION_LOCAL,
+    python: Optional[str] = None,
+    attrfile: Optional[str] = None,
+) -> int:
     """Install the git filter and set the git attributes."""
     try:
         filepath = f'"{PureWindowsPath(python or sys.executable).as_posix()}" -m nbstripout'
@@ -229,7 +236,7 @@ def install(git_config, install_location=INSTALL_LOCATION_LOCAL, python=None, at
         diff_exists = '*.ipynb diff' in attrs
 
         if filt_exists and diff_exists:
-            return
+            return 0
 
     try:
         with open(attrfile, 'a', newline='') as f:
@@ -242,6 +249,7 @@ def install(git_config, install_location=INSTALL_LOCATION_LOCAL, python=None, at
                 print('*.zpln filter=nbstripout', file=f)
             if not diff_exists:
                 print('*.ipynb diff=ipynb', file=f)
+        return 0
     except PermissionError:
         print(f'Installation failed: could not write to {attrfile}', file=sys.stderr)
 
@@ -251,7 +259,7 @@ def install(git_config, install_location=INSTALL_LOCATION_LOCAL, python=None, at
         return 1
 
 
-def uninstall(git_config, install_location=INSTALL_LOCATION_LOCAL, attrfile=None):
+def uninstall(git_config: str, install_location: str = INSTALL_LOCATION_LOCAL, attrfile: Optional[str] = None) -> int:
     """Uninstall the git filter and unset the git attributes."""
     try:
         call(git_config + ['--unset', 'filter.nbstripout.clean'], stdout=open(devnull, 'w'), stderr=STDOUT)
@@ -274,9 +282,10 @@ def uninstall(git_config, install_location=INSTALL_LOCATION_LOCAL, attrfile=None
             f.seek(0)
             f.write(''.join(lines))
             f.truncate()
+    return 0
 
 
-def status(git_config, install_location=INSTALL_LOCATION_LOCAL, verbose=False):
+def status(git_config: str, install_location: str = INSTALL_LOCATION_LOCAL, verbose: bool = False) -> int:
     """Return 0 if nbstripout is installed in the current repo, 1 otherwise"""
     try:
         if install_location == INSTALL_LOCATION_SYSTEM:
@@ -342,22 +351,28 @@ def status(git_config, install_location=INSTALL_LOCATION_LOCAL, verbose=False):
         return 1
 
 
-def process_jupyter_notebook(input_stream, output_stream, args, extra_keys, filename='input from stdin'):
+def process_jupyter_notebook(
+    input_stream: io.IOBase,
+    output_stream: io.IOBase,
+    args: Namespace,
+    extra_keys: List[str],
+    filename: str = 'input from stdin',
+) -> bool:
     with warnings.catch_warnings():
         warnings.simplefilter('ignore', category=UserWarning)
         nb = nbformat.read(input_stream, as_version=nbformat.NO_CONVERT)
 
     nb_orig = copy.deepcopy(nb)
     nb_stripped = strip_output(
-        nb,
-        args.keep_output,
-        args.keep_count,
-        args.keep_id,
-        extra_keys,
-        args.drop_empty_cells,
-        args.drop_tagged_cells.split(),
-        args.strip_init_cells,
-        _parse_size(args.max_size),
+        nb=nb,
+        keep_output=args.keep_output,
+        keep_count=args.keep_count,
+        keep_id=args.keep_id,
+        extra_keys=extra_keys,
+        drop_empty_cells=args.drop_empty_cells,
+        drop_tagged_cells=args.drop_tagged_cells.split(),
+        strip_init_cells=args.strip_init_cells,
+        max_size=_parse_size(args.max_size),
     )
 
     any_change = nb_orig != nb_stripped
@@ -377,7 +392,13 @@ def process_jupyter_notebook(input_stream, output_stream, args, extra_keys, file
     return any_change
 
 
-def process_zeppelin_notebook(input_stream, output_stream, args, extra_keys, filename='input from stdin'):
+def process_zeppelin_notebook(
+    input_stream: io.IOBase,
+    output_stream: io.IOBase,
+    args: Namespace,
+    extra_keys: List[str],
+    filename: str = 'input from stdin',
+):
     nb = json.load(input_stream, object_pairs_hook=collections.OrderedDict)
     nb_orig = copy.deepcopy(nb)
     nb_stripped = strip_zeppelin_output(nb)
@@ -569,7 +590,9 @@ def main():
         try:
             with io.open(filename, 'r+', encoding='utf8', newline='') as f:
                 out = output_stream if args.textconv or args.dry_run else f
-                if process_notebook(f, out, args, extra_keys, filename):
+                if process_notebook(
+                    input_stream=f, output_stream=out, args=args, extra_keys=extra_keys, filename=filename
+                ):
                     any_change = True
 
         except nbformat.reader.NotJSONError:
