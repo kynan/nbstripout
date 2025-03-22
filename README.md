@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD030 -->
+<!-- markdownlint-disable MD041 -->
 [![tests](https://github.com/kynan/nbstripout/actions/workflows/tests.yml/badge.svg)](https://github.com/kynan/nbstripout/actions/workflows/tests.yml)
 [![downloads](https://img.shields.io/pypi/dm/nbstripout)](https://pypi.org/project/nbstripout)
 [![PyPI version](https://img.shields.io/pypi/v/nbstripout)](https://pypi.org/project/nbstripout)
