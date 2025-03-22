@@ -217,7 +217,6 @@ Note that you need to uninstall with the same flags:
 [`git filter-repo`](https://github.com/newren/git-filter-repo) to strip output
 from existing notebooks. This invocation operates on all ipynb files in the repo:
 
-```sh
     #!/usr/bin/env bash
     # get lint-history with callback from https://github.com/newren/git-filter-repo/pull/542
     ./lint-history.py --relevant 'return filename.endswith(b".ipynb")' --callback '
@@ -237,7 +236,6 @@ from existing notebooks. This invocation operates on all ipynb files in the repo
     except NotJSONError as e:
          print("ERROR", type(e), change.blob_id, change.filename)
     '
-```
 
 ### Removing empty cells
 
