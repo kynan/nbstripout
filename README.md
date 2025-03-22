@@ -461,7 +461,7 @@ When passing parameters to the hook, be aware that arguments with spaces such as
       rev: 0.8.1
       hooks:
         - id: nbstripout
-          args: ['--extra-keys="metadata.celltoolbar cell.metadata.heading_collapsed"']
+          args: ['--extra-keys=metadata.celltoolbar cell.metadata.heading_collapsed']
 
 > [!WARNING]
 >
