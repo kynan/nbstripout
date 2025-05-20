@@ -1,0 +1,16 @@
+version: 2.1
+
+orbs:
+  codeql: cambiahealth/codeql-sast@1
+
+workflows:
+  codeql:
+    jobs:
+      - codeql/code-scan:
+          name: codeql/code-scan
+          context: cambia
+          docker-image: cimg/python:3.12
+          language: python
+          code-path: ./nbstripout
+
+  version: 2
