@@ -217,27 +217,72 @@ Note that you need to uninstall with the same flags:
 
 `nbstripout` can be used to rewrite an existing Git repository using
 [`git filter-repo`](https://github.com/newren/git-filter-repo) to strip output
-from existing notebooks. This invocation operates on all ipynb files in the repo:
-
-    #!/usr/bin/env bash
-    # get lint-history with callback from https://github.com/newren/git-filter-repo/pull/542
-    ./lint-history.py --relevant 'return filename.endswith(b".ipynb")' --callback '
-    import json, warnings, nbformat
-    from nbstripout import strip_output
-    from nbformat.reader import NotJSONError
+from existing notebooks. This invocation operates on all `.ipynb` files in the repo:
+```bash
+#!/bin/bash
+git-filter-repo \
+--file-info-callback "
+if filename.endswith(b'.ipynb'):
+    print(f'\nProcessing {filename.decode()}')
+    
+    import copy
+    
     try:
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", category=UserWarning)
-            notebook = nbformat.reads(blob.data, as_version=nbformat.NO_CONVERT)
-        # customize to your needs
-        strip_output(notebook, keep_output=False, keep_count=False, keep_id=False, extra_keys=["metadata.widgets","metadata.execution","cell.attachments"], drop_empty_cells=True,  drop_tagged_cells=[],strip_init_cells=False, max_size=0)
-        old_len = len(blob.data)
-        blob.data = (nbformat.writes(notebook) + "\n").encode("utf-8")
-        if old_len != len(blob.data):
-            print(change.blob_id, change.filename, old_len, len(blob.data))
-    except NotJSONError as e:
-         print("ERROR", type(e), change.blob_id, change.filename)
-    '
+        import nbformat
+        from nbstripout import strip_output
+        
+        # Get the file contents using the blob_id
+        contents = value.get_contents_by_identifier(blob_id)
+
+        nb = nbformat.reads(contents.decode('utf-8'), as_version=nbformat.NO_CONVERT)
+        nb_original = copy.deepcopy(nb)
+
+        # Customize parameters as needed:
+        nb_stripped = strip_output(
+            nb,
+            keep_output=False,
+            keep_count=False,
+            keep_id=False,
+            extra_keys=[
+                'metadata.signature',
+                'metadata.widgets', 
+                'cell.metadata.collapsed',
+                'cell.metadata.ExecuteTime',
+                'cell.metadata.execution',
+                'cell.metadata.heading_collapsed',
+                'cell.metadata.hidden',
+                'cell.metadata.scrolled'
+            ],
+            drop_empty_cells=False,
+            drop_tagged_cells=[],
+            strip_init_cells=False,
+            max_size=0
+        )
+        
+        if nb_original != nb_stripped:
+            # Convert cleaned notebook back to bytes
+            new_contents = nbformat.writes(nb_stripped).encode('utf-8')
+            
+            print(f'  → Cleaned {filename.decode()}: {len(contents)} → {len(new_contents)} bytes')
+            
+            new_blob_id = value.insert_file_with_contents(new_contents)
+            return (filename, mode, new_blob_id)
+        else:
+            print(f'  → No changes needed for {filename.decode()}')
+    except Exception as e:
+        print(f'Error processing {filename.decode()}: {e}')
+        import traceback
+        traceback.print_exc()
+        # Return unchanged file on error
+        return (filename, mode, blob_id)
+# Return unchanged file if it's not a notebook
+return (filename, mode, blob_id)
+"
+```
+
+> [!WARNING]
+>
+> This will affect the history of the repository, so use with caution!
 
 ### Removing empty cells
 
