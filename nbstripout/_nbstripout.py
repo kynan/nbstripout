@@ -388,7 +388,11 @@ def process_jupyter_notebook(
     with warnings.catch_warnings():
         warnings.simplefilter('ignore', category=UserWarning)
         nbformat.write(nb_stripped, output_stream)
-    output_stream.flush()
+    try:
+        output_stream.flush()
+    except BrokenPipeError:
+        # Receiver closed their end of the pipe after reading the data
+        pass
     return any_change
 
 
