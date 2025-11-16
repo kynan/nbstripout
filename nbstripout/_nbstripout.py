@@ -592,7 +592,7 @@ def main():
             continue
 
         try:
-            with io.open(filename, 'r+', encoding='utf8', newline='') as f:
+            with io.open(filename, 'r+', encoding='utf8') as f:
                 out = output_stream if args.textconv or args.dry_run else f
                 if process_notebook(
                     input_stream=f, output_stream=out, args=args, extra_keys=extra_keys, filename=filename
