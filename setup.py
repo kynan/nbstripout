@@ -7,7 +7,7 @@ install_requires = ['nbformat']
 
 setup(
     name='nbstripout',
-    version='0.8.1',
+    version='0.8.2',
     author='Florian Rathgeber',
     author_email='florian.rathgeber@gmail.com',
     url='https://github.com/kynan/nbstripout',
