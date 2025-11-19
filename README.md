@@ -324,6 +324,10 @@ Do not strip the output, only metadata:
 
     nbstripout --keep-output
 
+When keeping the output, drop a specific [`output_type`](https://ipython.readthedocs.io/en/3.x/notebook/nbformat.html#code-cell-outputs), like `error` or `stream`
+
+    nbstripout --drop-output-type error stream
+
 Do not reassign the cell ids to be sequential (which is the default behavior):
 
     nbstripout --keep-id
