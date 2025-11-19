@@ -1,6 +1,8 @@
 from collections import defaultdict
 import sys
-from typing import Any, Callable, Iterator, List, Optional
+from typing import Any, Callable, Iterator, List, Optional, Set, Dict
+import logging
+logger = logging.getLogger(__name__)
 
 from nbformat import NotebookNode
 
@@ -94,6 +96,34 @@ def strip_zeppelin_output(nb: dict) -> dict:
             cell['results'] = {}
     return nb
 
+class OutputType:
+    output_type: str
+    name: str
+
+    def __init__(self, output_type: str,
+                 name: str = None):
+        self.output_type = output_type
+        self.name = name
+
+    @classmethod
+    def from_string(cls, s: str) -> 'OutputType':
+        if ':' in s:
+            return cls(*s.split(':'))
+        else:
+            return cls(s)
+
+    def matches_output(self, output: Dict):
+        return (output.get('output_type') == self.output_type and
+                (self.name is None or output.get('name') == self.name))
+
+    def __hash__(self):
+        return hash(self.output_type + str(self.name))
+
+    def __repr__(self):
+        return f'{self.output_type}:{self.name}'
+
+
+
 
 def strip_output(
     nb: NotebookNode,
@@ -104,6 +134,8 @@ def strip_output(
     drop_empty_cells: bool = False,
     drop_tagged_cells: List[str] = [],
     strip_init_cells: bool = False,
+    drop_output_types: Set[str] = None,
+    keep_output_types: Set[str] = None,
     max_size: int = 0,
 ) -> NotebookNode:
     """
@@ -113,6 +145,11 @@ def strip_output(
 
     `extra_keys` could be 'metadata.foo cell.metadata.bar metadata.baz'
     """
+
+    # Replace mutable defaults
+    drop_output_types = {OutputType.from_string(s) for s in drop_output_types} if drop_output_types else set()
+    keep_output_types = {OutputType.from_string(s) for s in keep_output_types} if keep_output_types else set()
+
     if keep_output is None and 'keep_output' in nb.metadata:
         keep_output = bool(nb.metadata['keep_output'])
 
@@ -140,14 +177,25 @@ def strip_output(
         # Remove the outputs, unless directed otherwise
         if 'outputs' in cell:
             # Default behavior (max_size == 0) strips all outputs.
-            if not keep_output_this_cell:
-                cell['outputs'] = [output for output in cell['outputs'] if get_size(output) <= max_size]
+            if not keep_output_this_cell or keep_output_types:
+                cell['outputs'] = [output for output in cell['outputs']
+                                   if get_size(output) <= max_size
+                                   or any([ot.matches_output(output) for ot in keep_output_types])]
 
             # Strip the counts from the outputs that were kept if not keep_count.
             if not keep_count:
                 for output in cell['outputs']:
                     if 'execution_count' in output:
                         output['execution_count'] = None
+
+
+
+            # Remove specific output types
+            if drop_output_types:
+                cell['outputs'] = [
+                    output for output in cell['outputs']
+                    if not any([ot.matches_output(output) for ot in drop_output_types])
+                ]
 
             # If keep_output_this_cell and keep_count, do nothing.
 
