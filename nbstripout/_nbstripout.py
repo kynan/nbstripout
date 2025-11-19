@@ -453,8 +453,8 @@ def main():
     )
     parser.add_argument('--keep-count', action='store_true', help='Do not strip the execution count/prompt number')
     parser.add_argument('--keep-output', action='store_true', help='Do not strip output', default=None)
-    parser.add_argument('--drop-output-type', help='Types of output cells to drop, e.g. "error" or "stream". Only has effect with --keep-output', nargs='+')
-    parser.add_argument('--keep-output-type', help='Types of output cells to keep, e.g. "error" or "stream". Will take effect without --keep-output', nargs='+')
+    parser.add_argument('--drop-output-type', help='Types of output cells to drop, e.g. "error" or "stream". Only has effect with --keep-output', nargs='+', default=[])
+    parser.add_argument('--keep-output-type', help='Types of output cells to keep, e.g. "error" or "stream". Will take effect without --keep-output', nargs='+', default=[])
     parser.add_argument(
         '--keep-id',
         action='store_true',
