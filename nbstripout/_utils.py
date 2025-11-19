@@ -107,6 +107,7 @@ def strip_output(
     drop_tagged_cells: List[str] = [],
     strip_init_cells: bool = False,
     drop_output_types: Set[str] = None,
+    keep_output_types: Set[str] = None,
     max_size: int = 0,
 ) -> NotebookNode:
     """
@@ -118,8 +119,8 @@ def strip_output(
     """
 
     # Replace mutable defaults
-    drop_output_types = drop_output_types or {'error'}
-    print(drop_output_types)
+    drop_output_types = drop_output_types or set()
+    keep_output_types = keep_output_types or set()
 
     if keep_output is None and 'keep_output' in nb.metadata:
         keep_output = bool(nb.metadata['keep_output'])
@@ -149,7 +150,9 @@ def strip_output(
         if 'outputs' in cell:
             # Default behavior (max_size == 0) strips all outputs.
             if not keep_output_this_cell:
-                cell['outputs'] = [output for output in cell['outputs'] if get_size(output) <= max_size]
+                cell['outputs'] = [output for output in cell['outputs']
+                                   if get_size(output) <= max_size
+                                   or output.get('output_type') in keep_output_types]
 
             # Strip the counts from the outputs that were kept if not keep_count.
             if not keep_count:

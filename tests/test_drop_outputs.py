@@ -1,0 +1,68 @@
+import os
+from copy import deepcopy
+
+import nbformat
+import pytest
+
+from nbstripout import strip_output, MetadataError
+directory = os.path.dirname(__file__)
+
+@pytest.fixture
+def orig_nb():
+    fname = 'test_drop_outputs.ipynb'
+    return nbformat.read(os.path.join(directory, fname), nbformat.NO_CONVERT)
+
+def test_drop_errors(orig_nb):
+    nb_stripped = strip_output(deepcopy(orig_nb),
+                               keep_output=True,
+                               keep_count=False,
+                               keep_id=False,
+                               drop_output_types={'error'})
+
+    # No outputs in the markdown
+    assert not hasattr(nb_stripped.cells[0], 'outputs')
+
+    # Original cell should have 3 outputs, with the last being error
+    assert len(orig_nb.cells[1].outputs) == 3
+    assert orig_nb.cells[1].outputs[2]['output_type'] == 'error'
+
+    # Second cell should have a stdout stream, stderr stream and an error
+    stripped_output_1 = nb_stripped.cells[1].outputs[0]
+    stripped_output_2 = nb_stripped.cells[1].outputs[1]
+    assert len(nb_stripped.cells[1].outputs) == 2
+    assert stripped_output_1['output_type'] == 'stream'
+    assert stripped_output_2['output_type'] == 'stream'
+    assert stripped_output_1['name'] == 'stdout'
+    assert stripped_output_2['name'] == 'stderr'
+
+    # Third cell should have an execution output
+    assert len(nb_stripped.cells[2].outputs) == 1
+    assert nb_stripped.cells[2].outputs[0]['output_type'] == 'execute_result'
+
+    # Should be an error in the original cell, but not in the output
+    # assert orig_nb.cells[1].outputs[0]['output_type'] == 'error'
+    # print(nb_stripped.cells[1].outputs)
+
+
+def test_keep_output(orig_nb):
+    """
+    Te4st keep output types
+    """
+    nb_stripped = strip_output(deepcopy(orig_nb),
+                               keep_output=False,
+                               keep_count=False,
+                               keep_id=False,
+                               keep_output_types={'execute_result'})
+
+    # No outputs in the markdown
+    assert not hasattr(nb_stripped.cells[0], 'outputs')
+
+    # Original cell should have 3 outputs, with the last being error
+    assert len(orig_nb.cells[1].outputs) == 3
+    assert orig_nb.cells[1].outputs[2]['output_type'] == 'error'
+
+    # All outputs should be stripped in the second cell
+    assert len(nb_stripped.cells[1].outputs) == 0
+
+    # Third cell should have an execution output
+    assert len(nb_stripped.cells[2].outputs) == 1
