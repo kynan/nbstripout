@@ -372,6 +372,7 @@ def process_jupyter_notebook(
         drop_empty_cells=args.drop_empty_cells,
         drop_tagged_cells=args.drop_tagged_cells.split(),
         strip_init_cells=args.strip_init_cells,
+        drop_output_types=set(args.drop_output_type),
         max_size=_parse_size(args.max_size),
     )
 
@@ -451,6 +452,7 @@ def main():
     )
     parser.add_argument('--keep-count', action='store_true', help='Do not strip the execution count/prompt number')
     parser.add_argument('--keep-output', action='store_true', help='Do not strip output', default=None)
+    parser.add_argument('--drop-output-type', help='Types of output cells to drop, e.g. "error" or "stream"', nargs='+')
     parser.add_argument(
         '--keep-id',
         action='store_true',

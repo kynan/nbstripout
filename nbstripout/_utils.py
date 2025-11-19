@@ -1,6 +1,8 @@
 from collections import defaultdict
 import sys
-from typing import Any, Callable, Iterator, List, Optional
+from typing import Any, Callable, Iterator, List, Optional, Set
+import logging
+logger = logging.getLogger(__name__)
 
 from nbformat import NotebookNode
 
@@ -104,6 +106,7 @@ def strip_output(
     drop_empty_cells: bool = False,
     drop_tagged_cells: List[str] = [],
     strip_init_cells: bool = False,
+    drop_output_types: Set[str] = None,
     max_size: int = 0,
 ) -> NotebookNode:
     """
@@ -113,6 +116,11 @@ def strip_output(
 
     `extra_keys` could be 'metadata.foo cell.metadata.bar metadata.baz'
     """
+
+    # Replace mutable defaults
+    drop_output_types = drop_output_types or {'error'}
+    print(drop_output_types)
+
     if keep_output is None and 'keep_output' in nb.metadata:
         keep_output = bool(nb.metadata['keep_output'])
 
@@ -148,6 +156,13 @@ def strip_output(
                 for output in cell['outputs']:
                     if 'execution_count' in output:
                         output['execution_count'] = None
+
+            # Remove specific output types
+            if drop_output_types:
+                cell['outputs'] = [
+                    output for output in cell['outputs']
+                    if output.get('output_type') not in drop_output_types
+                ]
 
             # If keep_output_this_cell and keep_count, do nothing.
 
