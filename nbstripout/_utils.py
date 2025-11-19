@@ -149,7 +149,7 @@ def strip_output(
         # Remove the outputs, unless directed otherwise
         if 'outputs' in cell:
             # Default behavior (max_size == 0) strips all outputs.
-            if not keep_output_this_cell:
+            if not keep_output_this_cell or keep_output_types:
                 cell['outputs'] = [output for output in cell['outputs']
                                    if get_size(output) <= max_size
                                    or output.get('output_type') in keep_output_types]
@@ -159,6 +159,8 @@ def strip_output(
                 for output in cell['outputs']:
                     if 'execution_count' in output:
                         output['execution_count'] = None
+
+
 
             # Remove specific output types
             if drop_output_types:
