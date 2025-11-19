@@ -9,7 +9,7 @@ directory = os.path.dirname(__file__)
 
 @pytest.fixture
 def orig_nb():
-    fname = 'test_drop_outputs.ipynb'
+    fname = 'test_output_types.ipynb'
     return nbformat.read(os.path.join(directory, fname), nbformat.NO_CONVERT)
 
 def test_drop_errors(orig_nb):
@@ -49,7 +49,7 @@ def test_keep_output(orig_nb):
     Te4st keep output types
     """
     nb_stripped = strip_output(deepcopy(orig_nb),
-                               keep_output=False,
+                               keep_output=True,
                                keep_count=False,
                                keep_id=False,
                                keep_output_types={'execute_result'})
@@ -61,8 +61,30 @@ def test_keep_output(orig_nb):
     assert len(orig_nb.cells[1].outputs) == 3
     assert orig_nb.cells[1].outputs[2]['output_type'] == 'error'
 
+    print(nb_stripped.cells[2].outputs)
+
     # All outputs should be stripped in the second cell
     assert len(nb_stripped.cells[1].outputs) == 0
 
     # Third cell should have an execution output
+    assert len(nb_stripped.cells[2].outputs) == 1
+
+def test_output_format_tags(orig_nb):
+    """
+     Te4st keep output types
+     """
+    nb_stripped = strip_output(deepcopy(orig_nb),
+                               keep_output=False,
+                               keep_count=False,
+                               keep_id=False,
+                               keep_output_types={'stream:stdout', 'execute_result'})
+
+    # No outputs in the markdown
+    assert not hasattr(nb_stripped.cells[0], 'outputs')
+
+    # Stripping all but stdout should leave only the print statement
+    assert len(orig_nb.cells[1].outputs) == 3
+    assert len(nb_stripped.cells[1].outputs) == 1
+
+    # Third cell should have only the execute_result
     assert len(nb_stripped.cells[2].outputs) == 1
