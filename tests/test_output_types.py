@@ -9,10 +9,15 @@ directory = os.path.dirname(__file__)
 
 @pytest.fixture
 def orig_nb():
+    # Grab the original notebook
     fname = 'test_output_types.ipynb'
     return nbformat.read(os.path.join(directory, fname), nbformat.NO_CONVERT)
 
 def test_drop_errors(orig_nb):
+    """
+    Confirm that --drop-output-types works as expected,
+    when asking just to drop `error` outputs.
+    """
     nb_stripped = strip_output(deepcopy(orig_nb),
                                keep_output=True,
                                keep_count=False,
@@ -39,14 +44,10 @@ def test_drop_errors(orig_nb):
     assert len(nb_stripped.cells[2].outputs) == 1
     assert nb_stripped.cells[2].outputs[0]['output_type'] == 'execute_result'
 
-    # Should be an error in the original cell, but not in the output
-    # assert orig_nb.cells[1].outputs[0]['output_type'] == 'error'
-    # print(nb_stripped.cells[1].outputs)
-
-
 def test_keep_output(orig_nb):
     """
-    Te4st keep output types
+    Confirm that --keep-output-types works as expected,
+    dropping all but `execute_result` outputs from the notebook.
     """
     nb_stripped = strip_output(deepcopy(orig_nb),
                                keep_output=True,
@@ -61,8 +62,6 @@ def test_keep_output(orig_nb):
     assert len(orig_nb.cells[1].outputs) == 3
     assert orig_nb.cells[1].outputs[2]['output_type'] == 'error'
 
-    print(nb_stripped.cells[2].outputs)
-
     # All outputs should be stripped in the second cell
     assert len(nb_stripped.cells[1].outputs) == 0
 
@@ -71,8 +70,8 @@ def test_keep_output(orig_nb):
 
 def test_output_format_tags(orig_nb):
     """
-     Te4st keep output types
-     """
+    Confirm that both <output_type>:<name> and <output_type> formats work.
+    """
     nb_stripped = strip_output(deepcopy(orig_nb),
                                keep_output=False,
                                keep_count=False,

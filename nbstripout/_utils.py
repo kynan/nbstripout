@@ -1,8 +1,7 @@
+import re
 from collections import defaultdict
 import sys
 from typing import Any, Callable, Iterator, List, Optional, Set, Dict
-import logging
-logger = logging.getLogger(__name__)
 
 from nbformat import NotebookNode
 
@@ -96,34 +95,25 @@ def strip_zeppelin_output(nb: dict) -> dict:
             cell['results'] = {}
     return nb
 
-class OutputType:
-    output_type: str
-    name: str
+def match_output_type(output: Dict,
+                      output_type: str) -> bool:
+    """
+    Take the `output_type` string, and return whether the output matches.
 
-    def __init__(self, output_type: str,
-                 name: str = None):
-        self.output_type = output_type
-        self.name = name
+    Currently, supported formats are `output_type:name` or `output_type`.
 
-    @classmethod
-    def from_string(cls, s: str) -> 'OutputType':
-        if ':' in s:
-            return cls(*s.split(':'))
-        else:
-            return cls(s)
+    :param output: The output dictionary from a notebook cell.
+    :param output_type: User-provided string to match against.
+    """
 
-    def matches_output(self, output: Dict):
-        return (output.get('output_type') == self.output_type and
-                (self.name is None or output.get('name') == self.name))
+    # Check if the ':' format is used, and if so, split into output_type and name
+    name = None
 
-    def __hash__(self):
-        return hash(self.output_type + str(self.name))
+    if ':' in output_type:
+        output_type, name = re.search(r'^(.*?):(.*)$', output_type).groups()
 
-    def __repr__(self):
-        return f'{self.output_type}:{self.name}'
-
-
-
+    return (output.get('output_type') == output_type
+            and (name is None or output.get('name') == name))
 
 def strip_output(
     nb: NotebookNode,
@@ -147,8 +137,8 @@ def strip_output(
     """
 
     # Replace mutable defaults
-    drop_output_types = {OutputType.from_string(s) for s in drop_output_types} if drop_output_types else set()
-    keep_output_types = {OutputType.from_string(s) for s in keep_output_types} if keep_output_types else set()
+    drop_output_types = drop_output_types or set()
+    keep_output_types = keep_output_types or set()
 
     if keep_output is None and 'keep_output' in nb.metadata:
         keep_output = bool(nb.metadata['keep_output'])
@@ -180,7 +170,7 @@ def strip_output(
             if not keep_output_this_cell or keep_output_types:
                 cell['outputs'] = [output for output in cell['outputs']
                                    if get_size(output) <= max_size
-                                   or any([ot.matches_output(output) for ot in keep_output_types])]
+                                   or any(match_output_type(output, ot) for ot in keep_output_types)]
 
             # Strip the counts from the outputs that were kept if not keep_count.
             if not keep_count:
@@ -194,7 +184,7 @@ def strip_output(
             if drop_output_types:
                 cell['outputs'] = [
                     output for output in cell['outputs']
-                    if not any([ot.matches_output(output) for ot in drop_output_types])
+                    if not any(match_output_type(output, ot) for ot in drop_output_types)
                 ]
 
             # If keep_output_this_cell and keep_count, do nothing.

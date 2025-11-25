@@ -325,9 +325,11 @@ Do not strip the output, only metadata:
 
     nbstripout --keep-output
 
-##### Output Types
+#### Output Types
 
-When keeping the output, drop a specific [`output_type`](https://ipython.readthedocs.io/en/3.x/notebook/nbformat.html#code-cell-outputs), like `error` or `stream`
+When keeping the output, drop a specific [
+`output_type`](https://ipython.readthedocs.io/en/3.x/notebook/nbformat.html#code-cell-outputs),
+like `error` or `stream`
 
     nbstripout --drop-output-type error stream
 
@@ -335,9 +337,15 @@ Drop all output except specific output types:
 
     nbstripout --keep-output-type execute_result
 
-For stripping certain outputs that have names (like `stream` which can be `stderr` or `stdout`) you can use a colon to specify the name. The following would strip all `stderr` output.
+_**Note: `--keep-output-type` will override `--max-size` for outputs that match.**_
+
+For stripping certain outputs that have names (like `stream` which can be
+`stderr` or `stdout`) you can use a colon to specify the name. The following
+would strip all `stderr` output.
 
     nbstripout --drop-output-type stream:stderr
+
+`stream:stdout` would strip all `stdout` output, including print statements.
 
 ##### Cell IDs
 
