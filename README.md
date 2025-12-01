@@ -353,7 +353,7 @@ Do not reassign the cell ids to be sequential (which is the default behavior):
 
     nbstripout --keep-id
 
-##### Keeping Output on Specific Cells
+#### Keeping Output on Specific Cells
 
 To mark special cells so that the output is not stripped, you can either:
 
