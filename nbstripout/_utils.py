@@ -110,7 +110,7 @@ def match_output_type(output: Dict,
     name = None
 
     if ':' in output_type:
-        output_type, name = re.search(r'^(.*?):(.*)$', output_type).groups()
+        output_type, name = output_type.split(':')
 
     return (output.get('output_type') == output_type
             and (name is None or output.get('name') == name))
