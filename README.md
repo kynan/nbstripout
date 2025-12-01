@@ -347,7 +347,7 @@ would strip all `stderr` output.
 
 `stream:stdout` would strip all `stdout` output, including print statements.
 
-##### Cell IDs
+#### Cell IDs
 
 Do not reassign the cell ids to be sequential (which is the default behavior):
 
