@@ -178,8 +178,6 @@ def strip_output(
                     if 'execution_count' in output:
                         output['execution_count'] = None
 
-
-
             # Remove specific output types
             if drop_output_types:
                 cell['outputs'] = [
