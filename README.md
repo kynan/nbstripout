@@ -327,8 +327,8 @@ Do not strip the output, only metadata:
 
 #### Output Types
 
-When keeping the output, drop a specific [
-`output_type`](https://ipython.readthedocs.io/en/3.x/notebook/nbformat.html#code-cell-outputs),
+When keeping the output, drop a specific
+[`output_type`](https://ipython.readthedocs.io/en/3.x/notebook/nbformat.html#code-cell-outputs),
 like `error` or `stream`
 
     nbstripout --drop-output-type error stream
