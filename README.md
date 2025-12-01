@@ -218,6 +218,7 @@ Note that you need to uninstall with the same flags:
 `nbstripout` can be used to rewrite an existing Git repository using
 [`git filter-repo`](https://github.com/newren/git-filter-repo) to strip output
 from existing notebooks. This invocation operates on all `.ipynb` files in the repo:
+
 ```bash
 #!/bin/bash
 git-filter-repo \
@@ -324,9 +325,35 @@ Do not strip the output, only metadata:
 
     nbstripout --keep-output
 
+#### Output Types
+
+When keeping the output, drop a specific
+[`output_type`](https://ipython.readthedocs.io/en/3.x/notebook/nbformat.html#code-cell-outputs),
+like `error` or `stream`
+
+    nbstripout --drop-output-type error stream
+
+Drop all output except specific output types:
+
+    nbstripout --keep-output-type execute_result
+
+_**Note: `--keep-output-type` will override `--max-size` for outputs that match.**_
+
+For stripping certain outputs that have names (like `stream` which can be
+`stderr` or `stdout`) you can use a colon to specify the name. The following
+would strip all `stderr` output.
+
+    nbstripout --drop-output-type stream:stderr
+
+`stream:stdout` would strip all `stdout` output, including print statements.
+
+#### Cell IDs
+
 Do not reassign the cell ids to be sequential (which is the default behavior):
 
     nbstripout --keep-id
+
+#### Keeping Output on Specific Cells
 
 To mark special cells so that the output is not stripped, you can either:
 
