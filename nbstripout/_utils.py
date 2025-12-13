@@ -1,4 +1,3 @@
-import re
 from collections import defaultdict
 import sys
 from typing import Any, Callable, Iterator, List, Optional, Set, Dict
