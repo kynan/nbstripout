@@ -516,6 +516,119 @@ When passing parameters to the hook, be aware that arguments with spaces such as
 > In its regular mode, `nbstripout` acts as a filter and only modifies what git
 > gets to see for committing or diffing. The working copy stays intact.
 
+# nbstripout: guard PRs with github action
+
+`nbstripout` offers a re-usable GitHub action that verifies notebooks are properly stripped of output before merging. This is useful for enforcing clean notebooks in your CI/CD pipeline without modifying local files.
+
+## Basic usage
+
+```yaml
+name: Check Notebooks Output
+
+on:
+  pull_request:
+    paths:
+      - '**.ipynb'
+  push:
+    branches:
+      - main
+    paths:
+      - '**.ipynb'
+  workflow_dispatch:
+
+jobs:
+  check-notebooks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      
+      - name: Check notebooks are stripped
+        uses: kynan/nbstripout@main
+        with:
+          paths: '**/*.ipynb'
+```
+
+## Action inputs
+
+All inputs are optional and have sensible defaults:
+
+| Input | Description | Default |
+|-------|-------------|---------|
+| `python-version` | Python version to use (supports versions, ranges, or "3.x") | `'3.x'` |
+| `paths` | Space-separated list of paths to check (supports wildcards) | `'**/*.ipynb'` |
+| `extra-keys` | Extra metadata keys to strip (space-separated) | `''` |
+| `keep-output` | Keep output in notebooks | `'false'` |
+| `keep-count` | Keep execution counts | `'false'` |
+| `strip-init-cells` | Strip init cells | `'false'` |
+
+## Usage examples
+
+### Check specific paths
+
+```yaml
+- name: Check notebooks are stripped
+  uses: kynan/nbstripout@main
+  with:
+    paths: 'notebooks/*.ipynb examples/*.ipynb'
+```
+
+### Strip extra metadata keys
+
+```yaml
+- name: Check notebooks are stripped
+  uses: kynan/nbstripout@main
+  with:
+    extra-keys: 'metadata.celltoolbar cell.metadata.heading_collapsed'
+```
+
+### Keep execution counts
+
+```yaml
+- name: Check notebooks are stripped
+  uses: kynan/nbstripout@main
+  with:
+    keep-count: 'true'
+```
+
+### Use specific Python version
+
+```yaml
+- name: Check notebooks are stripped
+  uses: kynan/nbstripout@main
+  with:
+    python-version: '3.11'
+```
+
+### Combine multiple options
+
+```yaml
+- name: Check notebooks are stripped
+  uses: kynan/nbstripout@main
+  with:
+    paths: 'notebooks/**/*.ipynb'
+    keep-count: 'true'
+    extra-keys: 'metadata.widgets cell.metadata.tags'
+```
+
+## How it works
+
+The action runs `nbstripout --verify` on the specified notebooks, which performs a dry-run check without modifying files. If any notebook would be modified by stripping, the action fails and reports which files need to be cleaned.
+
+This approach ensures that:
+- Notebooks in pull requests are properly stripped before merging
+- The check is non-destructive (doesn't modify your working copy)
+- Developers are notified when they forgot to strip output
+- Your Git history stays clean without large diffs from notebook outputs
+
+## Combining with pre-commit hooks
+
+For the best developer experience, use both:
+1. **Git filter or pre-commit hook** (local): Automatically strips output before committing
+2. **GitHub Action** (CI): Guards against accidentally pushed non-stripped notebooks
+
+This provides defense in depth and catches cases where local filters weren't installed.
+
 ## Troubleshooting
 
 ### Known issues
