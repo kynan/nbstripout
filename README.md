@@ -516,11 +516,11 @@ When passing parameters to the hook, be aware that arguments with spaces such as
 > In its regular mode, `nbstripout` acts as a filter and only modifies what git
 > gets to see for committing or diffing. The working copy stays intact.
 
-# nbstripout: guard PRs with github action
+## Guard PRs with a GitHub Action 
 
 `nbstripout` offers a re-usable GitHub action that verifies notebooks are properly stripped of output before merging. This is useful for enforcing clean notebooks in your CI/CD pipeline without modifying local files.
 
-## Basic usage
+### Basic usage
 
 ```yaml
 name: Check Notebooks Output
@@ -549,7 +549,7 @@ jobs:
           paths: '**/*.ipynb'
 ```
 
-## Action inputs
+### Action inputs
 
 All inputs are optional and have sensible defaults:
 
@@ -562,9 +562,9 @@ All inputs are optional and have sensible defaults:
 | `keep-count` | Keep execution counts | `'false'` |
 | `strip-init-cells` | Strip init cells | `'false'` |
 
-## Usage examples
+### Usage examples
 
-### Check specific paths
+#### Check specific paths
 
 ```yaml
 - name: Check notebooks are stripped
@@ -573,7 +573,7 @@ All inputs are optional and have sensible defaults:
     paths: 'notebooks/*.ipynb examples/*.ipynb'
 ```
 
-### Strip extra metadata keys
+#### Strip extra metadata keys
 
 ```yaml
 - name: Check notebooks are stripped
@@ -582,7 +582,7 @@ All inputs are optional and have sensible defaults:
     extra-keys: 'metadata.celltoolbar cell.metadata.heading_collapsed'
 ```
 
-### Keep execution counts
+#### Keep execution counts
 
 ```yaml
 - name: Check notebooks are stripped
@@ -591,7 +591,7 @@ All inputs are optional and have sensible defaults:
     keep-count: 'true'
 ```
 
-### Use specific Python version
+#### Use specific Python version
 
 ```yaml
 - name: Check notebooks are stripped
@@ -600,7 +600,7 @@ All inputs are optional and have sensible defaults:
     python-version: '3.11'
 ```
 
-### Combine multiple options
+#### Combine multiple options
 
 ```yaml
 - name: Check notebooks are stripped
@@ -611,7 +611,7 @@ All inputs are optional and have sensible defaults:
     extra-keys: 'metadata.widgets cell.metadata.tags'
 ```
 
-## How it works
+### How it works
 
 The action runs `nbstripout --verify` on the specified notebooks, which performs a dry-run check without modifying files. If any notebook would be modified by stripping, the action fails and reports which files need to be cleaned.
 
@@ -621,7 +621,7 @@ This approach ensures that:
 - Developers are notified when they forgot to strip output
 - Your Git history stays clean without large diffs from notebook outputs
 
-## Combining with pre-commit hooks
+### Combining with pre-commit hooks
 
 For the best developer experience, use both:
 1. **Git filter or pre-commit hook** (local): Automatically strips output before committing
