@@ -49,7 +49,6 @@ runs:
         
         if [ -z "$notebooks" ]; then
           echo "No notebook files found"
-          echo "notebooks=" >> $GITHUB_OUTPUT
         else
           echo "Found notebooks: $notebooks"
           echo "notebooks=$notebooks" >> $GITHUB_OUTPUT
