@@ -1,0 +1,102 @@
+name: 'NBStripout Check'
+description: 'Verify that Jupyter notebooks have their output stripped'
+inputs:
+  python-version:
+    description: 'Python version to use (supports versions, ranges, or "3.x"). Can also use a .python-version file by setting this to an empty string and ensuring the file exists.'
+    required: false
+    default: '3.x'
+  paths:
+    description: 'Space-separated list of paths to check (supports wildcards)'
+    required: false
+    default: '**/*.ipynb'
+  extra-keys:
+    description: 'Extra metadata keys to strip (space-separated)'
+    required: false
+    default: ''
+  keep-output:
+    description: 'Keep output in notebooks'
+    required: false
+    default: 'false'
+  keep-count:
+    description: 'Keep execution counts'
+    required: false
+    default: 'false'
+  strip-init-cells:
+    description: 'Strip init cells'
+    required: false
+    default: 'false'
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: ${{ inputs.python-version }}
+        pip-install: 'nbstripout'
+    
+    - name: Find notebook files
+      id: find-notebooks
+      shell: bash
+      run: |
+        # Find all notebooks matching the patterns
+        notebooks=""
+        for pattern in ${{ inputs.paths }}; do
+          found=$(find . -path "./$pattern" -type f 2>/dev/null || true)
+          if [ -n "$found" ]; then
+            notebooks="$notebooks $found"
+          fi
+        done
+        
+        if [ -z "$notebooks" ]; then
+          echo "No notebook files found"
+        else
+          echo "Found notebooks: $notebooks"
+          echo "notebooks=$notebooks" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Check notebooks are stripped
+      if: steps.find-notebooks.outputs.notebooks != ''
+      shell: bash
+      run: |
+        # Build nbstripout command with options
+        cmd="nbstripout --verify"
+        
+        if [ "${{ inputs.keep-output }}" = "true" ]; then
+          cmd="$cmd --keep-output"
+        fi
+        
+        if [ "${{ inputs.keep-count }}" = "true" ]; then
+          cmd="$cmd --keep-count"
+        fi
+        
+        if [ "${{ inputs.strip-init-cells }}" = "true" ]; then
+          cmd="$cmd --strip-init-cells"
+        fi
+        
+        if [ -n "${{ inputs.extra-keys }}" ]; then
+          cmd="$cmd --extra-keys '${{ inputs.extra-keys }}'"
+        fi
+        
+        # Check each notebook
+        failed=0
+        for notebook in ${{ steps.find-notebooks.outputs.notebooks }}; do
+          echo "Checking $notebook..."
+          if ! eval "$cmd $notebook"; then
+            echo "❌ $notebook has output that should be stripped"
+            failed=1
+          else
+            echo "✅ $notebook is properly stripped"
+          fi
+        done
+        
+        if [ $failed -eq 1 ]; then
+          echo ""
+          echo "================================================"
+          echo "Some notebooks have output that should be stripped."
+          echo "Please run: nbstripout <notebook-file>"
+          echo "Or install nbstripout as a git filter with: nbstripout --install"
+          echo "================================================"
+          exit 1
+        fi
+        
+        echo "All notebooks are properly stripped! ✅"
