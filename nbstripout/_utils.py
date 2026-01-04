@@ -1,6 +1,6 @@
 from collections import defaultdict
 import sys
-from typing import Any, Callable, Iterator, List, Optional
+from typing import Any, Callable, Iterator, List, Optional, Set, Dict
 
 from nbformat import NotebookNode
 
@@ -94,6 +94,25 @@ def strip_zeppelin_output(nb: dict) -> dict:
             cell['results'] = {}
     return nb
 
+def match_output_type(output: Dict,
+                      output_type: str) -> bool:
+    """
+    Take the `output_type` string, and return whether the output matches.
+
+    Currently, supported formats are `output_type:name` or `output_type`.
+
+    :param output: The output dictionary from a notebook cell.
+    :param output_type: User-provided string to match against.
+    """
+
+    # Check if the ':' format is used, and if so, split into output_type and name
+    name = None
+
+    if ':' in output_type:
+        output_type, name = output_type.split(':')
+
+    return (output.get('output_type') == output_type
+            and (name is None or output.get('name') == name))
 
 def strip_output(
     nb: NotebookNode,
@@ -104,6 +123,8 @@ def strip_output(
     drop_empty_cells: bool = False,
     drop_tagged_cells: List[str] = [],
     strip_init_cells: bool = False,
+    drop_output_types: Set[str] = None,
+    keep_output_types: Set[str] = None,
     max_size: int = 0,
 ) -> NotebookNode:
     """
@@ -113,6 +134,11 @@ def strip_output(
 
     `extra_keys` could be 'metadata.foo cell.metadata.bar metadata.baz'
     """
+
+    # Replace mutable defaults
+    drop_output_types = drop_output_types or set()
+    keep_output_types = keep_output_types or set()
+
     if keep_output is None and 'keep_output' in nb.metadata:
         keep_output = bool(nb.metadata['keep_output'])
 
@@ -140,14 +166,23 @@ def strip_output(
         # Remove the outputs, unless directed otherwise
         if 'outputs' in cell:
             # Default behavior (max_size == 0) strips all outputs.
-            if not keep_output_this_cell:
-                cell['outputs'] = [output for output in cell['outputs'] if get_size(output) <= max_size]
+            if not keep_output_this_cell or keep_output_types:
+                cell['outputs'] = [output for output in cell['outputs']
+                                   if get_size(output) <= max_size
+                                   or any(match_output_type(output, ot) for ot in keep_output_types)]
 
             # Strip the counts from the outputs that were kept if not keep_count.
             if not keep_count:
                 for output in cell['outputs']:
                     if 'execution_count' in output:
                         output['execution_count'] = None
+
+            # Remove specific output types
+            if drop_output_types:
+                cell['outputs'] = [
+                    output for output in cell['outputs']
+                    if not any(match_output_type(output, ot) for ot in drop_output_types)
+                ]
 
             # If keep_output_this_cell and keep_count, do nothing.
 
