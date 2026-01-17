@@ -1,3 +1,70 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nbstripout"
+version = "0.8.2"
+description = "Strips outputs from Jupyter and IPython notebooks"
+keywords = ["jupyter", "notebook", "ipython", "git", "filter", "hooks"]
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE.txt"]
+authors = [
+    {name = "Florian Rathgeber", email = "florian.rathgeber@gmail.com"}
+]
+maintainers = [
+    {name = "Florian Rathgeber", email = "florian.rathgeber@gmail.com"}
+]
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Framework :: IPython",
+    "Framework :: Jupyter",
+    "Intended Audience :: Developers",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Version Control",
+]
+dependencies = [
+    "nbformat"
+]
+
+[project.urls]
+Homepage = "https://pypi.org/project/nbstripout"
+Repository = "https://github.com/kynan/nbstripout"
+
+[project.scripts]
+nbstripout = "nbstripout._nbstripout:main"
+
+[tool.bumpversion]
+current_version = "0.8.2"
+commit = true
+tag = true
+tag_name = "{new_version}"
+tag_message = "v{new_version}"
+
+[[tool.bumpversion.files]]
+filename = "CONTRIBUTING.md"
+
+[[tool.bumpversion.files]]
+filename = "README.md"
+
+[[tool.bumpversion.files]]
+filename = "pyproject.toml"
+
+[[tool.bumpversion.files]]
+filename = "nbstripout/_nbstripout.py"
+
 [tool.ruff]
 line-length = 120
 indent-width = 4
