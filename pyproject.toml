@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "nbstripout"
-version = "0.8.2"
+version = "0.9.0"
 description = "Strips outputs from Jupyter and IPython notebooks"
 keywords = ["jupyter", "notebook", "ipython", "git", "filter", "hooks"]
 readme = "README.md"
@@ -47,7 +47,7 @@ Repository = "https://github.com/kynan/nbstripout"
 nbstripout = "nbstripout._nbstripout:main"
 
 [tool.bumpversion]
-current_version = "0.8.2"
+current_version = "0.9.0"
 commit = true
 tag = true
 tag_name = "{new_version}"
