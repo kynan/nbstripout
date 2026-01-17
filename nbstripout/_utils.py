@@ -94,8 +94,8 @@ def strip_zeppelin_output(nb: dict) -> dict:
             cell['results'] = {}
     return nb
 
-def match_output_type(output: Dict,
-                      output_type: str) -> bool:
+
+def match_output_type(output: Dict, output_type: str) -> bool:
     """
     Take the `output_type` string, and return whether the output matches.
 
@@ -111,8 +111,8 @@ def match_output_type(output: Dict,
     if ':' in output_type:
         output_type, name = output_type.split(':')
 
-    return (output.get('output_type') == output_type
-            and (name is None or output.get('name') == name))
+    return output.get('output_type') == output_type and (name is None or output.get('name') == name)
+
 
 def strip_output(
     nb: NotebookNode,
@@ -167,9 +167,11 @@ def strip_output(
         if 'outputs' in cell:
             # Default behavior (max_size == 0) strips all outputs.
             if not keep_output_this_cell or keep_output_types:
-                cell['outputs'] = [output for output in cell['outputs']
-                                   if get_size(output) <= max_size
-                                   or any(match_output_type(output, ot) for ot in keep_output_types)]
+                cell['outputs'] = [
+                    output
+                    for output in cell['outputs']
+                    if get_size(output) <= max_size or any(match_output_type(output, ot) for ot in keep_output_types)
+                ]
 
             # Strip the counts from the outputs that were kept if not keep_count.
             if not keep_count:
@@ -180,7 +182,8 @@ def strip_output(
             # Remove specific output types
             if drop_output_types:
                 cell['outputs'] = [
-                    output for output in cell['outputs']
+                    output
+                    for output in cell['outputs']
                     if not any(match_output_type(output, ot) for ot in drop_output_types)
                 ]
 

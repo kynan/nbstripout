@@ -5,7 +5,9 @@ import nbformat
 import pytest
 
 from nbstripout import strip_output
+
 directory = os.path.dirname(__file__)
+
 
 @pytest.fixture
 def orig_nb():
@@ -13,16 +15,15 @@ def orig_nb():
     fname = 'test_output_types.ipynb'
     return nbformat.read(os.path.join(directory, fname), nbformat.NO_CONVERT)
 
+
 def test_drop_errors(orig_nb):
     """
     Confirm that --drop-output-types works as expected,
     when asking just to drop `error` outputs.
     """
-    nb_stripped = strip_output(deepcopy(orig_nb),
-                               keep_output=True,
-                               keep_count=False,
-                               keep_id=False,
-                               drop_output_types={'error'})
+    nb_stripped = strip_output(
+        deepcopy(orig_nb), keep_output=True, keep_count=False, keep_id=False, drop_output_types={'error'}
+    )
 
     # No outputs in the markdown
     assert not hasattr(nb_stripped.cells[0], 'outputs')
@@ -44,16 +45,15 @@ def test_drop_errors(orig_nb):
     assert len(nb_stripped.cells[2].outputs) == 1
     assert nb_stripped.cells[2].outputs[0]['output_type'] == 'execute_result'
 
+
 def test_keep_output(orig_nb):
     """
     Confirm that --keep-output-types works as expected,
     dropping all but `execute_result` outputs from the notebook.
     """
-    nb_stripped = strip_output(deepcopy(orig_nb),
-                               keep_output=True,
-                               keep_count=False,
-                               keep_id=False,
-                               keep_output_types={'execute_result'})
+    nb_stripped = strip_output(
+        deepcopy(orig_nb), keep_output=True, keep_count=False, keep_id=False, keep_output_types={'execute_result'}
+    )
 
     # No outputs in the markdown
     assert not hasattr(nb_stripped.cells[0], 'outputs')
@@ -68,15 +68,18 @@ def test_keep_output(orig_nb):
     # Third cell should have an execution output
     assert len(nb_stripped.cells[2].outputs) == 1
 
+
 def test_output_format_tags(orig_nb):
     """
     Confirm that both <output_type>:<name> and <output_type> formats work.
     """
-    nb_stripped = strip_output(deepcopy(orig_nb),
-                               keep_output=False,
-                               keep_count=False,
-                               keep_id=False,
-                               keep_output_types={'stream:stdout', 'execute_result'})
+    nb_stripped = strip_output(
+        deepcopy(orig_nb),
+        keep_output=False,
+        keep_count=False,
+        keep_id=False,
+        keep_output_types={'stream:stdout', 'execute_result'},
+    )
 
     # No outputs in the markdown
     assert not hasattr(nb_stripped.cells[0], 'outputs')
