@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.9.0 - 2026-01-17
+
+- Add GitHub Action checking that output is stripped (@lagamura, #205, #207)
+- Add `--drop-output-type`, `--keep-output-type` flags (@rgeorgi, #175, #204)
+- Drop support for Python 3.8 and 3.9, add support for Python 3.13 and 3.14
+- Migrate to pyproject.toml, remove setup.py and setup.cfg
+
 ## 0.8.2 - 2025-11-16
 
 - Preserve Windows CRLF file endings in output file (#202)
