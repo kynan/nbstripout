@@ -531,6 +531,8 @@ def main():
 
     parser.add_argument('--textconv', '-t', action='store_true', help='Prints stripped files to STDOUT')
 
+    parser.add_argument('--force-lf-eol', action='store_true', help='Force LF line endings when writing files')
+
     parser.add_argument('files', nargs='*', help='Files to strip output from')
     args = parser.parse_args()
     git_config = ['git', 'config']
@@ -612,7 +614,8 @@ def main():
             continue
 
         try:
-            with io.open(filename, 'r+', encoding='utf8') as f:
+            file_newline = '' if args.force_lf_eol else None
+            with io.open(filename, 'r+', encoding='utf8', newline=file_newline) as f:
                 out = output_stream if args.textconv or args.dry_run else f
                 if process_notebook(
                     input_stream=f, output_stream=out, args=args, extra_keys=extra_keys, filename=filename

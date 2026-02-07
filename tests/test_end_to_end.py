@@ -1,4 +1,5 @@
 import os
+import sys
 from pathlib import Path
 import re
 from subprocess import run, PIPE
@@ -202,3 +203,19 @@ def test_nochange_notebook_unchanged():
     zpln_mtime_after = zpln_file.stat().st_mtime_ns
 
     assert zpln_mtime_after == zpln_mtime_before
+
+
+def test_force_lf_eol(tmp_path: Path):
+    input_content = (NOTEBOOKS_FOLDER / 'test_drop_empty_cells.ipynb').read_bytes().replace(b'\n', b'\r\n')
+
+    p = tmp_path / 'input.ipynb'
+    p.write_bytes(input_content)
+
+    run([nbstripout_exe(), p])
+    if sys.platform == 'win32':
+        assert b'\r\n' in p.read_bytes()
+    else:
+        assert b'\r\n' not in p.read_bytes()
+
+    run([nbstripout_exe(), '--force-lf-eol', p])
+    assert b'\r\n' not in p.read_bytes()
