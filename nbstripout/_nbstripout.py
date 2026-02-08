@@ -602,7 +602,7 @@ def main():
     keep_metadata_keys.extend(args.keep_metadata_keys.split())
     extra_keys = [i for i in extra_keys if i not in keep_metadata_keys]
 
-    newline = None if args.preserve_newlines else ''
+    newline = '' if args.preserve_newlines else None
 
     # Wrap input/output stream in UTF-8 encoded text wrapper
     # https://stackoverflow.com/a/16549381
