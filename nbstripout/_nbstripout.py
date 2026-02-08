@@ -531,7 +531,7 @@ def main():
 
     parser.add_argument('--textconv', '-t', action='store_true', help='Prints stripped files to STDOUT')
 
-    parser.add_argument('--preserve-newlines', action='store_true', help='Preserve OS line endings when writing files')
+    parser.add_argument('--unix-newlines', action='store_true', help='Force UNIX line endings in output (if unset, normalize to os.linesep)')
 
     parser.add_argument('files', nargs='*', help='Files to strip output from')
     args = parser.parse_args()
