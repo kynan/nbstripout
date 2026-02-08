@@ -531,7 +531,7 @@ def main():
 
     parser.add_argument('--textconv', '-t', action='store_true', help='Prints stripped files to STDOUT')
 
-    parser.add_argument('--force-lf-eol', action='store_true', help='Force LF line endings when writing files')
+    parser.add_argument('--preserve-newlines', action='store_true', help='Preserve OS line endings when writing files')
 
     parser.add_argument('files', nargs='*', help='Files to strip output from')
     args = parser.parse_args()
@@ -602,10 +602,12 @@ def main():
     keep_metadata_keys.extend(args.keep_metadata_keys.split())
     extra_keys = [i for i in extra_keys if i not in keep_metadata_keys]
 
+    newline = None if args.preserve_newlines else ''
+
     # Wrap input/output stream in UTF-8 encoded text wrapper
     # https://stackoverflow.com/a/16549381
     input_stream = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8') if sys.stdin else None
-    output_stream = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', newline='')
+    output_stream = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', newline=newline)
 
     process_notebook = {'jupyter': process_jupyter_notebook, 'zeppelin': process_zeppelin_notebook}[args.mode]
     any_change = False
@@ -614,8 +616,7 @@ def main():
             continue
 
         try:
-            file_newline = '' if args.force_lf_eol else None
-            with io.open(filename, 'r+', encoding='utf8', newline=file_newline) as f:
+            with io.open(filename, 'r+', encoding='utf8', newline=newline) as f:
                 out = output_stream if args.textconv or args.dry_run else f
                 if process_notebook(
                     input_stream=f, output_stream=out, args=args, extra_keys=extra_keys, filename=filename

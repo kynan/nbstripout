@@ -208,14 +208,26 @@ def test_nochange_notebook_unchanged():
 def test_newline_behavior(tmp_path: Path):
     input_content = (NOTEBOOKS_FOLDER / 'test_drop_empty_cells.ipynb').read_bytes().replace(b'\n', b'\r\n')
 
-    p = tmp_path / 'input.ipynb'
-    p.write_bytes(input_content)
+    to_os_eol = tmp_path / 'should-have-os-eol.ipynb'
+    to_os_eol.write_bytes(input_content)
 
-    run([nbstripout_exe(), p])
+    run([nbstripout_exe(), '--preserve-newlines', to_os_eol])
     if sys.platform == 'win32':
-        assert b'\r\n' in p.read_bytes()
+        assert b'\r\n' in to_os_eol.read_bytes()
     else:
-        assert b'\r\n' not in p.read_bytes()
+        assert b'\r\n' not in to_os_eol.read_bytes()
 
-    run([nbstripout_exe(), '--force-lf-eol', p])
-    assert b'\r\n' not in p.read_bytes()
+    pc = run([nbstripout_exe(), '--preserve-newlines', '--textconv', to_os_eol], stdout=PIPE)
+    if sys.platform == 'win32':
+        assert b'\r\n' in pc.stdout
+    else:
+        assert b'\r\n' not in pc.stdout
+
+    to_lf_eol = tmp_path / 'should-have-lf-eol.ipynb'
+    to_lf_eol.write_bytes(input_content)
+
+    run([nbstripout_exe(), to_lf_eol])
+    assert b'\r\n' not in to_lf_eol.read_bytes()
+
+    pc = run([nbstripout_exe(), '--textconv', to_lf_eol], stdout=PIPE)
+    assert b'\r\n' not in pc.stdout
