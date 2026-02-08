@@ -310,6 +310,13 @@ To drop all cells tagged with "solution" run:
 
 The option accepts a list of tags separated by whitespace.
 
+### Forcing UNIX newlines
+
+Force UNIX (LF) newlines in the output (useful on Windows to keep consistent
+line endings in filtered output or textconv diffs):
+
+    nbstripout --unix-newlines FILE.ipynb
+
 ### Keeping some output
 
 Do not strip the execution count/prompt number:
