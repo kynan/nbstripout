@@ -379,7 +379,7 @@ def process_jupyter_notebook(
 
     any_change = nb_orig != nb_stripped
     # Early exit when writing in-place and nothing changes.
-    if any_change is False and output_stream is input_stream:
+    if not any_change and output_stream is input_stream:
         return any_change
 
     if args.dry_run:
@@ -414,7 +414,7 @@ def process_zeppelin_notebook(
 
     any_change = nb_orig != nb_stripped
     # Early exit when writing in-place and nothing changes.
-    if any_change is False and output_stream is input_stream:
+    if not any_change and output_stream is input_stream:
         return any_change
 
     if args.dry_run:
