@@ -205,7 +205,7 @@ def test_nochange_notebook_unchanged():
     assert zpln_mtime_after == zpln_mtime_before
 
 
-def test_force_lf_eol(tmp_path: Path):
+def test_newline_behavior(tmp_path: Path):
     input_content = (NOTEBOOKS_FOLDER / 'test_drop_empty_cells.ipynb').read_bytes().replace(b'\n', b'\r\n')
 
     p = tmp_path / 'input.ipynb'
