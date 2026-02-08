@@ -184,3 +184,21 @@ def test_make_errors(input_file: str, expected_errs: List[Union[str, Pattern]], 
             assert e.search(err_output)
         else:
             assert e in err_output
+
+
+def test_nochange_notebook_unchanged():
+    ipynb_file = NOTEBOOKS_FOLDER / 'test_nochange.ipynb'
+    ipynb_mtime_before = ipynb_file.stat().st_mtime_ns
+
+    run([nbstripout_exe(), ipynb_file])
+    ipynb_mtime_after = ipynb_file.stat().st_mtime_ns
+
+    assert ipynb_mtime_after == ipynb_mtime_before
+
+    zpln_file = NOTEBOOKS_FOLDER / 'test_zeppelin.zpln.expected'
+    zpln_mtime_before = zpln_file.stat().st_mtime_ns
+
+    run([nbstripout_exe(), '--force', '--mode', 'zeppelin', zpln_file])
+    zpln_mtime_after = zpln_file.stat().st_mtime_ns
+
+    assert zpln_mtime_after == zpln_mtime_before
