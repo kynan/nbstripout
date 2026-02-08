@@ -531,7 +531,11 @@ def main():
 
     parser.add_argument('--textconv', '-t', action='store_true', help='Prints stripped files to STDOUT')
 
-    parser.add_argument('--unix-newlines', action='store_true', help='Force UNIX line endings in output (if unset, normalize to os.linesep)')
+    parser.add_argument(
+        '--unix-newlines',
+        action='store_true',
+        help='Force UNIX line endings in output (if unset, normalize to os.linesep)',
+    )
 
     parser.add_argument('files', nargs='*', help='Files to strip output from')
     args = parser.parse_args()
@@ -602,7 +606,7 @@ def main():
     keep_metadata_keys.extend(args.keep_metadata_keys.split())
     extra_keys = [i for i in extra_keys if i not in keep_metadata_keys]
 
-    newline = '' if args.preserve_newlines else None
+    newline = '' if args.unix_newlines else None
 
     # Wrap input/output stream in UTF-8 encoded text wrapper
     # https://stackoverflow.com/a/16549381

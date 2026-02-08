@@ -226,8 +226,8 @@ def test_newline_behavior(tmp_path: Path):
     to_lf_eol = tmp_path / 'should-have-lf-eol.ipynb'
     to_lf_eol.write_bytes(input_content)
 
-    run([nbstripout_exe(), '--preserve-newlines', to_lf_eol])
+    run([nbstripout_exe(), '--unix-newlines', to_lf_eol])
     assert b'\r\n' not in to_lf_eol.read_bytes()
 
-    pc = run([nbstripout_exe(), '--preserve-newlines', '--textconv', to_lf_eol], stdout=PIPE)
+    pc = run([nbstripout_exe(), '--unix-newlines', '--textconv', to_lf_eol], stdout=PIPE)
     assert b'\r\n' not in pc.stdout
