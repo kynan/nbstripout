@@ -606,6 +606,8 @@ def main():
     keep_metadata_keys.extend(args.keep_metadata_keys.split())
     extra_keys = [i for i in extra_keys if i not in keep_metadata_keys]
 
+    # Note that we can't actually preserve newlines from the input file: nbformat implicitly converts all newlines to \n
+    # and setting newline='' disables normalization of newlines on output, so the output will always use \n as newlines.
     newline = '' if args.unix_newlines else None
 
     # Wrap input/output stream in UTF-8 encoded text wrapper
