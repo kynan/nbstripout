@@ -1,5 +1,6 @@
 <!-- markdownlint-disable MD030 -->
 <!-- markdownlint-disable MD041 -->
+<!-- markdownlint-disable MD046 -->
 [![tests](https://github.com/kynan/nbstripout/actions/workflows/tests.yml/badge.svg)](https://github.com/kynan/nbstripout/actions/workflows/tests.yml)
 [![downloads](https://img.shields.io/pypi/dm/nbstripout)](https://pypi.org/project/nbstripout)
 [![PyPI version](https://img.shields.io/pypi/v/nbstripout)](https://pypi.org/project/nbstripout)
@@ -344,7 +345,7 @@ Drop all output except specific output types:
 
     nbstripout --keep-output-type execute_result
 
-_**Note: `--keep-output-type` will override `--max-size` for outputs that match.**_
+**Note: `--keep-output-type` will override `--max-size` for outputs that match.**
 
 For stripping certain outputs that have names (like `stream` which can be
 `stderr` or `stdout`) you can use a colon to specify the name. The following
@@ -550,7 +551,7 @@ When passing parameters to the hook, be aware that arguments with spaces such as
 > In its regular mode, `nbstripout` acts as a filter and only modifies what git
 > gets to see for committing or diffing. The working copy stays intact.
 
-## Guard PRs with a GitHub Action 
+## Guard PRs with a GitHub Action
 
 `nbstripout` offers a re-usable GitHub action that verifies notebooks are properly stripped of output before merging. This is useful for enforcing clean notebooks in your CI/CD pipeline without modifying local files.
 
@@ -588,7 +589,7 @@ jobs:
 All inputs are optional and have sensible defaults:
 
 | Input | Description | Default |
-|-------|-------------|---------|
+| ----- | ----------- | ------- |
 | `python-version` | Python version to use (supports versions, ranges, or "3.x") | `'3.x'` |
 | `paths` | Space-separated list of paths to check (supports wildcards) | `'**/*.ipynb'` |
 | `extra-keys` | Extra metadata keys to strip (space-separated) | `''` |
@@ -650,6 +651,7 @@ All inputs are optional and have sensible defaults:
 The action runs `nbstripout --verify` on the specified notebooks, which performs a dry-run check without modifying files. If any notebook would be modified by stripping, the action fails and reports which files need to be cleaned.
 
 This approach ensures that:
+
 - Notebooks in pull requests are properly stripped before merging
 - The check is non-destructive (doesn't modify your working copy)
 - Developers are notified when they forgot to strip output
@@ -658,6 +660,7 @@ This approach ensures that:
 ### Combining with pre-commit hooks
 
 For the best developer experience, use both:
+
 1. **Git filter or pre-commit hook** (local): Automatically strips output before committing
 2. **GitHub Action** (CI): Guards against accidentally pushed non-stripped notebooks
 
