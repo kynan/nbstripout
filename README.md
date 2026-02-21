@@ -527,7 +527,7 @@ to the `.pre-commit-config.yaml` in your repository:
 
     repos:
     - repo: https://github.com/kynan/nbstripout
-      rev: 0.9.0
+      rev: 0.9.1
       hooks:
         - id: nbstripout
 
@@ -538,7 +538,7 @@ When passing parameters to the hook, be aware that arguments with spaces such as
 
     repos:
     - repo: https://github.com/kynan/nbstripout
-      rev: 0.9.0
+      rev: 0.9.1
       hooks:
         - id: nbstripout
           args: ['--extra-keys=metadata.celltoolbar cell.metadata.heading_collapsed']
