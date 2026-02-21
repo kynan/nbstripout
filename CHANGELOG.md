@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.1 - 2026-02-21
+
+- Don't rewrite files when there is no change (@s-weigand, #210)
+- Add `--unix-newline` flag to force using LF linebreaks (@s-weigand, #209)
+
 ## 0.9.0 - 2026-01-17
 
 - Add GitHub Action checking that output is stripped (@lagamura, #205, #207)
