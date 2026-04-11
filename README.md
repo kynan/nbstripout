@@ -591,7 +591,7 @@ All inputs are optional and have sensible defaults:
 | Input | Description | Default |
 | ----- | ----------- | ------- |
 | `python-version` | Python version to use (supports versions, ranges, or "3.x") | `'3.x'` |
-| `paths` | Space-separated list of paths to check (supports wildcards) | `'**/*.ipynb'` |
+| `paths` | Newline-separated list of paths to check (supports wildcards) | `'**/*.ipynb'` |
 | `extra-keys` | Extra metadata keys to strip (space-separated) | `''` |
 | `keep-output` | Keep output in notebooks | `'false'` |
 | `keep-count` | Keep execution counts | `'false'` |
@@ -605,7 +605,9 @@ All inputs are optional and have sensible defaults:
 - name: Check notebooks are stripped
   uses: kynan/nbstripout@main
   with:
-    paths: 'notebooks/*.ipynb examples/*.ipynb'
+    paths: |
+      notebooks/*.ipynb
+      examples/*.ipynb
 ```
 
 #### Strip extra metadata keys
@@ -641,7 +643,8 @@ All inputs are optional and have sensible defaults:
 - name: Check notebooks are stripped
   uses: kynan/nbstripout@main
   with:
-    paths: 'notebooks/**/*.ipynb'
+    paths: |
+      notebooks/**/*.ipynb
     keep-count: 'true'
     extra-keys: 'metadata.widgets cell.metadata.tags'
 ```

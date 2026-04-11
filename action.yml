@@ -6,7 +6,7 @@ inputs:
     required: false
     default: '3.x'
   paths:
-    description: 'Space-separated list of paths to check (supports wildcards)'
+    description: 'Newline-separated list of paths to check (supports wildcards)'
     required: false
     default: '**/*.ipynb'
   extra-keys:
@@ -33,63 +33,69 @@ runs:
       with:
         python-version: ${{ inputs.python-version }}
         pip-install: 'nbstripout'
-    
-    - name: Find notebook files
-      id: find-notebooks
-      shell: bash
-      run: |
-        # Find all notebooks matching the patterns
-        notebooks=""
-        for pattern in ${{ inputs.paths }}; do
-          found=$(find . -path "./$pattern" -type f 2>/dev/null || true)
-          if [ -n "$found" ]; then
-            notebooks="$notebooks $found"
-          fi
-        done
-        
-        if [ -z "$notebooks" ]; then
-          echo "No notebook files found"
-        else
-          echo "Found notebooks: $notebooks"
-          echo "notebooks=$notebooks" >> $GITHUB_OUTPUT
-        fi
-    
+
     - name: Check notebooks are stripped
-      if: steps.find-notebooks.outputs.notebooks != ''
       shell: bash
+      env:
+        INPUT_PATHS: ${{ inputs.paths }}
+        INPUT_EXTRA_KEYS: ${{ inputs.extra-keys }}
+        INPUT_KEEP_OUTPUT: ${{ inputs.keep-output }}
+        INPUT_KEEP_COUNT: ${{ inputs.keep-count }}
+        INPUT_STRIP_INIT_CELLS: ${{ inputs.strip-init-cells }}
       run: |
-        # Build nbstripout command with options
-        cmd="nbstripout --verify"
-        
-        if [ "${{ inputs.keep-output }}" = "true" ]; then
-          cmd="$cmd --keep-output"
+        # Build nbstripout args as an array (bash 3.1+)
+        args=(--verify)
+
+        if [ "$INPUT_KEEP_OUTPUT" = "true" ]; then
+          args+=(--keep-output)
         fi
-        
-        if [ "${{ inputs.keep-count }}" = "true" ]; then
-          cmd="$cmd --keep-count"
+
+        if [ "$INPUT_KEEP_COUNT" = "true" ]; then
+          args+=(--keep-count)
         fi
-        
-        if [ "${{ inputs.strip-init-cells }}" = "true" ]; then
-          cmd="$cmd --strip-init-cells"
+
+        if [ "$INPUT_STRIP_INIT_CELLS" = "true" ]; then
+          args+=(--strip-init-cells)
         fi
-        
-        if [ -n "${{ inputs.extra-keys }}" ]; then
-          cmd="$cmd --extra-keys '${{ inputs.extra-keys }}'"
+
+        if [ -n "$INPUT_EXTRA_KEYS" ]; then
+          args+=(--extra-keys "$INPUT_EXTRA_KEYS")
         fi
-        
-        # Check each notebook
-        failed=0
-        for notebook in ${{ steps.find-notebooks.outputs.notebooks }}; do
-          echo "Checking $notebook..."
-          if ! eval "$cmd $notebook"; then
-            echo "❌ $notebook has output that should be stripped"
-            failed=1
-          else
-            echo "✅ $notebook is properly stripped"
-          fi
-        done
-        
-        if [ $failed -eq 1 ]; then
+
+        # Use Python for file discovery: correct ** glob handling on all platforms
+        # Outputs null-delimited paths and deduplicates overlapping patterns.
+        # INPUT_PATHS is quoted to prevent bash from expanding globs before Python sees them.
+        notebook_list="${RUNNER_TEMP:-/tmp}/nbstripout_filelist.txt"
+
+        python3 - "$INPUT_PATHS" << 'PYTHON' > "$notebook_list"
+        import sys
+        from pathlib import Path
+
+        raw_input = sys.argv[1]
+        patterns = [stripped for line in raw_input.splitlines() if (stripped := line.strip())]
+        seen = set()
+        for pat in patterns:
+            for p in sorted(Path(".").glob(pat)):
+                rp = str(p)
+                if p.is_file() and rp not in seen:
+                    seen.add(rp)
+                    sys.stdout.write(rp + "\0")
+        PYTHON
+
+        if [ ! -s "$notebook_list" ]; then
+          echo "No notebook files found matching: $INPUT_PATHS"
+          exit 0
+        fi
+
+        # Count null-delimited entries (POSIX-compatible, works on macOS and Linux)
+        notebook_count=$(tr -cd '\0' < "$notebook_list" | wc -c | tr -d ' ')
+        echo "Found $notebook_count notebook(s) to check."
+
+        # xargs -0 reads null-delimited paths (handles any filename characters)
+        # and batches automatically for ARG_MAX safety on large repos
+        if xargs -0 nbstripout "${args[@]}" < "$notebook_list"; then
+          echo "All notebooks are properly stripped! ✅"
+        else
           echo ""
           echo "================================================"
           echo "Some notebooks have output that should be stripped."
@@ -98,5 +104,3 @@ runs:
           echo "================================================"
           exit 1
         fi
-        
-        echo "All notebooks are properly stripped! ✅"

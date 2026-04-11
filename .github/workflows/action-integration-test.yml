@@ -1,0 +1,62 @@
+name: Action Integration Test
+
+on:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Optional branch, tag, or SHA to checkout for testing'
+        required: false
+        default: 'main'
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  test-action:
+    name: Test composite action behavior
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        case:
+          - name: clean notebook should pass
+            path: tests/e2e_notebooks/test_nochange.ipynb
+            expect_failure: false
+          - name: clean notebook with parentheses in filename should pass
+            path: tests/e2e_notebooks/test (nochange).ipynb
+            expect_failure: false
+          - name: dirty notebook with space in filename should fail
+            path: tests/e2e_notebooks/test metadata.ipynb
+            expect_failure: true
+          - name: dirty notebook should fail
+            path: tests/e2e_notebooks/test_metadata.ipynb
+            expect_failure: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Run action for ${{ matrix.case.name }}
+        id: run_case
+        continue-on-error: true
+        uses: ./
+        with:
+          paths: |
+            ${{ matrix.case.path }}
+
+      - name: Assert expected outcome
+        if: always()
+        shell: bash
+        run: |
+          expected_outcome="${{ matrix.case.expect_failure && 'failure' || 'success' }}"
+          actual_outcome="${{ steps.run_case.outcome }}"
+
+          if [ "$actual_outcome" != "$expected_outcome" ]; then
+            echo "Case: ${{ matrix.case.name }}"
+            echo "Path: ${{ matrix.case.path }}"
+            echo "Expected outcome: $expected_outcome"
+            echo "Actual outcome: $actual_outcome"
+            exit 1
+          fi
