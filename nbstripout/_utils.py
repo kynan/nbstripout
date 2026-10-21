@@ -4,10 +4,13 @@ from typing import Any, Callable, Iterator, List, Optional, Set, Dict
 
 from nbformat import NotebookNode
 
-__all__ = ['pop_recursive', 'strip_output', 'strip_zeppelin_output', 'MetadataError']
+__all__ = ['pop_recursive', 'strip_output', 'strip_zeppelin_output', 'MetadataError', 'NotebookContainsError']
 
 
 class MetadataError(Exception):
+    pass
+
+class NotebookContainsError(Exception):
     pass
 
 
@@ -125,6 +128,7 @@ def strip_output(
     strip_init_cells: bool = False,
     drop_output_types: Set[str] = None,
     keep_output_types: Set[str] = None,
+    strip_error: str | None = None,
     max_size: int = 0,
 ) -> NotebookNode:
     """
@@ -166,6 +170,13 @@ def strip_output(
         # Remove the outputs, unless directed otherwise
         if 'outputs' in cell:
             # Default behavior (max_size == 0) strips all outputs.
+            
+            # if the notebook contains error we need to stop if the user has specified such argument
+            if strip_error == 'error':
+                for output in cell['outputs']:
+                    if output['output_type'] == 'error':
+                        raise NotebookContainsError(f"The notebook contains this error: {output['evalue']}")
+            
             if not keep_output_this_cell or keep_output_types:
                 cell['outputs'] = [
                     output

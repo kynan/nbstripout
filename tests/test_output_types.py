@@ -4,7 +4,7 @@ from copy import deepcopy
 import nbformat
 import pytest
 
-from nbstripout import strip_output
+from nbstripout import strip_output, NotebookContainsError
 
 directory = os.path.dirname(__file__)
 
@@ -90,3 +90,44 @@ def test_output_format_tags(orig_nb):
 
     # Third cell should have only the execute_result
     assert len(nb_stripped.cells[2].outputs) == 1
+    
+    
+def test_strip_error_ignore(orig_nb):
+    """
+    Confirm that `strip_error='ignore'` applies normal output stripping, including to error outputs.
+    """
+    nb_stripped = strip_output(
+        deepcopy(orig_nb),
+        keep_output=False,
+        keep_count=False,
+        keep_id=False,
+        strip_error='ignore', 
+    )
+
+    # No outputs in the markdown
+    assert not hasattr(nb_stripped.cells[0], 'outputs')
+    
+    # making sure that the error output is not kept
+    assert nb_stripped.cells[1].outputs == []
+    
+
+def test_strip_error(orig_nb):
+    """
+    Confirm that `strip_error='error'` raises with the notebook error and leaves outputs unchanged.
+    """
+    
+    nb_copy = deepcopy(orig_nb)
+    
+    # outputs must be present before
+    outputs_before = [deepcopy(cell.get("outputs")) for cell in nb_copy.cells]
+    
+    with pytest.raises(NotebookContainsError,  match="No module named 'notalibrary'"):
+        strip_output(
+            nb_copy,
+            keep_output=False,
+            keep_count=False,
+            keep_id=False,
+            strip_error="error", 
+        )
+    # the same output must be present after, since it failed
+    assert [cell.get("outputs") for cell in nb_copy.cells] == outputs_before
