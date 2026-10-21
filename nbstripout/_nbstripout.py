@@ -371,6 +371,7 @@ def process_jupyter_notebook(
         strip_init_cells=args.strip_init_cells,
         drop_output_types=set(args.drop_output_type),
         keep_output_types=set(args.keep_output_type),
+        strip_error=args.strip_error,
         max_size=_parse_size(args.max_size),
     )
 
@@ -493,6 +494,12 @@ def main():
     )
     parser.add_argument(
         '--strip-init-cells', action='store_true', help='Remove cells with `init_cell: true` metadata (default: False)'
+    )
+    parser.add_argument(
+        '--strip-error',
+        default='ignore',
+        choices=['ignore', 'error'],
+        help='Controls what behavior should be done with errors',
     )
     parser.add_argument(
         '--attributes',
