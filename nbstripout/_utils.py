@@ -1,17 +1,18 @@
-from collections import defaultdict
 import sys
-from typing import Any, Callable, Iterator, List, Optional, Set, Dict
+from collections import defaultdict
+from collections.abc import Callable, Iterator
+from typing import Any
 
 from nbformat import NotebookNode
 
-__all__ = ['pop_recursive', 'strip_output', 'strip_zeppelin_output', 'MetadataError']
+__all__ = ['MetadataError', 'pop_recursive', 'strip_output', 'strip_zeppelin_output']
 
 
 class MetadataError(Exception):
     pass
 
 
-def pop_recursive(d: dict, key: str, default: Optional[NotebookNode] = None) -> NotebookNode:
+def pop_recursive(d: dict, key: str, default: NotebookNode | None = None) -> NotebookNode:
     """dict.pop(key) where `key` is a `.`-delimited list of nested keys.
 
     >>> d = {'a': {'b': 1, 'c': 2}}
@@ -95,7 +96,7 @@ def strip_zeppelin_output(nb: dict) -> dict:
     return nb
 
 
-def match_output_type(output: Dict, output_type: str) -> bool:
+def match_output_type(output: dict, output_type: str) -> bool:
     """
     Take the `output_type` string, and return whether the output matches.
 
@@ -119,12 +120,12 @@ def strip_output(
     keep_output: bool,
     keep_count: bool,
     keep_id: bool,
-    extra_keys: List[str] = [],
+    extra_keys: list[str] = [],
     drop_empty_cells: bool = False,
-    drop_tagged_cells: List[str] = [],
+    drop_tagged_cells: list[str] = [],
     strip_init_cells: bool = False,
-    drop_output_types: Set[str] = None,
-    keep_output_types: Set[str] = None,
+    drop_output_types: set[str] = None,
+    keep_output_types: set[str] = None,
     max_size: int = 0,
 ) -> NotebookNode:
     """

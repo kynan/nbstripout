@@ -1,11 +1,11 @@
-from copy import deepcopy
 import os
 import re
+from copy import deepcopy
 
 import nbformat
 import pytest
 
-from nbstripout import strip_output, MetadataError
+from nbstripout import MetadataError, strip_output
 
 directory = os.path.dirname(__file__)
 

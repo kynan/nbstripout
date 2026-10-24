@@ -1,12 +1,11 @@
 import os
+import re
 import sys
 from pathlib import Path
-import re
-from subprocess import run, PIPE
+from re import Pattern
+from subprocess import PIPE, run
 
 # Note: typing.Pattern is deprecated, for removal in 3.13 in favour of re.Pattern introduced in 3.8
-from typing import List, Union, Pattern
-
 import pytest
 
 NOTEBOOKS_FOLDER = Path('tests/e2e_notebooks')
@@ -86,7 +85,7 @@ def nbstripout_exe():
 
 @pytest.mark.parametrize('input_file, expected_file, args', TEST_CASES)
 @pytest.mark.parametrize('verify', (True, False))
-def test_end_to_end_stdin(input_file: str, expected_file: str, args: List[str], verify: bool):
+def test_end_to_end_stdin(input_file: str, expected_file: str, args: list[str], verify: bool):
     with open(NOTEBOOKS_FOLDER / expected_file, mode='r') as f:
         expected = f.read()
 
@@ -97,7 +96,7 @@ def test_end_to_end_stdin(input_file: str, expected_file: str, args: List[str], 
         args = [nbstripout_exe()] + args
         if verify:
             args.append('--verify')
-        pc = run(args, stdin=f, stdout=PIPE, universal_newlines=True)
+        pc = run(args, stdin=f, stdout=PIPE, text=True)
         output = pc.stdout
 
     if verify:
@@ -110,7 +109,7 @@ def test_end_to_end_stdin(input_file: str, expected_file: str, args: List[str], 
 
 @pytest.mark.parametrize('input_file, expected_file, args', TEST_CASES)
 @pytest.mark.parametrize('verify', (True, False))
-def test_end_to_end_file(input_file: str, expected_file: str, args: List[str], tmp_path, verify: bool):
+def test_end_to_end_file(input_file: str, expected_file: str, args: list[str], tmp_path, verify: bool):
     with open(NOTEBOOKS_FOLDER / expected_file, mode='r') as f:
         expected = f.read()
 
@@ -124,7 +123,7 @@ def test_end_to_end_file(input_file: str, expected_file: str, args: List[str], t
     args = [nbstripout_exe(), p] + args
     if verify:
         args.append('--verify')
-    pc = run(args, stdout=PIPE, universal_newlines=True)
+    pc = run(args, stdout=PIPE, text=True)
 
     output = pc.stdout.strip()
     if verify:
@@ -144,14 +143,14 @@ def test_end_to_end_file(input_file: str, expected_file: str, args: List[str], t
 
 @pytest.mark.parametrize('input_file, extra_args, any_change', DRY_RUN_CASES)
 @pytest.mark.parametrize('verify', (True, False))
-def test_dry_run_stdin(input_file: str, extra_args: List[str], any_change: bool, verify: bool):
+def test_dry_run_stdin(input_file: str, extra_args: list[str], any_change: bool, verify: bool):
     expected = 'Dry run: would have stripped input from stdin\n'
 
     with open(NOTEBOOKS_FOLDER / input_file, mode='r') as f:
         args = [nbstripout_exe(), '--dry-run'] + extra_args
         if verify:
             args.append('--verify')
-        pc = run(args, stdin=f, stdout=PIPE, universal_newlines=True)
+        pc = run(args, stdin=f, stdout=PIPE, text=True)
         output = pc.stdout
 
     assert output == (expected if any_change else '')
@@ -160,7 +159,7 @@ def test_dry_run_stdin(input_file: str, extra_args: List[str], any_change: bool,
 
 @pytest.mark.parametrize('input_file, extra_args, any_change', DRY_RUN_CASES)
 @pytest.mark.parametrize('verify', (True, False))
-def test_dry_run_args(input_file: str, extra_args: List[str], any_change: bool, verify: bool):
+def test_dry_run_args(input_file: str, extra_args: list[str], any_change: bool, verify: bool):
     expected_regex = re.compile(f'Dry run: would have stripped .*[/\\\\]{input_file}\n')
     args = [
         nbstripout_exe(),
@@ -169,7 +168,7 @@ def test_dry_run_args(input_file: str, extra_args: List[str], any_change: bool, 
     ] + extra_args
     if verify:
         args.append('--verify')
-    pc = run(args, stdout=PIPE, universal_newlines=True)
+    pc = run(args, stdout=PIPE, text=True)
     output = pc.stdout
 
     assert expected_regex.match(output) if any_change else output == ''
@@ -177,9 +176,9 @@ def test_dry_run_args(input_file: str, extra_args: List[str], any_change: bool, 
 
 
 @pytest.mark.parametrize('input_file, expected_errs, extra_args', ERR_OUTPUT_CASES)
-def test_make_errors(input_file: str, expected_errs: List[Union[str, Pattern]], extra_args: List[str]):
+def test_make_errors(input_file: str, expected_errs: list[str | Pattern], extra_args: list[str]):
     with open(NOTEBOOKS_FOLDER / input_file, mode='r') as f:
-        pc = run([nbstripout_exe(), '--dry-run'] + extra_args, stdin=f, stderr=PIPE, universal_newlines=True)
+        pc = run([nbstripout_exe(), '--dry-run'] + extra_args, stdin=f, stderr=PIPE, text=True)
         err_output = pc.stderr
 
     for e in expected_errs:
