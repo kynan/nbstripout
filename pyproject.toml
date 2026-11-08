@@ -70,5 +70,8 @@ line-length = 120
 indent-width = 4
 extend-exclude = ["*.ipynb"]
 
+[tool.ruff.lint]
+ignore = ["PLW1510", "B023", "RUF013", "B006", "UP028", "PIE810", "SIM115"]
+
 [tool.ruff.format]
 quote-style = "single"
