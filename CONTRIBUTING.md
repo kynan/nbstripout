@@ -5,6 +5,33 @@ Development of nbstripout happens on
 [bug reports](https://github.com/kynan/nbstripout/issues) and
 [pull requests](https://github.com/kynan/nbstripout/pulls) welcome!
 
+
+# How to get started
+
+Let's clone the repo and get into it:
+
+    git clone https://github.com/kynan/nbstripout.git
+    cd nbstripout
+
+Then start by making a virtual environment:
+
+    python3 -m venv .venv
+
+Activate this environment:
+
+    source .venv/bin/activate
+
+NOTE: Please read [this](https://docs.python.org/3/library/venv.html#how-venvs-work) page to understand how to activate it based on your platform/shell.
+
+For installing the required dependencies run:
+
+    pip install -e .[dev]
+
+Lastly to run the test suite run:
+
+    python3 -m pytest
+
+
 ## Releasing a new version
 
 To simplify updating the version number consistently across different files and

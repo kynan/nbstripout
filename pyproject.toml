@@ -39,6 +39,12 @@ dependencies = [
     "nbformat"
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-ruff",
+]
+
 [project.urls]
 Homepage = "https://pypi.org/project/nbstripout"
 Repository = "https://github.com/kynan/nbstripout"
