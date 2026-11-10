@@ -232,3 +232,17 @@ def test_newline_behavior(tmp_path: Path):
 
     pc = run([nbstripout_exe(), '--unix-newlines', '--textconv', to_lf_eol], stdout=PIPE)
     assert b'\r\n' not in pc.stdout
+
+
+@pytest.mark.parametrize('bad_size', ['', 'XB', '1.5M'])
+def test_invalid_max_size(bad_size: str):
+    with open(NOTEBOOKS_FOLDER / 'test_metadata.ipynb', mode='r') as f:
+        pc = run(
+            [nbstripout_exe(), '--max-size', bad_size],
+            stdin=f,
+            capture_output=True,
+            text=True,
+        )
+    assert pc.returncode == 2
+    assert 'invalid size value' in pc.stderr
+    assert 'Traceback' not in pc.stderr

@@ -189,6 +189,8 @@ def _get_attrfile(
 
 def _parse_size(num_str: str) -> int:
     num_str = num_str.upper()
+    if not num_str:
+        raise ValueError('Empty size identifier')
     if num_str[-1].isdigit():
         return int(num_str)
     elif num_str[-1] == 'K':
@@ -613,6 +615,11 @@ def main():
     # https://stackoverflow.com/a/16549381
     input_stream = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8') if sys.stdin else None
     output_stream = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', newline=newline)
+
+    try:
+        _parse_size(args.max_size)
+    except ValueError:
+        parser.error(f'argument --max-size: invalid size value: {args.max_size!r}')
 
     process_notebook = {'jupyter': process_jupyter_notebook, 'zeppelin': process_zeppelin_notebook}[args.mode]
     any_change = False
