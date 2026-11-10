@@ -8,7 +8,12 @@ Development of nbstripout happens on
 
 # How to get started
 
-Start by making a virtual environment:
+Let's clone the repo and get into it:
+
+    git clone https://github.com/kynan/nbstripout.git
+    cd nbstripout
+
+Then start by making a virtual environment:
 
     python3 -m venv .venv
 
@@ -24,7 +29,7 @@ For installing the required dependencies run:
 
 Lastly to run the test suite run:
 
-    python -m pytest
+    python3 -m pytest
 
 
 ## Releasing a new version
