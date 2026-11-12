@@ -117,9 +117,9 @@ import re
 import sys
 import warnings
 from argparse import ArgumentParser, Namespace, RawDescriptionHelpFormatter
-from os import devnull, environ, makedirs, path
+from os import environ, makedirs, path
 from pathlib import PureWindowsPath
-from subprocess import STDOUT, CalledProcessError, call, check_call, check_output
+from subprocess import DEVNULL, STDOUT, CalledProcessError, call, check_call, check_output
 
 import nbformat
 
@@ -160,9 +160,7 @@ def _get_system_gitconfig_folder() -> str:
     return path.abspath(path.dirname(system_gitconfig_file_path))
 
 
-def _get_attrfile(
-    git_config: str, install_location: str = INSTALL_LOCATION_LOCAL, attrfile: str | None = None
-) -> str:
+def _get_attrfile(git_config: str, install_location: str = INSTALL_LOCATION_LOCAL, attrfile: str | None = None) -> str:
     if not attrfile:
         if install_location == INSTALL_LOCATION_SYSTEM:
             try:
@@ -261,10 +259,10 @@ def install(
 def uninstall(git_config: str, install_location: str = INSTALL_LOCATION_LOCAL, attrfile: str | None = None) -> int:
     """Uninstall the git filter and unset the git attributes."""
     try:
-        call(git_config + ['--unset', 'filter.nbstripout.clean'], stdout=open(devnull, 'w'), stderr=STDOUT)
-        call(git_config + ['--unset', 'filter.nbstripout.smudge'], stdout=open(devnull, 'w'), stderr=STDOUT)
-        call(git_config + ['--unset', 'filter.nbstripout.required'], stdout=open(devnull, 'w'), stderr=STDOUT)
-        call(git_config + ['--remove-section', 'diff.ipynb'], stdout=open(devnull, 'w'), stderr=STDOUT)
+        call(git_config + ['--unset', 'filter.nbstripout.clean'], stdout=DEVNULL, stderr=STDOUT)
+        call(git_config + ['--unset', 'filter.nbstripout.smudge'], stdout=DEVNULL, stderr=STDOUT)
+        call(git_config + ['--unset', 'filter.nbstripout.required'], stdout=DEVNULL, stderr=STDOUT)
+        call(git_config + ['--remove-section', 'diff.ipynb'], stdout=DEVNULL, stderr=STDOUT)
         attrfile = _get_attrfile(git_config, install_location, attrfile)
     except FileNotFoundError:
         print('Uninstall failed: git is not on path!', file=sys.stderr)
