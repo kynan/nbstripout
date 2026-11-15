@@ -32,7 +32,9 @@ runs:
       uses: actions/setup-python@v6
       with:
         python-version: ${{ inputs.python-version }}
-        pip-install: 'nbstripout'
+    - name: Install nbstripout
+      shell: bash
+      run: pip install nbstripout
 
     - name: Check notebooks are stripped
       shell: bash
