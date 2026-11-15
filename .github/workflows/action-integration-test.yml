@@ -16,6 +16,8 @@ jobs:
   test-action:
     name: Test composite action behavior
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
