@@ -68,6 +68,6 @@ Use [twine](https://twine.readthedocs.io/en/latest/#using-twine) to upload the
 new release to PyPI:
 
     python -m build
-    twine check dist/nbstripout-0.9.1*
-    twine upload -r testpypi dist/nbstripout-0.9.1*
-    twine upload dist/nbstripout-0.9.1*
+    twine check dist/nbstripout-0.9.2*
+    twine upload -r testpypi dist/nbstripout-0.9.2*
+    twine upload dist/nbstripout-0.9.2*
