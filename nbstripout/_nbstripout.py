@@ -126,7 +126,7 @@ import nbformat
 from nbstripout._utils import strip_output, strip_zeppelin_output
 
 __all__ = ['install', 'main', 'status', 'uninstall']
-__version__ = '0.9.1'
+__version__ = '0.9.2'
 
 
 INSTALL_LOCATION_LOCAL = 'local'
