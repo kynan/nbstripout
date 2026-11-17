@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.9.2 - 2026-11-17
+
+- Add support for Python 3.15 (@phalberg, #233)
+- Use `subprocess.DEVNULL` instead of opening `os.devnull` (@phalberg, #222)
+- Update contributing and installation documentation (@phalberg, #220, #227)
+- Refactor GitHub Action for improved notebook file handling (@kunalagra, #212)
+
 ## 0.9.1 - 2026-02-21
 
 - Don't rewrite files when there is no change (@s-weigand, #210)
