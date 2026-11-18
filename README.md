@@ -346,6 +346,10 @@ notebook that contains an error output and report it, use:
 
     nbstripout --strip-error error notebook.ipynb
 
+To strip error outputs while preserving non-error outputs (even when `keep-output` is enabled), use:
+
+    nbstripout --strip-error strip notebook.ipynb
+
 Drop all output except specific output types:
 
     nbstripout --keep-output-type execute_result

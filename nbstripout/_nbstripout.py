@@ -75,6 +75,15 @@ configuration summary of filter and attributes if installed
 (exits with code 0 if installed, 1 otherwise): ::
 
     nbstripout --status
+Control error output stripping: ::
+
+    nbstripout --strip-error=strip <file.ipynb>
+    nbstripout --strip-error=error <file.ipynb>
+
+Available options for `--strip-error`:
+    - `ignore` (default): Do nothing special with error outputs.
+    - `error`: Treat notebooks containing error outputs as an error/failure condition.
+    - `strip`: Strip error outputs while preserving non-error outputs (even if `keep_out
 
 Do a dry run and only list which files would have been stripped: ::
 
