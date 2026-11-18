@@ -498,7 +498,7 @@ def main():
     parser.add_argument(
         '--strip-error',
         default='ignore',
-        choices=['ignore', 'error'],
+        choices=['ignore', 'error', 'strip'],
         help='Controls what behavior should be done with errors',
     )
     parser.add_argument(
