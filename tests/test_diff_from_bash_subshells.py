@@ -6,10 +6,10 @@ import pytest
 # fix this before pytester.chdir() happens
 NOTEBOOKS_FOLDER = Path('tests').absolute()
 
+pytestmark = pytest.mark.skipif(sys.platform.startswith('win'), reason='test requires proper bash shell')
+
 
 def test_diff_with_process_substitution_nodiff(pytester: pytest.Pytester):
-    if sys.platform.startswith('win'):
-        pytest.skip('test requires proper bash shell')
 
     r = pytester.run(
         'bash',
@@ -21,8 +21,6 @@ def test_diff_with_process_substitution_nodiff(pytester: pytest.Pytester):
 
 
 def test_diff_with_process_substitution_diff(pytester: pytest.Pytester):
-    if sys.platform.startswith('win'):
-        pytest.skip('test requires proper bash shell')
 
     r = pytester.run(
         'bash',
