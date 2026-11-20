@@ -32,6 +32,16 @@ Lastly to run the test suite run:
     python3 -m pytest
 
 
+Bonus:
+If you think the tests take a while to run try out [`pytest-xdist`](https://pytest-xdist.readthedocs.io/en/latest/), install it by running:
+
+    pip install pytest-xdist
+
+Then just run by using:
+
+    python3 -m pytest -n auto
+
+
 ## Releasing a new version
 
 To simplify updating the version number consistently across different files and
