@@ -5,8 +5,7 @@ Development of nbstripout happens on
 [bug reports](https://github.com/kynan/nbstripout/issues) and
 [pull requests](https://github.com/kynan/nbstripout/pulls) welcome!
 
-
-# How to get started
+## How to get started
 
 Let's clone the repo and get into it:
 
@@ -31,7 +30,6 @@ Lastly to run the test suite run:
 
     python3 -m pytest
 
-
 Bonus:
 If you think the tests take a while to run try out [`pytest-xdist`](https://pytest-xdist.readthedocs.io/en/latest/), install it by running:
 
@@ -40,7 +38,6 @@ If you think the tests take a while to run try out [`pytest-xdist`](https://pyte
 Then just run by using:
 
     python3 -m pytest -n auto
-
 
 ## Releasing a new version
 
@@ -69,6 +66,16 @@ Explicit approval is required due to a deployment protection rule configured for
 
 The workflow has separate branches for publishing to Test PyPI and PyPI, which
 can be approved separately.
+
+## Creating the GitHub release
+
+Create the [GitHub Release](https://github.com/kynan/nbstripout/releases) once
+the tag is pushed
+([GitHub documentation](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository)).
+
+Name the release the same as the tag. For the description, copy over the section
+from the Changelog. Download both the source `.tar.gz` and `.whl` from PyPI and
+attach them in the binaries section. Then hit publish.
 
 ## Manual upload
 
