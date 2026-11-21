@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Add `--max-size-action error` to reject oversized outputs without rewriting
+  the failing notebook (#167).
+
 ## 0.9.2 - 2026-11-17
 
 - Add support for Python 3.15 (@phalberg, #233)

@@ -132,7 +132,7 @@ from subprocess import DEVNULL, STDOUT, CalledProcessError, call, check_call, ch
 
 import nbformat
 
-from nbstripout._utils import strip_output, strip_zeppelin_output
+from nbstripout._utils import OutputTooLargeError, strip_output, strip_zeppelin_output
 
 __all__ = ['install', 'main', 'status', 'uninstall']
 __version__ = '0.9.2'
@@ -382,6 +382,7 @@ def process_jupyter_notebook(
         keep_output_types=set(args.keep_output_type),
         strip_error=args.strip_error,
         max_size=_parse_size(args.max_size),
+        max_size_action=args.max_size_action,
     )
 
     any_change = nb_orig != nb_stripped
@@ -535,6 +536,12 @@ def main():
     )
     parser.add_argument('--max-size', metavar='SIZE', help='Keep outputs smaller than SIZE', default='0')
     parser.add_argument(
+        '--max-size-action',
+        choices=['strip', 'error'],
+        default='strip',
+        help='Strip outputs exceeding --max-size (default), or fail without writing the notebook',
+    )
+    parser.add_argument(
         '--mode',
         '-m',
         default='jupyter',
@@ -642,6 +649,9 @@ def main():
                 ):
                     any_change = True
 
+        except OutputTooLargeError as e:
+            print(f"Could not strip '{filename}': {e}", file=sys.stderr)
+            raise SystemExit(1)
         except nbformat.reader.NotJSONError:
             print(f"No valid notebook detected in '{filename}'", file=sys.stderr)
             raise SystemExit(1)
@@ -657,6 +667,9 @@ def main():
         try:
             if process_notebook(input_stream, output_stream, args, extra_keys):
                 any_change = True
+        except OutputTooLargeError as e:
+            print(f'Could not strip input from stdin: {e}', file=sys.stderr)
+            raise SystemExit(1)
         except nbformat.reader.NotJSONError:
             print('No valid notebook detected on stdin', file=sys.stderr)
             raise SystemExit(1)

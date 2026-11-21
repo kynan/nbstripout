@@ -5,7 +5,14 @@ from typing import Any
 
 from nbformat import NotebookNode
 
-__all__ = ['MetadataError', 'NotebookContainsError', 'pop_recursive', 'strip_output', 'strip_zeppelin_output']
+__all__ = [
+    'MetadataError',
+    'NotebookContainsError',
+    'OutputTooLargeError',
+    'pop_recursive',
+    'strip_output',
+    'strip_zeppelin_output',
+]
 
 
 class MetadataError(Exception):
@@ -13,6 +20,10 @@ class MetadataError(Exception):
 
 
 class NotebookContainsError(Exception):
+    pass
+
+
+class OutputTooLargeError(Exception):
     pass
 
 
@@ -132,6 +143,7 @@ def strip_output(
     keep_output_types: set[str] = None,
     strip_error: str = 'ignore',
     max_size: int = 0,
+    max_size_action: str = 'strip',
 ) -> NotebookNode:
     """
     Strip the outputs, execution count/prompt number and miscellaneous
@@ -139,6 +151,8 @@ def strip_output(
     or counts.
 
     `extra_keys` could be 'metadata.foo cell.metadata.bar metadata.baz'
+    `max_size_action='error'` raises OutputTooLargeError instead of removing
+    an output that exceeds `max_size`. Outputs explicitly kept are exempt.
     """
 
     # Replace mutable defaults
@@ -190,11 +204,19 @@ def strip_output(
                 cell['outputs'] = [output for output in cell['outputs'] if output['output_type'] != 'error']
 
             if not keep_output_this_cell or keep_output_types:
-                cell['outputs'] = [
-                    output
-                    for output in cell['outputs']
-                    if get_size(output) <= max_size or any(match_output_type(output, ot) for ot in keep_output_types)
-                ]
+                outputs = []
+                for output in cell['outputs']:
+                    if any(match_output_type(output, ot) for ot in keep_output_types):
+                        outputs.append(output)
+                        continue
+                    size = get_size(output)
+                    if size <= max_size:
+                        outputs.append(output)
+                    elif max_size_action == 'error':
+                        raise OutputTooLargeError(
+                            f'Output in cell number {i + 1} has size {size}, exceeding --max-size {max_size}'
+                        )
+                cell['outputs'] = outputs
 
             # Strip the counts from the outputs that were kept if not keep_count.
             if not keep_count:

@@ -329,6 +329,22 @@ only large outputs like images):
 
     nbstripout --max-size 1k
 
+To report oversized outputs instead of removing them, use:
+
+    nbstripout --max-size 1k --max-size-action error notebook.ipynb
+
+If an output would be removed by the size limit, this exits with status 1,
+reports the notebook and cell, and leaves that notebook file unchanged. No
+notebook is written to stdout on failure either. Outputs explicitly kept by
+`--keep-output`, cell metadata/tags, or `--keep-output-type` remain exempt from
+the size limit. The default action is `strip`.
+
+The size uses the same sum of string lengths (including output metadata) as
+`--max-size`, with outputs at the limit retained. Other stripping, such as
+execution counts and metadata, still applies when the notebook passes the check.
+Each notebook is processed independently; earlier files may have been stripped
+before a later file fails.
+
 Do not strip the output, only metadata:
 
     nbstripout --keep-output
@@ -541,6 +557,10 @@ to the `.pre-commit-config.yaml` in your repository:
         - id: nbstripout
 
 Then run `pre-commit install` to activate the hook.
+
+To fail the hook on oversized output for manual review, add
+`args: [--max-size, 1k, --max-size-action, error]` to the hook configuration.
+This preserves the failing notebook's output for the developer to handle.
 
 When passing parameters to the hook, be aware that arguments with spaces such as
 `--extra-keys` need to be quoted as a whole:

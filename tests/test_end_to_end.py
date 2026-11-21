@@ -206,6 +206,65 @@ def test_nochange_notebook_unchanged():
     assert zpln_mtime_after == zpln_mtime_before
 
 
+@pytest.mark.parametrize('extra_args', [[], ['--textconv'], ['--dry-run'], ['--verify']])
+def test_large_output_error_leaves_file_unchanged(tmp_path: Path, extra_args: list[str]):
+    notebook = tmp_path / 'large output.ipynb'
+    original = (NOTEBOOKS_FOLDER / 'test_max_size.ipynb').read_bytes()
+    notebook.write_bytes(original)
+    mtime = notebook.stat().st_mtime_ns
+
+    pc = run(
+        [nbstripout_exe(), '--max-size', '50', '--max-size-action', 'error', *extra_args, notebook],
+        capture_output=True,
+        text=True,
+    )
+
+    assert pc.returncode == 1
+    assert str(notebook) in pc.stderr
+    assert 'exceeding --max-size 50' in pc.stderr
+    assert 'cell number' in pc.stderr
+    assert 'Traceback' not in pc.stderr
+    assert pc.stdout == ''
+    assert notebook.read_bytes() == original
+    assert notebook.stat().st_mtime_ns == mtime
+
+
+def test_large_output_error_stdin():
+    pc = run(
+        [nbstripout_exe(), '--max-size', '50', '--max-size-action', 'error'],
+        input=(NOTEBOOKS_FOLDER / 'test_max_size.ipynb').read_text(),
+        capture_output=True,
+        text=True,
+    )
+
+    assert pc.returncode == 1
+    assert 'input from stdin' in pc.stderr
+    assert 'exceeding --max-size 50' in pc.stderr
+    assert 'Traceback' not in pc.stderr
+    assert pc.stdout == ''
+
+
+def test_max_size_error_keeps_small_output():
+    pc = run(
+        [nbstripout_exe(), '--max-size', '1M', '--max-size-action', 'error', '--keep-id'],
+        input=(NOTEBOOKS_FOLDER / 'test_max_size.ipynb').read_text(),
+        capture_output=True,
+        text=True,
+    )
+
+    assert pc.returncode == 0
+    assert pc.stderr == ''
+    # With this limit, the normal stripping path retains every output too.
+    expected = run(
+        [nbstripout_exe(), '--max-size', '1M', '--keep-id'],
+        input=(NOTEBOOKS_FOLDER / 'test_max_size.ipynb').read_text(),
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert pc.stdout == expected.stdout
+
+
 def test_newline_behavior(tmp_path: Path):
     input_content = (NOTEBOOKS_FOLDER / 'test_drop_empty_cells.ipynb').read_bytes().replace(b'\n', b'\r\n')
 
