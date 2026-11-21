@@ -52,6 +52,12 @@ and for a minor release, run
 
     bump-my-version bump minor
 
+When finalizing the publish of a new release via a PR, please create a branch with the following name:
+
+    release/*
+
+This should activate an automatic CI job to test all MacOS python versions, since we only test partially in the lead-up to the release.
+
 Remember to also push the release tag with `git push --tags`.
 
 ## Publishing to PyPI

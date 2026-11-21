@@ -3,11 +3,11 @@ name: nbstripout
 on: [push, pull_request, workflow_dispatch]
 
 jobs:
-  test:
+  test_windows_and_linux:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest]
         python-version: ['3.10', '3.11', '3.12', '3.13', '3.14', '3.15']
 
     steps:
@@ -27,11 +27,6 @@ jobs:
       shell: bash
       run: |
         pytest
-    - name: Run tests (MacOS)
-      if: matrix.os == 'macos-latest'
-      shell: bash
-      run: |
-        pytest
     - name: Run tests (Windows)
       if: matrix.os == 'windows-latest'
       shell: bash
@@ -40,3 +35,18 @@ jobs:
       run: |
         git config --global core.autocrlf true
         pytest
+
+  test_macos_partial:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.15']
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install ".[dev]"
+      - run: git config --global init.defaultBranch main
+      - run: pytest
