@@ -75,6 +75,15 @@ configuration summary of filter and attributes if installed
 (exits with code 0 if installed, 1 otherwise): ::
 
     nbstripout --status
+Control error output stripping: ::
+
+    nbstripout --strip-error=strip <file.ipynb>
+    nbstripout --strip-error=error <file.ipynb>
+
+Available options for `--strip-error`:
+    - `ignore` (default): Do nothing special with error outputs.
+    - `error`: Treat notebooks containing error outputs as an error/failure condition.
+    - `strip`: Strip error outputs while preserving non-error outputs (even if `keep_out
 
 Do a dry run and only list which files would have been stripped: ::
 
@@ -371,6 +380,7 @@ def process_jupyter_notebook(
         strip_init_cells=args.strip_init_cells,
         drop_output_types=set(args.drop_output_type),
         keep_output_types=set(args.keep_output_type),
+        strip_error=args.strip_error,
         max_size=_parse_size(args.max_size),
     )
 
@@ -493,6 +503,12 @@ def main():
     )
     parser.add_argument(
         '--strip-init-cells', action='store_true', help='Remove cells with `init_cell: true` metadata (default: False)'
+    )
+    parser.add_argument(
+        '--strip-error',
+        default='ignore',
+        choices=['ignore', 'error', 'strip'],
+        help='Controls what behavior should be done with errors',
     )
     parser.add_argument(
         '--attributes',

@@ -5,10 +5,14 @@ from typing import Any
 
 from nbformat import NotebookNode
 
-__all__ = ['MetadataError', 'pop_recursive', 'strip_output', 'strip_zeppelin_output']
+__all__ = ['MetadataError', 'NotebookContainsError', 'pop_recursive', 'strip_output', 'strip_zeppelin_output']
 
 
 class MetadataError(Exception):
+    pass
+
+
+class NotebookContainsError(Exception):
     pass
 
 
@@ -126,6 +130,7 @@ def strip_output(
     strip_init_cells: bool = False,
     drop_output_types: set[str] = None,
     keep_output_types: set[str] = None,
+    strip_error: str = 'ignore',
     max_size: int = 0,
 ) -> NotebookNode:
     """
@@ -167,6 +172,23 @@ def strip_output(
         # Remove the outputs, unless directed otherwise
         if 'outputs' in cell:
             # Default behavior (max_size == 0) strips all outputs.
+
+            # if the notebook contains error we need to stop if the user has specified such argument
+            if strip_error == 'error':
+                # Blocking: stop processing upon errors found.
+                for output in cell['outputs']:
+                    if output['output_type'] == 'error':
+                        cell_num = i + 1
+                        err_name = output.get('ename', 'Error')
+                        err_value = output.get('evalue', '<unknown error>')
+                        raise NotebookContainsError(
+                            f'Notebook contains an error in cell number {cell_num}: {err_name}: {err_value}'
+                        )
+
+            elif strip_error == 'strip':
+                # Non-blocking: continue processing but remove errors.
+                cell['outputs'] = [output for output in cell['outputs'] if output['output_type'] != 'error']
+
             if not keep_output_this_cell or keep_output_types:
                 cell['outputs'] = [
                     output
