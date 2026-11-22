@@ -164,7 +164,7 @@ def strip_output(
     if drop_empty_cells:
         conditionals.append(lambda c: any(line.strip() for line in c.get('source', [])))
     for tag_to_drop in drop_tagged_cells:
-        conditionals.append(lambda c: tag_to_drop not in c.get('metadata', {}).get('tags', []))
+        conditionals.append(lambda c, tag_to_drop=tag_to_drop: tag_to_drop not in c.get('metadata', {}).get('tags', []))
 
     for i, cell in enumerate(_cells(nb, conditionals)):
         keep_output_this_cell = determine_keep_output(cell=cell, default=keep_output, strip_init_cells=strip_init_cells)
