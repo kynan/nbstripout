@@ -15,6 +15,11 @@ TEST_CASES = [
     ('test_drop_empty_cells.ipynb', 'test_drop_empty_cells.ipynb.expected', ['--drop-empty-cells']),
     ('test_drop_tagged_cells.ipynb', 'test_drop_tagged_cells_dontdrop.ipynb.expected', []),
     ('test_drop_tagged_cells.ipynb', 'test_drop_tagged_cells.ipynb.expected', ['--drop-tagged-cells=test']),
+    (
+        'test_drop_tagged_cells.ipynb',
+        'test_drop_multiple_tagged_cells.ipynb.expected',
+        ['--drop-tagged-cells', 'test test2'],
+    ),
     ('test_execution_timing.ipynb', 'test_execution_timing.ipynb.expected', []),
     ('test_max_size.ipynb', 'test_max_size.ipynb.expected', ['--max-size', '50', '--keep-id']),
     ('test_max_size.ipynb', 'test_max_size.ipynb.expected_sequential_id', ['--max-size', '50']),
