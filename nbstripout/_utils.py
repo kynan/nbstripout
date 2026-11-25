@@ -89,8 +89,7 @@ def determine_keep_output(cell: NotebookNode, default: bool, strip_init_cells: b
 
 
 def _zeppelin_cells(nb: dict) -> Iterator[dict]:
-    for pg in nb['paragraphs']:
-        yield pg
+    yield from nb['paragraphs']
 
 
 def strip_zeppelin_output(nb: dict) -> dict:
