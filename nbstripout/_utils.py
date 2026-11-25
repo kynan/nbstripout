@@ -128,8 +128,8 @@ def strip_output(
     drop_empty_cells: bool = False,
     drop_tagged_cells: list[str] = [],
     strip_init_cells: bool = False,
-    drop_output_types: set[str] = None,
-    keep_output_types: set[str] = None,
+    drop_output_types: set[str] | None = None,
+    keep_output_types: set[str] | None = None,
     strip_error: str = 'ignore',
     max_size: int = 0,
 ) -> NotebookNode:
@@ -142,8 +142,10 @@ def strip_output(
     """
 
     # Replace mutable defaults
-    drop_output_types = drop_output_types or set()
-    keep_output_types = keep_output_types or set()
+    if drop_output_types is None:
+        drop_output_types = set()
+    if keep_output_types is None:
+        keep_output_types = set()
 
     if keep_output is None and 'keep_output' in nb.metadata:
         keep_output = bool(nb.metadata['keep_output'])
