@@ -124,9 +124,9 @@ def strip_output(
     keep_output: bool,
     keep_count: bool,
     keep_id: bool,
-    extra_keys: list[str] = [],
+    extra_keys: list[str] | None = None,
     drop_empty_cells: bool = False,
-    drop_tagged_cells: list[str] = [],
+    drop_tagged_cells: list[str] | None = None,
     strip_init_cells: bool = False,
     drop_output_types: set[str] | None = None,
     keep_output_types: set[str] | None = None,
@@ -146,6 +146,10 @@ def strip_output(
         drop_output_types = set()
     if keep_output_types is None:
         keep_output_types = set()
+    if extra_keys is None:
+        extra_keys = []
+    if drop_tagged_cells is None:
+        drop_tagged_cells = []
 
     if keep_output is None and 'keep_output' in nb.metadata:
         keep_output = bool(nb.metadata['keep_output'])
