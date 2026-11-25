@@ -25,13 +25,6 @@ the output to Git. This helps minimizing diffs and reduce file size.
 
 Originally based on <https://gist.github.com/minrk/6176788>.
 
-## Python 3 only
-
-As of version 0.4.0, nbstripout supports Python 3 *only*. If you need to use
-Python 2.7, install nbstripout 0.3.10:
-
-    pip install nbstripout==0.3.10
-
 ## Screencast
 
 This screencast demonstrates the use and working principles behind the
@@ -677,6 +670,13 @@ For the best developer experience, use both:
 2. **GitHub Action** (CI): Guards against accidentally pushed non-stripped notebooks
 
 This provides defense in depth and catches cases where local filters weren't installed.
+
+## Python 3 only
+
+As of version 0.4.0, nbstripout supports Python 3 *only*. If you need to use
+Python 2.7, install nbstripout 0.3.10:
+
+    pip install nbstripout==0.3.10
 
 ## Troubleshooting
 
