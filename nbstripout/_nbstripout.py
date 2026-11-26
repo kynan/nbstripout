@@ -631,7 +631,7 @@ def main():
     process_notebook = {'jupyter': process_jupyter_notebook, 'zeppelin': process_zeppelin_notebook}[args.mode]
     any_change = False
     for filename in args.files:
-        if not (args.force or filename.endswith('.ipynb') or filename.endswith('.zpln')):
+        if not (args.force or filename.endswith(('.ipynb', '.zpln'))):
             continue
 
         try:
