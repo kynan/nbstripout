@@ -78,7 +78,7 @@ indent-width = 4
 extend-exclude = ["*.ipynb"]
 
 [tool.ruff.lint]
-ignore = ["PLW1510", "B006", "UP028", "PIE810"]
+ignore = ["PLW1510", "B006", "PIE810"]
 
 [tool.ruff.format]
 quote-style = "single"
